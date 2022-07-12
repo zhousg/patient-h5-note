@@ -15,7 +15,7 @@ module.exports = {
       indexName: 'patient-h5'
     },
     nav: [
-      { text: 'Vue3.0', link: '/vue3pre/' },
+      { text: 'Vue3.0', link: '/vue/' },
       { text: 'TypeScript', link: '/ts/' },
       { text: '优医问诊', link: '/project/' },
     ],
@@ -31,13 +31,13 @@ module.exports = {
       lastUpdatedText: 'Updated Date'
     },
     sidebar: {
-      '/vue3pre/': [
+      '/vue/': [
         {
           text: 'Vue3核心',
           items: [
-            { text: '快速开始', link: '/vue3pre/' }, 
-            { text: '组合API', link: '/vue3pre/composition' },
-            { text: '综合案例', link: '/vue3pre/case' },
+            { text: '快速开始', link: '/vue/' }, 
+            { text: '组合API', link: '/vue/composition' },
+            { text: '综合案例', link: '/vue/case' },
           ]
         }
       ],
