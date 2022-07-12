@@ -4,6 +4,7 @@ module.exports = {
   markdown: {
     lineNumbers: true
   },
+  base: '/patient-h5-note/',
   lastUpdated: true,
   themeConfig: {
     logo: '/logo2.png',
