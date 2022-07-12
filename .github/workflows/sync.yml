@@ -19,7 +19,6 @@ jobs:
           source-repo: git@github.com:zhousg/patient-h5-note.git
           # 注意替换为你的 Gitee 目标仓库地址
           destination-repo: git@gitee.com:zhoushugang/patient-h5-note.git
-
       - name: Build Gitee Pages
         uses: yanglbme/gitee-pages-action@main
         with:
