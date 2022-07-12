@@ -1,0 +1,21 @@
+{
+  "name": "patients-h5-note",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "sass": "^1.53.0",
+    "vitepress": "1.0.0-alpha.4"
+  },
+  "dependencies": {
+    "ant-design-vue": "^3.2.10"
+  }
+}

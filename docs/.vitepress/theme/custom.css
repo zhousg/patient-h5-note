@@ -1,0 +1,11 @@
+/* :root {
+  --vp-c-brand: #646cff;
+  --vp-c-brand-light: #747bff;
+} */
+
+.clip {
+  background: -webkit-linear-gradient(315deg,#42d392 25%,#647eff) !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+}
