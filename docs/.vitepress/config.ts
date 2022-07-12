@@ -8,7 +8,7 @@ module.exports = {
   base: '/patient-h5-note/',
   lastUpdated: true,
   themeConfig: {
-    logo: '/logo2.png',
+    logo: '/public/logo2.png',
     algolia: {
       appId: '61BYHAARMH',
       apiKey: '51ce6ea532fd1accd33d2216e04c4469',
