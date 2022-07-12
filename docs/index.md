@@ -3,7 +3,7 @@ layout: home
 
 
 hero:
-  name: 优医问诊H5
+  name: 简介
   text: Vue3+TS+Pinia+Vant
   tagline: 采用Vue最新技术栈开发，涵盖了找医生、快速问诊、开药门诊、疾病查询，健康百科等功能。
   actions:
