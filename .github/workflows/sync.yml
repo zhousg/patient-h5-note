@@ -9,7 +9,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Sync To Gitee 1
+      - name: Sync To Gitee
         uses: wearerequired/git-mirror-action@master
         env:
           # 注意在 Settings->Secrets 配置 GITEE_RSA_PRIVATE_KEY
