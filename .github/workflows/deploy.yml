@@ -1,0 +1,43 @@
+name: deploy
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 'v16.13.0'
+
+      - run: yarn install
+      - run: yarn run build
+      #- run: npm run test
+
+      - uses: actions/upload-artifact@v2
+        with:
+          path: ./docs/.vitepress/dist
+
+  deploy:
+    needs: build
+
+    runs-on: ubuntu-latest
+
+    if: github.ref=='refs/heads/master'
+
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          path: ./docs/.vitepress/dist
+
+      - uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./docs/.vitepress/dist/artifact
