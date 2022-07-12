@@ -68,8 +68,6 @@ vite的原理：
 > 掌握：使用create-vue脚手架创建项目
 
 
-<a-button type="primary">Primary Button</a-button>
-
 
 
 
