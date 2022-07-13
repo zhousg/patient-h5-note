@@ -23,3 +23,10 @@ img {
 .vp-doc [class*='language-'] code {
   padding: 0;
 }
+
+
+.home-container {
+  margin: 0 auto;
+  max-width: 1152px;
+  padding: 25px 0;
+}

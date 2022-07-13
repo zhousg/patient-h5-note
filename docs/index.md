@@ -4,8 +4,8 @@ layout: home
 
 
 hero:
-  name: 优医问诊H5
-  text: Vue3+TS+Pinia+Vant
+  name: 优医问诊H5 
+  text: Vue3+TS+Pinia+Vant 
   tagline: 采用Vue最新技术栈开发，涵盖了找医生、快速问诊、开药门诊、疾病查询，健康百科等功能。
   actions:
     - theme: brand
@@ -23,10 +23,11 @@ features:
     title: 最佳的实践
     details: Compositions-API最佳实践，Vue3+TypeScript最佳实战，Pinia状态管理最佳实战，Vant开发H5项目实战，tailwindcss最佳实战，socket.io通讯解决方案
   - icon: 🧬
-    title: 最多的业务
+    title: 最多的业务 
     details: 涵盖了找医生、快速问诊、开药门诊、疾病查询，健康百科等功能。包含第三方支付，第三方登录，地图轨迹等业务。
 
 ---
 
-
-
+<div class="home-container">
+<img src="https://badges.toozhao.com/badges/01G7W37EHAMRR6HXGCHNEYZ01A/green.svg" />
+</div>

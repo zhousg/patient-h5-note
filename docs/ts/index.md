@@ -1,8 +1,8 @@
-## TypeScript入门
+# TypeScript核心
 
 
 
-### 01-认识TypeScript
+## 认识TypeScript
 
 
 

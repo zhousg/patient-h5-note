@@ -41,6 +41,15 @@ module.exports = {
           ]
         }
       ],
+      '/ts/': [
+        {
+          text: 'TypeScript',
+          items: [
+            { text: 'TypeScript核心', link: '/ts/' }, 
+            { text: 'TypeScript高级', link: '/ts/advance' },
+          ]
+        }
+      ],
     }
   }
 }
