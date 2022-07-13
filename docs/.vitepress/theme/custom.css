@@ -9,3 +9,17 @@
   background-clip: text !important;
   -webkit-background-clip: text !important;
 }
+@media (min-width: 960px) {
+  .VPHomeHero .name .clip {
+    font-size: 68px;
+  }
+}
+img {
+  border-radius: 4px;
+}
+.vp-doc :not(pre) > code {
+  color: #fa4400;
+}
+.vp-doc [class*='language-'] code {
+  padding: 0;
+}

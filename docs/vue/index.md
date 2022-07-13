@@ -32,7 +32,7 @@
 
 **总结：**
 
-- 前端学习 vue3 是加薪不是事，学习 vue3 主要学习 `组合API` 的使用。
+- 学习 vue3 加薪不是事，学习 vue3 主要学习 `组合API` 的使用。
 
 
 
@@ -57,7 +57,6 @@ vite的原理：
 
 
 问题：
-
 - 基于 `webpack` 构建项目，基于 `vite` 构建项目，谁更快体验更好？vite
 - 基于 `webpack` 的 `vue-cli` 可以创建vue项目吗？可以，慢一点而已
 
@@ -65,18 +64,90 @@ vite的原理：
 
 ## vite 创建项目
 
-> 掌握：使用create-vue脚手架创建项目
+> 掌握：使用vite构建工具创建项目
 
 
 
+1. 运行创建项目命令：
+
+```bash
+# 使用npm
+npm create vite@latest
+# 使用yarn
+yarn create vite
+# 使用pnpm
+pnpm create vite
+```
+
+2. 输入项目名称，默认是 vite-project
+
+![image-20220713110332145](./images/image-20220713110332145.png)
+
+3. 选择前端框架
+
+![image-20220713110539914](./images/image-20220713110539914.png)
+
+4. 选择项目类型
+
+![image-20220713110719136](./images/image-20220713110719136.png)
+
+5. 创建完毕
+
+![image-20220713110801896](./images/image-20220713110801896.png)
+
+6. 进入项目目录，安装依赖，启动项目即可。
 
 
 
+## 代码解析
+> 对vite初始化的代码进行分析
+
+1. 需要切换插件
+
+vue3组件代码和vue2有些不一样，使用的语法提示和高亮插件也不一样。
+
+- `vuter` 插件需要禁用，安装 `volar`插件。
+
+![image-20220713115203696](./images/image-20220713115203696.png)
+
+
+2. 总结vue3写法不同
+
+   
+   1. 组件一个根节点非必需
+   
+   
+   1. 创建应用挂载到根容器
+   2. 入口页面，ESM加载资源
+
+`平常组件`
+
+```vue
+<template>
+  <div>节点1</div>
+  <div>节点2</div>
+</template>
+```
+
+`main.js`
+```js
+import { createApp } from 'vue'
+import App from './App.vue'
+// 根据App组件创建一个应用实例
+const app = createApp(App)
+// app应用挂载（管理）index.html的 #app 容器
+app.mount('#app')
+```
+
+`index.html`
+```html
+<div id="app"></div>
+<script type="module" src="/src/main.js"></script>
+```
 
 
 
+总结：
 
-
-
-
-## 模板代码解析
+- 安装 `volar` 禁用 `vuter`
+- vue中是使用 `createApp` 管理容器，不是 `new Vue()` 

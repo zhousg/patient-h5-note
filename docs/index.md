@@ -1,5 +1,5 @@
 ---
-title: HomePage
+title: 简介
 layout: home
 
 
