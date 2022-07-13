@@ -150,4 +150,4 @@ app.mount('#app')
 总结：
 
 - 安装 `volar` 禁用 `vuter`
-- vue中是使用 `createApp` 管理容器，不是 `new Vue()` 
+- vue中是使用 `createApp()` 管理容器，不是 `new Vue()` 

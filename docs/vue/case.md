@@ -1,7 +1,75 @@
 # 综合案例
 
+![image-20220713190914689](./images/image-20220713190914689.png)
 
-## 克隆模板
+## 基础准备
+
+> 初始化代码安装element-plus组件库
+
+- 克隆代码 `git@gitee.com:zhoushugang/vue3-case.git`
+- 模板代码分析
+
+```diff
+import { createApp } from 'vue'
+import App from './App.vue'
+
++// element-plus 支持vue3的ui组件库，使用和element-ui一致 
++import ElementUI from 'element-plus'
++import 'element-plus/dist/index.css'
+
++// use(ElementUI) 使用组件库
++createApp(App).use(ElementUI).mount('#app')
+```
+
+
+
+- 需求说明，使用组合API实现
+  - 列表渲染
+  - 删除数据
+
 
 
 ## 实现功能
+
+```vue
+<template>
+  <div class="app">
+    <el-table :data="list">
+      <el-table-column label="ID" prop="id"></el-table-column>
+      <el-table-column label="姓名" prop="name" width="150"></el-table-column>
+      <el-table-column label="籍贯" prop="place"></el-table-column>
+      <el-table-column label="操作" width="100">
+        <template v-slot="{ row }">
+          <el-button type="text" @click="delRow(row.id)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+  </div>
+</template>
+<script setup>
+  import { onMounted, ref } from "vue";
+  import axios from 'axios'
+  // 获取列表数据
+  const list = ref([])
+  const geList = async () => {
+    const res = await axios.get('/list')
+    list.value = res.data
+  }
+
+  onMounted(() => {
+    geList()
+  })
+
+  // 删除数据
+  const delRow = async (id) => {
+    await axios.delete(`/del?id=${id}`)
+    geList()
+  }
+</script>
+<style>
+.app {
+  width: 980px;
+  margin: 100px auto 0;
+}
+</style>
+```
