@@ -4,10 +4,10 @@
 } */
 
 .VPHomeHero .name .clip {
-  background: -webkit-linear-gradient(315deg,#42d392 25%,#647eff) !important;
-  -webkit-text-fill-color: transparent !important;
-  background-clip: text !important;
-  -webkit-background-clip: text !important;
+  background: -webkit-linear-gradient(315deg,#42d392 25%,#647eff);
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-background-clip: text;
 }
 @media (min-width: 960px) {
   .VPHomeHero .name .clip {
@@ -18,7 +18,7 @@ img {
   border-radius: 4px;
 }
 .vp-doc :not(pre) > code {
-  color: #fa4400;
+  color: #fa7700;
 }
 .vp-doc [class*='language-'] code {
   padding: 0;
@@ -29,4 +29,10 @@ img {
   margin: 0 auto;
   max-width: 1152px;
   padding: 25px 0;
+}
+@media screen and (max-width: 768px) {
+  .home-container {
+    max-width: 100%;
+    padding: 25px;
+  }
 }

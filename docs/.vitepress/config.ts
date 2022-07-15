@@ -45,8 +45,18 @@ module.exports = {
         {
           text: 'TypeScript',
           items: [
-            { text: 'TypeScript核心', link: '/ts/' }, 
+            { text: 'TypeScript起步', link: '/ts/' }, 
+            { text: 'TypeScript核心', link: '/ts/core' },
             { text: 'TypeScript高级', link: '/ts/advance' },
+          ]
+        }
+      ],
+      '/project/': [
+        {
+          text: '在线问诊H5个人端',
+          items: [
+            { text: '项目起步', link: '/project/' }, 
+            { text: '超级医生', link: '/project/super-doctor' },
           ]
         }
       ],
