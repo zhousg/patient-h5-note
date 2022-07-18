@@ -172,6 +172,14 @@ const add: AddFn = (num1, num2) => {
 ### void 类型
 > 掌握：void 函数返回值类型
 
+- 如果函数没有返回值，定义函数类型时返回值类型为 `void`
+
+```typescript
+function greet(name: string): void {
+  console.log('Hello', name)
+}
+```
+
 
 
 

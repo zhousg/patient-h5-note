@@ -10,8 +10,8 @@ module.exports = {
   themeConfig: {
     logo: '/logo2.png',
     algolia: {
-      appId: '61BYHAARMH',
-      apiKey: '51ce6ea532fd1accd33d2216e04c4469',
+      appId: 'V5OB9FQ1RB',
+      apiKey: '72c9c195bbe0b4ac381d9da952bfe289',
       indexName: 'patient-h5'
     },
     nav: [
