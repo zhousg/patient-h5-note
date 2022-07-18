@@ -47,7 +47,9 @@ module.exports = {
           items: [
             { text: 'TypeScript起步', link: '/ts/' }, 
             { text: 'TypeScript核心', link: '/ts/core' },
-            { text: 'TypeScript高级', link: '/ts/advance' },
+            { text: 'TypeScript泛型', link: '/ts/generic' },
+            { text: 'TS和Vue3', link: '/ts/vue' },
+            { text: 'TS类型声明文件', link: '/ts/file' },
           ]
         }
       ],
