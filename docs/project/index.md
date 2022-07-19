@@ -43,15 +43,15 @@ npm i pinia
 
 - 导入，实例化，当做插件使用，和其他插件使用套路相同
 
-```diff
+```typescript{2,5,8}
 import { createApp } from 'vue'
-+ import { createPinia } from 'pinia'
+import { createPinia } from 'pinia'
 import App from './App.vue'
 
-+ const pinia = createPinia()
+const pinia = createPinia()
 const app = createApp(App)
 
-+ app.use(pinia)
+app.use(pinia)
 app.mount('#app')
 ```
 

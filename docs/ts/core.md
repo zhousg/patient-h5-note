@@ -173,27 +173,132 @@ const add: AddFn = (num1, num2) => {
 > 掌握：void 函数返回值类型
 
 - 如果函数没有返回值，定义函数类型时返回值类型为 `void`
-
 ```typescript
-function greet(name: string): void {
-  console.log('Hello', name)
+const say = (): void => {
+  console.log('hi')
 }
 ```
 
+- 如果函数没有返回值，且没有定义函数返回值类型的时候，默认是 `void`
+```typescript
+const say = () => {
+  console.log('hi')
+}
+```
 
-
+注意：
+- 在 `JS` 中如果没有返回值，默认返回的是 `undefined` 
+- 但是 `void` 和 `undefined` 在 `TypeScript` 中并不是一回事
+- 如果指定返回值类型是 `undefined` 那返回值必须是 `undefined` 
+```typescript
+const add = (): undefined => {
+  return undefined
+}
+```
 
 ### 可选参数
+> 掌握： 使用 `?` 将参数标记为可选
+
+- 如果函数的参数，可以传也可以不传，这种情况就可以使用 `可选参数` 语法，参数后加 `?` 即可
+```typescript
+const fn = (n?: number) => {
+  // ..
+}
+fn()
+fn(10)
+```
+
+- 练习，模拟 `slice` 函数，定义函数参数类型
+```typescript 
+const mySlice = (start?: number, end?: number) => {
+  console.log('起始Index:', start, '结束Index:', end);
+};
+mySlice()
+mySlice(1)
+mySlice(1, 2)
+```
+
+:::tip 注意：
+- 必选参数不能位于可选参数后 `(start?: number, end: number)` 这样是不行的
+:::
+
+
 
 ## 对象类型
 
 ### 基本使用
 
-### 箭头函数类型
+> 掌握：对象类型语法
 
-### 对象可选属性
+- TS 的对象类型，其实就是描述对象中的 `属性` `方法` 的类型为，对象是由属性和方法组成的。
 
-### 使用类型别名
+```typescript
+// 空对象
+let person: {} = {}
+
+// 有属性的对象
+let person: { name: string } = {
+  name: '同学'
+}
+
+// 有属性和方法，一行书写多个属性 ; 分隔
+let person: { name: string; sayHi(): void } = {
+  name: 'jack',
+  sayHi() {},
+};
+
+// 换行写可以省略 ; 符号
+let person: { 
+  name: string
+  sayHi(): void 
+} = {
+  name: 'jack',
+  sayHi() {},
+};
+```
+小结：
+- 使用声明描述对象结构？`{}`
+- 属性怎么写类型？`属性名: 类型`
+- 方法怎么写类型? `方法名(): 返回值类型`
+
+
+### 扩展用法
+
+> 掌握：对象类型中，函数使用箭头函数类型，属性设置可选，使用类型别名。
+
+
+- 函数使用箭头函数类型
+```typescript{3}
+let person: { 
+  name: string
+  sayHi: () => void
+} = {
+  name: 'jack',
+  sayHi() {},
+};
+```
+
+- 对象属性可选
+```typescript
+// 例如：axios({url,method}) 如果是 get 请求 method 可以省略
+const axios = (config: { url: string; method?: string }) => {};
+```
+
+- 使用类型别名
+```typescript
+// {} 会降低代码可阅读性，建议对象使用类型别名
+// const axios = (config: { url: string; method?: string }) => {};
+type Config = {
+  url: string
+  method?: string
+}
+const axios = (config: Config) => {};
+```
+
+小结：
+- 对象的方法使用箭头函数类型怎么写？`{sayHi:()=>void}`
+- 对象的可选参数怎么设置？`{name?: string}`
+- 对象类型会使用 `{}` 如何提供可阅读性？`类型别名`
 
 ## 接口类型
 
