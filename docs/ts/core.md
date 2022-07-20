@@ -300,15 +300,142 @@ const axios = (config: Config) => {};
 - 对象的可选参数怎么设置？`{name?: string}`
 - 对象类型会使用 `{}` 如何提供可阅读性？`类型别名`
 
+:::warning 作业
+创建一个学生对象，该对象中具有以下属性和方法：
+- 属性：必选属性：姓名、性别、成绩，可选属性：身高
+- 方法：学习、打游戏（可选）
+:::
+
+
 ## 接口类型
+
+
 
 ### 基本使用
 
-### interface vs type
+> 掌握：使用 interface 声明对象类型
 
-### 接口继承
+- 接口声明是命名对象类型的另一种方式
+```typescript
+// 通过interface定义对象类型
+interface Person {
+  name: string;
+  age: number;
+  sayHi: () => void;
+}
+// 使用类型
+let person: Person = {
+  name: 'jack',
+  age: 19,
+  sayHi() {},
+};
+```
+小结：
+- `interface` 后面是接口名称，和类型别名的意思一样。
+- 指定 `接口名称` 作为变量的类型使用。
+- 接口的每一行只能有 `一个` 属性或方法，每一行不需要加分号。
+
+
+### interface 继承
+
+> 掌握：使用 extends 实现接口继承，达到类型复用
+
+思考：
+- 有两个接口，有相同的属性或者函数，如何提高代码复用？
+```typescript
+interface Point2D { x: number; y: number }
+interface Point3D { x: number; y: number; z: number }
+```
+
+继承：
+- 相同的属性或展示可以抽离出来，然后使用 `extends` 实现继承复用
+```typescript
+interface Point2D { x: number; y: number }
+// 继承 Point2D
+interface Point3D extends Point2D {
+  z: number
+}
+// 继承后 Point3D 的结构：{ x: number; y: number; z: number }
+```
+小结：
+- 接口继承的语法：`interface 接口A extends 接口B {}`
+- 继承后 `接口A` 拥有 `接口B` 的所有属性和函数的类型声明
+
 
 ### type 交叉类型
+> 掌握：使用 `交叉类型` 实现接口的继承效果
+
+- 实现 `Point2D` 与 `{z: number}` 类型合并得到 `Ponit3D` 类型
+
+```typescript
+// 使用 type 来定义 Point2D 和 Point3D
+type Point2D = {
+  x: number
+  y: number
+}
+
+// 使用 交叉类型 来实现接口继承的功能：
+// 使用 交叉类型 后，Point3D === { x: number; y: number; z: number }
+type Point3D = Point2D & {
+  z: number
+}
+
+let o: Point3D = {
+  x: 1,
+  y: 2,
+  z: 3
+}
+```
+小结：
+- 使用 `&` 可以合并连接的对象类型，也叫：`交叉类型`
+
+
+### interface vs type
+> 了解：interface 和 type 的相同点和区别
+
+- 类型别名和接口非常相似，在许多情况下，您可以在它们之间`自由选择`。
+- 接口的几乎所有特性都以类型的形式可用，关键的区别在于不能重新打开类型以添加新属性，而接口总是`可扩展`的。
+
+| interface | type |
+| ---- | ---- |
+| 支持：对象类型 | 支持：对象类型，其他类型 |
+| 复用：可以继承 | 复用：交叉类型 |
+
+不同的点：
+
+- type 不可重复定义
+```typescript
+type Person = {
+  name: string
+}
+// 标识符“Person”重复  Error
+type Person = {
+  age: number
+}
+```
+- interface 重复定义会合并
+```typescript
+interface Person {
+  name: string
+}
+interface Person {
+  age: number
+}
+// 类型会合并，注意：属性和方法不同重复定义
+const p: Person = {
+  name: 'jack',
+  age: 18
+}
+```
+
+小结：
+- 它们都可以定义对象类型
+- 它们都可以复用，interface 使用 `extends` , type 使用 `&`
+- type 不能重复定义，interface 可以重复会合并
+
+
+
+
 
 ## 元组类型
 
