@@ -86,23 +86,27 @@ let strings: Array<string> = ['a', 'b', 'c'];
 需求：数组中有 `number` 和 `string` 类型，这个数组的类型如何书写？
 
 ```typescript
-  let arr: (number | string)[] = [1, 'a', 3, 'b'];
+let arr: (number | string)[] = [1, 'a', 3, 'b'];
 ```
 
 定义：
+
 - 类型与类型之间使用 `|` 连接，代表类型可以是它们当中的其中一种，这种类型叫：`联合类型`
 
-----
-练习：给一个定时器ID加类型
+---
+
+练习：给一个定时器 ID 加类型
+
 ```typescript
-  let timer: number | null = null
-  timer = setInterval(() => {}, 1000)
+let timer: number | null = null;
+timer = setInterval(() => {}, 1000);
 ```
 
 思考：
+
 ```typescript
-  let arr: number | string[]
-  // 这是什么类型？
+let arr: number | string[];
+// 这是什么类型？
 ```
 
 ## 类型别名
@@ -110,31 +114,34 @@ let strings: Array<string> = ['a', 'b', 'c'];
 > 掌握：使用类型别名语法给类型取别字
 
 示例代码：
+
 ```typescript
-// let arr: ( number | string )[] = [ 1, 'a', 4] 
+// let arr: ( number | string )[] = [ 1, 'a', 4]
 // 类型别名: type 类型别名 = 具体类型
-type CustomArr = ( number | string )[]
-let arr: CustomArr = [ 1, 'a', 4] 
+type CustomArr = (number | string)[];
+let arr: CustomArr = [1, 'a', 4];
 ```
-类型别名: 
+
+类型别名:
+
 - `type 类型别名 = 具体类型` 基本语法
 - 定义类型别名，遵循大驼峰命名规范，类似于变量
 - 使用类型别名，与类型注解的写法一样即可
 
 使用场景：
+
 - 当同一类型（复杂）被多次使用时，可以通过类型别名，`简化` 该类型的使用
 
 ```typescript
-type CustomArr = ( number | string )[]
-let arr: CustomArr = [ 1, 'a', 4] 
-let arr2: CustomArr = [ 2, 'b', 8] 
+type CustomArr = (number | string)[];
+let arr: CustomArr = [1, 'a', 4];
+let arr2: CustomArr = [2, 'b', 8];
 ```
-
-
 
 ## 函数类型
 
 ### 基本使用
+
 > 掌握：给函数指定类型
 
 - 给函数指定类型，其实是给 `参数` 和 `返回值` 指定类型。
@@ -142,87 +149,95 @@ let arr2: CustomArr = [ 2, 'b', 8]
   - 在函数基础上 `分别指定` 参数和返回值类型
   - 使用类型别名 `同时指定` 参数和返回值类型
 
-示例代码1：分别指定
+示例代码 1：分别指定
+
 ```typescript
 // 函数声明
 function add(num1: number, num2: number): number {
-  return num1 + num2
+  return num1 + num2;
 }
 
 // 箭头函数
 const add = (num1: number, num2: number): number => {
-  return num1 + num2
-}
+  return num1 + num2;
+};
 ```
 
-示例代码2：同时指定
+示例代码 2：同时指定
+
 ```typescript
-type AddFn = (num1: number, num2: number) => number
+type AddFn = (num1: number, num2: number) => number;
 
 const add: AddFn = (num1, num2) => {
-  return num1 + num2
-}
+  return num1 + num2;
+};
 ```
 
 ::: tip 注意：
-通过类似箭头函数形式的语法来为函数添加类型，只使用与 `函数表达`
+通过类似箭头函数形式的语法来为函数添加类型，只适用于 `函数表达式`
 :::
 
-
 ### void 类型
+
 > 掌握：void 函数返回值类型
 
 - 如果函数没有返回值，定义函数类型时返回值类型为 `void`
+
 ```typescript
 const say = (): void => {
-  console.log('hi')
-}
+  console.log('hi');
+};
 ```
 
 - 如果函数没有返回值，且没有定义函数返回值类型的时候，默认是 `void`
+
 ```typescript
 const say = () => {
-  console.log('hi')
-}
+  console.log('hi');
+};
 ```
 
 注意：
-- 在 `JS` 中如果没有返回值，默认返回的是 `undefined` 
+
+- 在 `JS` 中如果没有返回值，默认返回的是 `undefined`
 - 但是 `void` 和 `undefined` 在 `TypeScript` 中并不是一回事
-- 如果指定返回值类型是 `undefined` 那返回值必须是 `undefined` 
+- 如果指定返回值类型是 `undefined` 那返回值必须是 `undefined`
+
 ```typescript
 const add = (): undefined => {
-  return undefined
-}
+  return undefined;
+};
 ```
 
 ### 可选参数
+
 > 掌握： 使用 `?` 将参数标记为可选
 
 - 如果函数的参数，可以传也可以不传，这种情况就可以使用 `可选参数` 语法，参数后加 `?` 即可
+
 ```typescript
 const fn = (n?: number) => {
   // ..
-}
-fn()
-fn(10)
+};
+fn();
+fn(10);
 ```
 
 - 练习，模拟 `slice` 函数，定义函数参数类型
-```typescript 
+
+```typescript
 const mySlice = (start?: number, end?: number) => {
   console.log('起始Index:', start, '结束Index:', end);
 };
-mySlice()
-mySlice(1)
-mySlice(1, 2)
+mySlice();
+mySlice(1);
+mySlice(1, 2);
 ```
 
 :::tip 注意：
+
 - 必选参数不能位于可选参数后 `(start?: number, end: number)` 这样是不行的
-:::
-
-
+  :::
 
 ## 对象类型
 
@@ -230,16 +245,16 @@ mySlice(1, 2)
 
 > 掌握：对象类型语法
 
-- TS 的对象类型，其实就是描述对象中的 `属性` `方法` 的类型为，对象是由属性和方法组成的。
+- TS 的对象类型，其实就是描述对象中的 `属性` `方法` 的类型，因为对象是由属性和方法组成的。
 
 ```typescript
 // 空对象
-let person: {} = {}
+let person: {} = {};
 
 // 有属性的对象
 let person: { name: string } = {
-  name: '同学'
-}
+  name: '同学',
+};
 
 // 有属性和方法，一行书写多个属性 ; 分隔
 let person: { name: string; sayHi(): void } = {
@@ -248,28 +263,29 @@ let person: { name: string; sayHi(): void } = {
 };
 
 // 换行写可以省略 ; 符号
-let person: { 
-  name: string
-  sayHi(): void 
+let person: {
+  name: string;
+  sayHi(): void;
 } = {
   name: 'jack',
   sayHi() {},
 };
 ```
+
 小结：
+
 - 使用声明描述对象结构？`{}`
 - 属性怎么写类型？`属性名: 类型`
 - 方法怎么写类型? `方法名(): 返回值类型`
-
 
 ### 扩展用法
 
 > 掌握：对象类型中，函数使用箭头函数类型，属性设置可选，使用类型别名。
 
-
 - 函数使用箭头函数类型
+
 ```typescript{3}
-let person: { 
+let person: {
   name: string
   sayHi: () => void
 } = {
@@ -279,43 +295,45 @@ let person: {
 ```
 
 - 对象属性可选
+
 ```typescript
 // 例如：axios({url,method}) 如果是 get 请求 method 可以省略
 const axios = (config: { url: string; method?: string }) => {};
 ```
 
 - 使用类型别名
+
 ```typescript
 // {} 会降低代码可阅读性，建议对象使用类型别名
 // const axios = (config: { url: string; method?: string }) => {};
 type Config = {
-  url: string
-  method?: string
-}
+  url: string;
+  method?: string;
+};
 const axios = (config: Config) => {};
 ```
 
 小结：
+
 - 对象的方法使用箭头函数类型怎么写？`{sayHi:()=>void}`
 - 对象的可选参数怎么设置？`{name?: string}`
 - 对象类型会使用 `{}` 如何提供可阅读性？`类型别名`
 
 :::warning 作业
 创建一个学生对象，该对象中具有以下属性和方法：
+
 - 属性：必选属性：姓名、性别、成绩，可选属性：身高
 - 方法：学习、打游戏（可选）
-:::
+  :::
 
-
-## 接口类型
-
-
+## 接口 interface
 
 ### 基本使用
 
 > 掌握：使用 interface 声明对象类型
 
 - 接口声明是命名对象类型的另一种方式
+
 ```typescript
 // 通过interface定义对象类型
 interface Person {
@@ -330,39 +348,56 @@ let person: Person = {
   sayHi() {},
 };
 ```
+
 小结：
+
 - `interface` 后面是接口名称，和类型别名的意思一样。
 - 指定 `接口名称` 作为变量的类型使用。
 - 接口的每一行只能有 `一个` 属性或方法，每一行不需要加分号。
-
 
 ### interface 继承
 
 > 掌握：使用 extends 实现接口继承，达到类型复用
 
 思考：
+
 - 有两个接口，有相同的属性或者函数，如何提高代码复用？
+
 ```typescript
-interface Point2D { x: number; y: number }
-interface Point3D { x: number; y: number; z: number }
+interface Point2D {
+  x: number;
+  y: number;
+}
+interface Point3D {
+  x: number;
+  y: number;
+  z: number;
+}
 ```
 
 继承：
+
 - 相同的属性或展示可以抽离出来，然后使用 `extends` 实现继承复用
+
 ```typescript
-interface Point2D { x: number; y: number }
+interface Point2D {
+  x: number;
+  y: number;
+}
 // 继承 Point2D
 interface Point3D extends Point2D {
-  z: number
+  z: number;
 }
 // 继承后 Point3D 的结构：{ x: number; y: number; z: number }
 ```
+
 小结：
+
 - 接口继承的语法：`interface 接口A extends 接口B {}`
 - 继承后 `接口A` 拥有 `接口B` 的所有属性和函数的类型声明
 
-
 ### type 交叉类型
+
 > 掌握：使用 `交叉类型` 实现接口的继承效果
 
 - 实现 `Point2D` 与 `{z: number}` 类型合并得到 `Ponit3D` 类型
@@ -370,87 +405,181 @@ interface Point3D extends Point2D {
 ```typescript
 // 使用 type 来定义 Point2D 和 Point3D
 type Point2D = {
-  x: number
-  y: number
-}
+  x: number;
+  y: number;
+};
 
 // 使用 交叉类型 来实现接口继承的功能：
 // 使用 交叉类型 后，Point3D === { x: number; y: number; z: number }
 type Point3D = Point2D & {
-  z: number
-}
+  z: number;
+};
 
 let o: Point3D = {
   x: 1,
   y: 2,
-  z: 3
-}
+  z: 3,
+};
 ```
+
 小结：
+
 - 使用 `&` 可以合并连接的对象类型，也叫：`交叉类型`
 
-
 ### interface vs type
+
 > 了解：interface 和 type 的相同点和区别
 
 - 类型别名和接口非常相似，在许多情况下，您可以在它们之间`自由选择`。
 - 接口的几乎所有特性都以类型的形式可用，关键的区别在于不能重新打开类型以添加新属性，而接口总是`可扩展`的。
 
-| interface | type |
-| ---- | ---- |
+| interface      | type                     |
+| -------------- | ------------------------ |
 | 支持：对象类型 | 支持：对象类型，其他类型 |
-| 复用：可以继承 | 复用：交叉类型 |
+| 复用：可以继承 | 复用：交叉类型           |
 
 不同的点：
 
 - type 不可重复定义
+
 ```typescript
 type Person = {
-  name: string
-}
+  name: string;
+};
 // 标识符“Person”重复  Error
 type Person = {
-  age: number
-}
+  age: number;
+};
 ```
+
 - interface 重复定义会合并
+
 ```typescript
 interface Person {
-  name: string
+  name: string;
 }
 interface Person {
-  age: number
+  age: number;
 }
 // 类型会合并，注意：属性和方法不同重复定义
 const p: Person = {
   name: 'jack',
-  age: 18
-}
+  age: 18,
+};
 ```
 
 小结：
+
 - 它们都可以定义对象类型
 - 它们都可以复用，interface 使用 `extends` , type 使用 `&`
 - type 不能重复定义，interface 可以重复会合并
 
+## 类型推断
 
+> 知道：TS 的的类型推断机制作用
 
+- 在 TS 中存在类型推断机制，在没有指定类型的情况下，TS 也会给变量提供类型。
 
+发生类型推断的几个场景场景：
 
-## 元组类型
+- 声明变量并初始化时
+
+```typescript
+// 变量 age 的类型被自动推断为：number
+let age = 18;
+```
+
+- 决定函数返回值时
+
+```typescript
+// 函数返回值的类型被自动推断为：number
+const add = (num1: number, num2: number) => {
+  return num1 + num2;
+};
+```
+
+建议：
+
+- 将来在开发项目的时候，能省略类型注解的地方就省略，`充分利用TS推断` 的能力，提高开发效率。
+  :::tip
+- 在你还没有熟悉 ts 类型的时候建议都加上类型，比如今天第一次写 ts 最好都写上
+- 如果你不知道类型怎么写，可以把鼠标放至变量上，可以通过 `Vscode` 提示看到类型
+  :::
 
 ## 字面量类型
 
+### 字面量类型介绍
+
+> 知道：什么是字面量类型
+
+- js 字面量如：`18` `'jack'` `['a']` `{age: 10}` 等等。
+- 使用 `js字面量` 作为变量类型，这种类型就是字面量类型。
+
+```typescript
+// : 'jack' 是字面量类型
+let name: 'jack' = 'jack';
+// : 18 是字面量类型
+let age: 18 = 18;
+
+// 报错：不能将类型“19”分配给类型“18”
+age = 19;
+```
+
+思考：这两个变量的类型是什么？
+
+```typescript
+let str1 = 'Hello TS';
+const str2 = 'Hello TS';
+```
+
+- 通过类型推断发现，str1 类型是 `string` ， str2 类型是 `Hello TS`
+- 原因：`str2` 是 `const` 声明的，值只能是 `Hello TS`，所以类型只能是 `Hello TS`
+
+### 字面量类型应用
+
+> 知道：字面量类型的应用场景
+
+例如：性别只能是 男 和 女，不会出现其他值。
+
+```ts
+// let gender = '男'
+// gender = '女'
+// ------------------------
+type Gender = '男' | '女'
+let gender: Gender = '男'
+gender = '女'
+```
+小结：
+- 字面量类型配合联合类型来使用，表示：一组明确的可选的值
+
+例子：
+```ts
+// 使用自定义类型:
+type Direction = 'up' | 'down' | 'left' | 'right'
+
+function changeDirection(direction: Direction) {
+  console.log(direction)
+}
+
+// 调用函数时，会有类型提示：
+changeDirection('up')
+```
+- 解释：参数 `direction` 的值只能是 `up/down/left/right` 中的任意一个
+- 优势：相比于 `string` 类型，使用字面量类型更加精确、严谨
+
 ## 枚举类型
 
-### 基本使用
+### 枚举基本语法
+> 掌握：枚举的基本语法和使用细节
 
-### 数字枚举
+- 作用：表示一组明确可选的值，和字面量类配合联合类型一类似。
+- 解释：枚举可以定义一组常量，使用该类型后，约定只能使用这组常量中的其中一个。
 
-### 字符串枚举
 
-### 枚举原理
+### 枚举使用场景
 
 ## any 类型
 
 ## 类型断言
+
+## 泛型

@@ -1,4 +1,4 @@
-# TypeScript 核心
+# TypeScript 起步
 
 
 
