@@ -17,6 +17,7 @@ module.exports = {
     nav: [
       { text: 'Vue3.0', link: '/vue/' },
       { text: 'TypeScript', link: '/ts/' },
+      { text: 'Pinia', link: '/pinia/' },
       { text: '优医问诊', link: '/project/' },
     ],
     search: true,
@@ -49,6 +50,14 @@ module.exports = {
             { text: 'TypeScript核心', link: '/ts/core' },
             { text: 'TypeScript应用', link: '/ts/pro' },
             { text: 'TS黑马头条案例', link: '/ts/case' },
+          ]
+        }
+      ],
+      '/pinia/': [
+        {
+          text: 'Pinia',
+          items: [
+            { text: 'Pinia 核心', link: '/pinia/' }, 
           ]
         }
       ],

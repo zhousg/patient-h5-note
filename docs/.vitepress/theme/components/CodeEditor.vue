@@ -2,16 +2,9 @@
 import sdk from '@stackblitz/sdk';
 import { onMounted } from 'vue';
 onMounted(() => {
-  sdk.embedProject(
+  sdk.embedGithubProject(
     'editor',
-    {
-      files: {
-        'index.html': '!',
-      },
-      title: '测试',
-      description: '测试',
-      template: 'html',
-    },
+    'zhousg/vuex-demo',
     {
       height: '1000px',
       width: '1000px',

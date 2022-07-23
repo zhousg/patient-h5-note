@@ -572,14 +572,140 @@ changeDirection('up')
 ### 枚举基本语法
 > 掌握：枚举的基本语法和使用细节
 
-- 作用：表示一组明确可选的值，和字面量类配合联合类型一类似。
+- 作用：表示一组明确可选的值，和字面量类型配合联合类型类似。
 - 解释：枚举可以定义一组常量，使用该类型后，约定只能使用这组常量中的其中一个。
+
+```ts
+// 创建枚举类型
+enum Direction { Up, Down, Left, Right }
+
+// 使用枚举类型
+const changeDirection = (direction: Direction) => {
+  console.log(direction)
+}
+
+// 调用函数时，需要应该传入：枚举 Direction 成员的任意一个
+// 类似于 JS 中的对象，直接通过 点（.）语法 访问枚举的成员
+changeDirection(Direction.Up)
+```
+
+问题：
+- 通过枚举访问其成员，成员的值是什么？
+  - 默认从 0 开始自增的数值
+- 可以修改其成员的值吗？
+  - `Up = 10` , 后面是从 10 开始自增
+- 成员的值可以使用字符串吗？
+  - `Up = 'Up'` 可以，但是后面的值都需要使用字符串。
 
 
 ### 枚举使用场景
 
+> 场景：用于一组没有语义的可选值，给它们添加类型。
+
+比如：
+- 后台给的数据： 0 是男  1 是女  ----   1 是待付款  5 是已付款  8 是已完成
+- 好处，通过枚举可以让成员更加语义化，提高代码可读性
+
+代码：
+```ts
+// 性别
+enum GenderType {
+  Boy,
+  Girl
+}
+const showGender = (gender: GenderType) => {
+  if (gender === GenderType.Boy) {
+    console.log('性别：男')
+  }
+}
+showGender(GenderType.Boy)
+// 订单状态
+enum OrderStatus {
+  UnPay = 1,
+  Payed = 5,
+  Complete = 8
+}
+const showOrderStatus = (status: OrderStatus) => {
+  if (status === OrderStatus.Complete) {
+    console.log('状态：已完成')
+  }
+}
+showOrderStatus(OrderStatus.Complete)
+```
+
+小结：
+- 枚举一般使用在，表示一组明确可选的值，语义化不高的情况。
+- 如果这组可选值语义很高，如 ` unpay | payed | complete ` ，使用字面量配合联合类型更简单些。
+
 ## any 类型
+
+> 知道：any 类型的作用是逃避 TS 的类型检查
+
+- 当变量的类型是 any 的时候，不会有任何错误，也不会有代码提示，TS类型检查会忽略
+
+```ts
+let obj: any = { age: 18 }
+obj.bar = 100
+obj()
+const n: number = obj
+```
+以上的代码虽然没有报错提示，但是将来是可能出现错误的。
+
+隐式any的情况：
+```ts
+// 声明变量不给类和值
+let a;
+// 函数参数不给类型
+const fn = (n) => {}
+```
+
+小结：
+- `any` 的使用越多，程序可能出现的漏洞越多，因此**不推荐**使用 `any` 类型，尽量避免使用。
+
+
 
 ## 类型断言
 
+有时候你会比 TS 更加明确一个值的类型，此时，可以使用类型断言来指定更具体的类型。 比如，
+
+```ts
+// aLink 的类型 HTMLElement，该类型只包含所有标签公共的属性或方法
+// 这个类型太宽泛，没包含 a 元素特有的属性或方法，如 href
+const aLink = document.getElementById('link')
+```
+- 但是我们明确知道获取的是一个 `A` 元素，可以通过 `类型断言` 给它指定一个更具体的类型。
+  
+```ts
+const aLink = document.getElementById('link') as HTMLAnchorElement
+```
+- 解释:
+  1. 使用 `as` 关键字实现类型断言
+  2. 关键字 `as` 后面的类型是一个更加具体的类型（HTMLAnchorElement 是 HTMLElement 的子类型）
+  3. 通过类型断言，aLink 的类型变得更加具体，这样就可以访问 a 标签特有的属性或方法了
+
+例如：
+```ts
+const img = document.getElementById('img') as HTMLImageElement
+// 如果不知道标签的类型：document.querySelector('div') 鼠标摸上去就可以看见
+```
+
 ## 泛型
+
+
+### 基本使用
+
+
+
+
+### 泛型接口
+
+
+
+### 泛型函数
+
+
+
+### 泛型约束
+
+
+
