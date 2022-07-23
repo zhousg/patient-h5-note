@@ -1,22 +1,35 @@
 <script setup>
-import { onMounted } from 'vue'
-import * as ace from 'brace';
-import 'brace/mode/html';
-import 'brace/theme/monokai';
-onMounted(()=>{
-  const editor = ace.edit('editor');
-  editor.getSession().setMode('ace/mode/javascript');
-  editor.setTheme('ace/theme/monokai');
-
-})
+import sdk from '@stackblitz/sdk';
+import { onMounted } from 'vue';
+onMounted(() => {
+  sdk.embedProject(
+    'editor',
+    {
+      files: {
+        'index.html': '!',
+      },
+      title: '测试',
+      description: '测试',
+      template: 'html',
+    },
+    {
+      height: '1000px',
+      width: '1000px',
+    },
+  );
+});
 </script>
 
 <template>
-  <div id="editor">const age = 18;</div>
+  <div id="editor"></div>
 </template>
 
 <style lang="scss" scoped>
 #editor {
-  height: 500px;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  width: 100vw;
 }
 </style>
