@@ -63,11 +63,17 @@ module.exports = {
       ],
       '/project/': [
         {
-          text: '在线问诊H5个人端',
+          text: '优医问诊H5项目课程',
           items: [
-            { text: '项目起步', link: '/project/' }, 
-            { text: '超级医生', link: '/project/super-doctor' },
-            { text: '在线代码', link: '/project/code' },
+            { text: '1. 项目起步', link: '/project/' }, 
+            { text: '2. 用户模块', link: '/project/user' }, 
+            { text: '3. 首页模块', link: '/project/home' }, 
+            { text: '4. 快速问诊模块', link: '/project/fast' }, 
+            { text: '5. 问诊室模块', link: '/project/room' }, 
+            { text: '6. 订单模块', link: '/project/order' }, 
+            { text: '7. 项目上线', link: '/project/end' }, 
+            { text: '辅助-超级医生', link: '/project/super-doctor' },
+            { text: '辅助-在线代码', link: '/project/code' },
           ]
         }
       ],
