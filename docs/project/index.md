@@ -48,7 +48,7 @@ yarn create vue
 2. 选择项目依赖内容
 
 ```bash
-✔ Project name: … patient-h5-100
+✔ Project name: … patients-h5-100
 ✔ Add TypeScript? … No / `Yes`
 ✔ Add JSX Support? … `No` / Yes
 ✔ Add Vue Router for Single Page Application development? … No / `Yes`
@@ -67,7 +67,6 @@ Done. Now run:
   pnpm lint
   pnpm dev
 ```
-
 
 
 ## vscode插件安装
