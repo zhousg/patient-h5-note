@@ -3,7 +3,7 @@
 
 ## Pinia 介绍
 
-<img src="https://pinia.vuejs.org/logo.svg" alt="https://pinia.vuejs.org/logo.svg" style="zoom:50%;" />
+<img src="./images/logo.svg" alt="https://pinia.vuejs.org/logo.svg" style="zoom:50%;" />
 
 What is Pinia ?
 
