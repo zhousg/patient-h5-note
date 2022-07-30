@@ -1,4 +1,4 @@
-# 在线问诊-起步
+# 优医问诊-项目起步
 
 ## 项目介绍
 > 知道：整体项目概况，并且知道课程中会实现哪些功能
@@ -147,9 +147,38 @@ Done. Now run:
 
 小结：
 - 如果公司中会有自己的代码风格规则，大家只需遵守即可
+- https://prettier.io/docs/en/options.html 常见规则
 
 
 ## 项目结构调整
+
+> 了解：每一个目录结构的作用
+
+```bash
+./src
+├── assets        `静态资源，图片...`
+├── components    `通用组件`
+├── composable    `组合功能通用函数`
+├── icons         `svg图标`
+├── router        `路由`
+│   └── index.ts
+├── services      `接口服务API`
+├── stores        `状态仓库`
+├── styles        `样式`
+│   └── main.scss
+├── types         `TS类型`
+├── utils         `工具函数`
+├── views         `页面`
+├── main.ts       `入口文件`
+└──App.vue       `根组件`
+```
+
+
+项目使用sass预处理器，安装sass，即可支持scss语法：
+```bash
+pnpm add sass -D
+```
+
 
 ## 路由代码解析
 
