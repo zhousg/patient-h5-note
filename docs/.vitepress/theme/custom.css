@@ -2,6 +2,9 @@
   --vp-c-brand: #646cff;
   --vp-c-brand-light: #747bff;
 } */
+:root{
+  --vp-nav-height-desktop: 60px;
+}
 
 .VPHomeHero .name .clip {
   background: -webkit-linear-gradient(315deg,#42d392 25%,#647eff);

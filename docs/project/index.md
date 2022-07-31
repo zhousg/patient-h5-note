@@ -104,7 +104,7 @@ Done. Now run:
 - `Eslint` 代码风格校验
 
 :::tip 提示
-- vscode 安装了 `Prettier` 插件的可以先 `禁用`，避免和项目的 `Eslint` 风格冲突。
+- vscode 安装了 `Prettier` 插件的可以先 `禁用`，或者关闭保存自动格式化功能，避免和项目的 `Eslint` 风格冲突。
 :::
 
 
@@ -382,28 +382,10 @@ const store = useUserStore()
 
 
 
-## stores及types统一导出
-> 实现：仓库的导出统一从 `./stores`  类型的导出统一走 `./types` 代码简洁，职能单一
+## stores统一导出
+> 实现：仓库的导出统一从 `./stores`  代码简洁，职能单一，入口唯一
 
-
-types 统一导出
-
-`types/index.d.ts`
-```ts
-// 通用的类型
-// ------------
-// 导入user的所有成员，从当前文件导出
-export * from './user'
-// 导入order的所有成员，从当前文件导出
-// ...等等
-```
-`stores/user.ts`
-```diff
--import type { User } from '@/types/user'
-+import type { User } from '@/types'
-```
-
-stores 统一导出
+- 抽取pinia实例代码，职能单一
 
 `stores/index`
 ```ts
@@ -416,8 +398,6 @@ const pinia = createPinia()
 pinia.use(persist)
 // 导出pinia实例，给main使用
 export default pinia
-
-export * from './user'
 ```
 `main.ts`
 ```ts{3,9}
@@ -433,6 +413,15 @@ app.use(pinia)
 app.use(router)
 app.mount('#app')
 ```
+
+- 统一导出，代码简洁，入口唯一
+
+`stores/index`
+
+```ts
+export * from './user'
+```
+
 `App.vue`
 ```diff
 -import { useUserStore } from './stores/user'
@@ -442,24 +431,163 @@ app.mount('#app')
 小结：
 - 统一导出是什么意思？
   - 一个模块下的所有资源通过index导出
-- 这么做的意义是？
-  - 使用时候代码简洁，模块职能汇集统一
 
 
 ## 请求工具函数
 
+### 拦截器逻辑
 
-## 测试请求工具
+> 实现：token请求头携带，错误响应处理，401错误处理
 
+
+### 工具函数封装
+
+> 实现：导出一个通用的请求工具函数，支持设置响应数据类型
+
+
+### 测试请求工具
+
+> 测试：封装好的请求工具函数
 
 ## vant组件库
+
+> 实现：完整使用vant组件库
+
+[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/quickstart#dao-ru-suo-you-zu-jian-bu-tui-jian)
+
+安装：
+```bash
+# Vue 3 项目，安装最新版 Vant
+npm i vant
+# 通过 yarn 安装
+yarn add vant
+# 通过 pnpm 安装
+pnpm add vant
+```
+
+注册：`main.ts`
+```ts{5,6,11}
+import { createApp } from 'vue'
+import App from './App.vue'
+import pinia from './stores'
+import router from './router'
+import Vant from 'vant'
+import 'vant/lib/index.css'
+import './styles/main.scss'
+
+const app = createApp(App)
+
+app.use(Vant)
+app.use(pinia)
+app.use(router)
+app.mount('#app')
+
+```
+
+提问：
+- 这么全量使用组件，没使用到的也加载进来了，是不是优化？
+  - 按需加载
+
+
+使用：`App.vue`
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <van-button>按钮</van-button>
+</template>
+
+<style scoped></style>
+```
 
 
 ## 移动端适配
 
+> 实现：使用 vw 完成移动端适配
+
+[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/advanced-usage#viewport-bu-ju)
+
+安装：
+```bash
+npm install postcss-px-to-viewport -D
+# or
+yarn add -D postcss-px-to-viewport
+# or
+pnpm add -D postcss-px-to-viewport
+```
+
+配置：
+`postcss.config.js`
+
+```js
+// eslint-disable-next-line no-undef
+module.exports = {
+  plugins: {
+    'postcss-px-to-viewport': {
+      // 设备宽度375计算vw的值
+      viewportWidth: 375,
+    },
+  },
+};
+```
+
+测试：
+
+![image-20220731214535978](./images/image-20220731214535978.png)
+
+- 有一个控制台警告可忽略，或者使用 `postcss-px-to-viewport-8-plugin` 代替当前插件
 
 ## 自动按需加载
 
+> 实现：实现自动按需加载，和自动导入
+
+[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/quickstart#an-xu-yin-ru-zu-jian-tui-jian)
+
+
+手动按需使用组件比较麻烦，需要先导入。配置函数自动按需导入后直接使用即可。
+
+
+- 安装：
+
+```bash
+# 通过 npm 安装
+npm i unplugin-vue-components -D
+# 通过 yarn 安装
+yarn add unplugin-vue-components -D
+# 通过 pnpm 安装
+pnpm add unplugin-vue-components -D
+```
+
+- 配置：
+```ts{5,6,12-15}
+import { fileURLToPath, URL } from 'node:url'
+
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+import Components from 'unplugin-vue-components/vite'
+import { VantResolver } from 'unplugin-vue-components/resolvers'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    vue(),
+    Components({
+      dts: false,
+      resolvers: [VantResolver()]
+    })
+  ],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url))
+    }
+  }
+})
+
+```
+
+-解释 '@' 是vite配置的，基于node提供的API
 
 
 ## css变量主题定制
+
+> 实现：使用css变量定制项目主题，和修改vant主题
