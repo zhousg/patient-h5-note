@@ -439,10 +439,117 @@ export * from './user'
 
 > 实现：token请求头携带，错误响应处理，401错误处理
 
+`utils/reuqest.ts`
+```ts
+import { useUserStore } from '@/stores'
+import router from '@/router'
+import axios from 'axios'
+
+// 1. 新axios实例，基础配置
+const baseURL = 'https://consult-api.itheima.net/'
+const instance = axios.create({
+  baseURL,
+  timeout: 10000
+})
+
+// 2. 请求拦截器，携带token
+instance.interceptors.request.use(
+  (config) => {
+    const store = useUserStore()
+    if (store.user?.token && config.headers) {
+      config.headers['Authorization'] = `Bearer ${store.user?.token}`
+    }
+    return config
+  },
+  (err) => Promise.reject(err)
+)
+
+// 3. 响应拦截器，剥离无效数据，401拦截
+instance.interceptors.response.use(
+  (res) => {
+    // 后台约定，响应成功，但是code不是10000，是业务逻辑失败
+    if (res.data?.code !== 10000) {
+      return Promise.reject(res.data)
+    }
+    // 业务逻辑成功，返回响应数据，作为axios成功的结果
+    return res.data
+  },
+  (err) => {
+    if (err.response.status === 401) {
+      // 删除用户信息
+      const store = useUserStore()
+      store.delUser()
+      // 跳转登录，带上接口失效所在页面的地址，登录完成后回跳使用
+      router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
+    }
+    return Promise.reject(err)
+  }
+)
+
+export { baseURL, instance }
+```
+
+提问：
+- baseURL 导出的目的是啥？
+  - 其他模块可能需要使用
+
+- 为什么使用函数 `useXxxStore` 函数，建议在拦截器使用？
+  - 模块中的话，store可能还没初始化
+
+- 业务成功是什么意思？
+  - 响应成功，且后台业务操作完毕
 
 ### 工具函数封装
 
 > 实现：导出一个通用的请求工具函数，支持设置响应数据类型
+
+- 导出一个通用的请求工具函数
+```ts
+// 4. 请求工具函数
+const reuqest = (url: string, method = 'get', submitData: object) => {
+  return instance.request({
+    url,
+    method,
+    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
+  })
+}
+```
+
+- 支持不同接口设不同的响应数据的类型
+
+基础写法
+```ts
+// 4. 请求工具函数
+const reuqest = (url: string, method = 'get', submitData: object) => {
+  return instance.request({
+    url,
+    method,
+    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
+  })
+}
+```
+加上泛型
+```ts
+// 这个需要替换axsio.request默认的响应成功后的结果类型
+// 之前是：传 { name: string } 然后res是   res = { data: { name: string } }
+// 但现在：在响应拦截器中返回了 res.data  也就是将来响应成功后的结果，和上面的类型一致吗？
+// 所以要：request<数据类型，数据类型>() 这样才指定了 res.data 的类型
+// 但是呢：后台返回的数据结构相同，所以可以抽取相同的类型
+type Data<T> = {
+  success: boolean
+  code: number
+  message: string
+  data: T
+}
+// 4. 请求工具函数
+const reuqest = <T>(url: string, method = 'get', submitData: object) => {
+  return instance.request<T, Data<T>>({
+    url,
+    method,
+    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
+  })
+}
+```
 
 
 ### 测试请求工具
@@ -559,7 +666,7 @@ pnpm add unplugin-vue-components -D
 ```
 
 - 配置：
-```ts{5,6,12-15}
+```ts{5,6,13-18}
 import { fileURLToPath, URL } from 'node:url'
 
 import { defineConfig } from 'vite'
@@ -570,9 +677,12 @@ import { VantResolver } from 'unplugin-vue-components/resolvers'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
+    // 解析单文件组件的插件
     vue(),
+    // 自动导入的插件，解析器可以是 vant element and-vue 
     Components({
       dts: false,
+      // vant已经内置了组件类型，不需要自动生成
       resolvers: [VantResolver()]
     })
   ],
@@ -585,9 +695,64 @@ export default defineConfig({
 
 ```
 
--解释 '@' 是vite配置的，基于node提供的API
+- 解释：
+  - `@` 是vite配置的，基于node提供的API，得到 `src` 的绝对路径
 
 
 ## css变量主题定制
 
 > 实现：使用css变量定制项目主题，和修改vant主题
+
+
+- 如果定义 css 变量使用 css 变量
+```css
+:root {
+  --main: #999;
+}
+a {
+  color: var(--main)
+}
+```
+
+- 定义项目的颜色风格，覆盖vant的主题色
+
+`styles/main.scss`
+```scss
+:root {
+  // 问诊患者：色板
+  --cp-primary: #16C2A3;
+  --cp-plain: #EAF8F6;
+  --cp-orange: #FCA21C;
+  --cp-text1: #121826;
+  --cp-text2: #3C3E42;
+  --cp-text3: #6F6F6F;
+  --cp-tag: #848484;
+  --cp-dark: #979797;
+  --cp-tip: #C3C3C5;
+  --cp-disable: #D9DBDE;
+  --cp-line: #EDEDED;
+  --cp-bg: #F6F7F9;
+  // 覆盖vant主体色
+  --van-primary-color: var(--cp-primary);
+}
+```
+
+`App.vue`
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <!-- 验证vant颜色被覆盖 -->
+  <van-button type="primary">按钮</van-button>
+  <a href="#">123</a>
+</template>
+
+<style scoped lang="scss">
+// 使用 css 变量
+a {
+  color: var(--cp-primary);
+}
+</style>
+```
+
+
