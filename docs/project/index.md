@@ -131,8 +131,7 @@ Done. Now run:
         singleQuote: true,
         semi: false,
         printWidth: 100,
-        trailingComma: 'none',
-        'zh-hans': true
+        trailingComma: 'none'
       }
     ],
     'vue/multi-word-component-names': [
@@ -145,7 +144,7 @@ Done. Now run:
   }
 ```
 
-- 格式：单引号，没有分号，行宽度100字符，没有对象数组最后一个逗号，允许中文标点符号
+- 格式：单引号，没有分号，行宽度100字符，没有对象数组最后一个逗号
 - vue 组件需要大驼峰命名，除去 index 之外，App 是默认支持的
 - 允许对 props 进行解构，我们会开启解构保持响应式的语法糖
 
@@ -231,42 +230,6 @@ export default router
 - `base` 作用是什么?
   - 项目的基础路径前缀，默认是 `/`
 
-
-## 约定路由规则{#router-rules}
-
-> 知道：约定项目的映射规则
-
-
-
-|  路由路径    |   路由级别   |  组件功能    |
-| ---- | ---- | ---- |
-|   /register   |   1   |   注册   |
-|   /login   |   1  |   登录   |
-|   /login/mobile   |   1   |   手机登录   |
-|   /login/callback   |   1   |   QQ登录回跳   |
-|   /   |   1    |  布局容器    |
-|   /user   |   ②    |   个人中心   |
-|   /user/patient   |   1   |   家庭档案   |
-|   /user/address   |   1   |   地址管理   |
-|   /user/profile   |   1   |   个人资料   |
-|   /home   |   ②   |   首页   |
-|   /fast   |   1   |   快速问诊   |
-|   /fast/dep   |   1   |   选择科室   |
-|   /fast/illness   |   1   |   病情描述   |
-|   /consult/pay   |   1   |   问诊支付   |
-|   /consult/room   |   1   |   问诊室   |
-|   /consult   |   1   |   我的问诊   |
-|   /order/pay   |   1   |   药品订单支付   |
-|   /order/pay/result   |   1   |   药品订单支付结果   |
-|   /order   |   1   |   药品订单列表   |
-|   /order/:id   |   1   |   药品订单详情   |
-|   /order/logistics/:id   |   1   |   药品订单物流   |
-|   /article   |   ②    |   健康百科   |
-|   /notify   |   ②    |   消息通知   |
-
-小结：
-- `/` 是布局容器，是一级路由  `/home` `/article`  `/notify`  `/user` 是二级路由
-- 他们的配置需要嵌套，其他的页面路由都是一级路由
 
 
 ## 用户状态仓库{#store}
@@ -419,7 +382,7 @@ app.mount('#app')
 `stores/index`
 
 ```ts
-export * from './user'
+export * from './modules/user'
 ```
 
 `App.vue`
@@ -431,130 +394,6 @@ export * from './user'
 小结：
 - 统一导出是什么意思？
   - 一个模块下的所有资源通过index导出
-
-
-## 请求工具函数{#request}
-
-### 拦截器逻辑{#request-interceptors}
-
-> 实现：token请求头携带，错误响应处理，401错误处理
-
-`utils/reuqest.ts`
-```ts
-import { useUserStore } from '@/stores'
-import router from '@/router'
-import axios from 'axios'
-
-// 1. 新axios实例，基础配置
-const baseURL = 'https://consult-api.itheima.net/'
-const instance = axios.create({
-  baseURL,
-  timeout: 10000
-})
-
-// 2. 请求拦截器，携带token
-instance.interceptors.request.use(
-  (config) => {
-    const store = useUserStore()
-    if (store.user?.token && config.headers) {
-      config.headers['Authorization'] = `Bearer ${store.user?.token}`
-    }
-    return config
-  },
-  (err) => Promise.reject(err)
-)
-
-// 3. 响应拦截器，剥离无效数据，401拦截
-instance.interceptors.response.use(
-  (res) => {
-    // 后台约定，响应成功，但是code不是10000，是业务逻辑失败
-    if (res.data?.code !== 10000) {
-      return Promise.reject(res.data)
-    }
-    // 业务逻辑成功，返回响应数据，作为axios成功的结果
-    return res.data
-  },
-  (err) => {
-    if (err.response.status === 401) {
-      // 删除用户信息
-      const store = useUserStore()
-      store.delUser()
-      // 跳转登录，带上接口失效所在页面的地址，登录完成后回跳使用
-      router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
-    }
-    return Promise.reject(err)
-  }
-)
-
-export { baseURL, instance }
-```
-
-提问：
-- baseURL 导出的目的是啥？
-  - 其他模块可能需要使用
-
-- 为什么使用函数 `useXxxStore` 函数，建议在拦截器使用？
-  - 模块中的话，store可能还没初始化
-
-- 业务成功是什么意思？
-  - 响应成功，且后台业务操作完毕
-
-### 工具函数封装{#request-fn}
-
-> 实现：导出一个通用的请求工具函数，支持设置响应数据类型
-
-- 导出一个通用的请求工具函数
-```ts
-// 4. 请求工具函数
-const reuqest = (url: string, method = 'get', submitData: object) => {
-  return instance.request({
-    url,
-    method,
-    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
-  })
-}
-```
-
-- 支持不同接口设不同的响应数据的类型
-
-基础写法
-```ts
-// 4. 请求工具函数
-const reuqest = (url: string, method = 'get', submitData: object) => {
-  return instance.request({
-    url,
-    method,
-    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
-  })
-}
-```
-加上泛型
-```ts
-// 这个需要替换axsio.request默认的响应成功后的结果类型
-// 之前是：传 { name: string } 然后res是   res = { data: { name: string } }
-// 但现在：在响应拦截器中返回了 res.data  也就是将来响应成功后的结果，和上面的类型一致吗？
-// 所以要：request<数据类型，数据类型>() 这样才指定了 res.data 的类型
-// 但是呢：后台返回的数据结构相同，所以可以抽取相同的类型
-type Data<T> = {
-  success: boolean
-  code: number
-  message: string
-  data: T
-}
-// 4. 请求工具函数
-const reuqest = <T>(url: string, method = 'get', submitData: object) => {
-  return instance.request<T, Data<T>>({
-    url,
-    method,
-    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
-  })
-}
-```
-
-
-### 测试请求工具{#request-test}
-
-> 测试：封装好的请求工具函数
 
 ## vant组件库{#vant}
 
@@ -572,33 +411,30 @@ yarn add vant
 pnpm add vant
 ```
 
-注册：`main.ts`
+样式：`main.ts`
 ```ts{5,6,11}
 import { createApp } from 'vue'
 import App from './App.vue'
 import pinia from './stores'
 import router from './router'
-import Vant from 'vant'
+// 样式全局使用
 import 'vant/lib/index.css'
 import './styles/main.scss'
 
 const app = createApp(App)
 
-app.use(Vant)
 app.use(pinia)
 app.use(router)
 app.mount('#app')
 
 ```
 
-提问：
-- 这么全量使用组件，没使用到的也加载进来了，是不是优化？
-  - 按需加载
-
 
 使用：`App.vue`
 ```vue
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { Button as VanButton } from 'vant'
+</script>
 
 <template>
   <van-button>按钮</van-button>
@@ -607,6 +443,8 @@ app.mount('#app')
 <style scoped></style>
 ```
 
+提问：为什么不全局使用？
+- 全局使用是全量加载，是项目体积变大，加载慢
 
 ## 移动端适配{#vw}
 
@@ -644,114 +482,195 @@ module.exports = {
 
 - 有一个控制台警告可忽略，或者使用 `postcss-px-to-viewport-8-plugin` 代替当前插件
 
-## 自动按需加载{#auto-import}
+## 请求工具函数{#request}
 
-> 实现：实现自动按需加载，和自动导入
+### 拦截器逻辑{#request-interceptors}
 
-[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/quickstart#an-xu-yin-ru-zu-jian-tui-jian)
+> 实现：token请求头携带，错误响应处理，401错误处理
 
+`utils/reuqest.ts`
+```ts
+import { useUserStore } from '@/stores'
+import router from '@/router'
+import axios from 'axios'
+import { Toast } from 'vant'
 
-手动按需使用组件比较麻烦，需要先导入。配置函数自动按需导入后直接使用即可。
-
-
-- 安装：
-
-```bash
-# 通过 npm 安装
-npm i unplugin-vue-components -D
-# 通过 yarn 安装
-yarn add unplugin-vue-components -D
-# 通过 pnpm 安装
-pnpm add unplugin-vue-components -D
-```
-
-- 配置：
-```ts{5,6,13-18}
-import { fileURLToPath, URL } from 'node:url'
-
-import { defineConfig } from 'vite'
-import vue from '@vitejs/plugin-vue'
-import Components from 'unplugin-vue-components/vite'
-import { VantResolver } from 'unplugin-vue-components/resolvers'
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    // 解析单文件组件的插件
-    vue(),
-    // 自动导入的插件，解析器可以是 vant element and-vue 
-    Components({
-      dts: false,
-      // vant已经内置了组件类型，不需要自动生成
-      resolvers: [VantResolver()]
-    })
-  ],
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
-    }
-  }
+// 1. 新axios实例，基础配置
+const baseURL = 'https://consult-api.itheima.net/'
+const instance = axios.create({
+  baseURL,
+  timeout: 10000
 })
 
+// 2. 请求拦截器，携带token
+instance.interceptors.request.use(
+  (config) => {
+    const store = useUserStore()
+    if (store.user?.token && config.headers) {
+      config.headers['Authorization'] = `Bearer ${store.user?.token}`
+    }
+    return config
+  },
+  (err) => Promise.reject(err)
+)
+
+// 3. 响应拦截器，剥离无效数据，401拦截
+instance.interceptors.response.use(
+  (res) => {
+    // 后台约定，响应成功，但是code不是10000，是业务逻辑失败
+    if (res.data?.code !== 10000) {
+      Toast(res.data?.message)
+      return Promise.reject(res.data)
+    }
+    // 业务逻辑成功，返回响应数据，作为axios成功的结果
+    return res.data
+  },
+  (err) => {
+    if (err.response.status === 401) {
+      // 删除用户信息
+      const store = useUserStore()
+      store.delUser()
+      // 跳转登录，带上接口失效所在页面的地址，登录完成后回跳使用
+      router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
+    }
+    return Promise.reject(err)
+  }
+)
+
+export { baseURL, instance }
 ```
 
-- 解释：
-  - `@` 是vite配置的，基于node提供的API，得到 `src` 的绝对路径
+提问：
+- baseURL 导出的目的是啥？
+  - 其他模块可能需要使用
 
+- 为什么使用函数 `useXxxStore` 函数，建议在拦截器使用？
+  - 模块中的话，store可能还没初始化
 
-## css变量主题定制{#css-var}
+- 业务成功是什么意思？
+  - 响应成功，且后台业务操作完毕
 
-> 实现：使用css变量定制项目主题，和修改vant主题
+### 工具函数封装{#request-fn}
 
+> 实现：导出一个通用的请求工具函数，支持设置响应数据类型
 
-- 如果定义 css 变量使用 css 变量
-```css
-:root {
-  --main: #999;
+- 导出一个通用的请求工具函数
+```ts
+// 4. 请求工具函数
+const reuqest = (url: string, method = 'get', submitData?: object) => {
+  return instance.request({
+    url,
+    method,
+    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
+  })
 }
-a {
-  color: var(--main)
+```
+
+- 支持不同接口设不同的响应数据的类型
+
+加上泛型
+```ts
+// 这个需要替换axsio.request默认的响应成功后的结果类型
+// 之前是：传 { name: string } 然后res是   res = { data: { name: string } }
+// 但现在：在响应拦截器中返回了 res.data  也就是将来响应成功后的结果，和上面的类型一致吗？
+// 所以要：request<数据类型，数据类型>() 这样才指定了 res.data 的类型
+// 但是呢：后台返回的数据结构相同，所以可以抽取相同的类型
+type Data<T> = {
+  code: number
+  message: string
+  data: T
+}
+// 4. 请求工具函数
+const reuqest = <T>(url: string, method: Method = 'get', submitData?: object) => {
+  return instance.request<T, Data<T>>({
+    url,
+    method,
+    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
+  })
 }
 ```
 
-- 定义项目的颜色风格，覆盖vant的主题色
 
-`styles/main.scss`
-```scss
-:root {
-  // 问诊患者：色板
-  --cp-primary: #16C2A3;
-  --cp-plain: #EAF8F6;
-  --cp-orange: #FCA21C;
-  --cp-text1: #121826;
-  --cp-text2: #3C3E42;
-  --cp-text3: #6F6F6F;
-  --cp-tag: #848484;
-  --cp-dark: #979797;
-  --cp-tip: #C3C3C5;
-  --cp-disable: #D9DBDE;
-  --cp-line: #EDEDED;
-  --cp-bg: #F6F7F9;
-  // 覆盖vant主体色
-  --van-primary-color: var(--cp-primary);
-}
-```
+### 测试请求工具{#request-test}
+
+> 测试：封装好的请求工具函数
+
 
 `App.vue`
 ```vue
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { reuqest } from '@/utils/request'
+import type { User } from './types/user'
+import { Button as VanButton } from 'vant'
+import { useUserStore } from './stores'
+
+// 测试，请求拦截器，是否携带token，响应拦截器401拦截到登录地址
+const getUserInfo = async () => {
+  const res = await reuqest('/patient/myUser')
+  console.log(res)
+}
+
+// 测试，响应拦截器，出现非10000的情况，和返回剥离后的数据
+const store = useUserStore()
+const login = async () => {
+  const res = await reuqest<User>('/login/password', 'POST', {
+    mobile: '13211112222',
+    // 密码 abc123456 测试：出现非10000的情况
+    password: 'abc12345'
+  })
+  store.setUser(res.data)
+}
+</script>
 
 <template>
-  <!-- 验证vant颜色被覆盖 -->
-  <van-button type="primary">按钮</van-button>
-  <a href="#">123</a>
+  <van-button type="primary" @click="getUserInfo">获取个人信息</van-button>
+  <van-button type="primary" @click="login">登录</van-button>
 </template>
-
-<style scoped lang="scss">
-// 使用 css 变量
-a {
-  color: var(--cp-primary);
-}
-</style>
 ```
 
+测试：
+- 登录的时候把密码改错，是测试？
+  - 业务逻辑失败
+- 登录成功，看 res 打印，是测试？
+  - 剥离一层数据
+- 获取用户信息成功，是测试？
+  - 是否携带token
+- 把 token 删除或修改，获取用户信息失败，是测试？
+  - 401 token 失效跳转 login 页面
+
+
+## 约定路由规则{#router-rules}
+
+> 知道：约定项目的映射规则
+
+
+
+|  路由路径    |   路由级别   |  组件功能    |
+| ---- | ---- | ---- |
+|   /register   |   1   |   注册   |
+|   /login   |   1  |   登录   |
+|   /login/mobile   |   1   |   手机登录   |
+|   /login/callback   |   1   |   QQ登录回跳   |
+|   /   |   1    |  布局容器    |
+|   /user   |   ②    |   个人中心   |
+|   /user/patient   |   1   |   家庭档案   |
+|   /user/address   |   1   |   地址管理   |
+|   /user/profile   |   1   |   个人资料   |
+|   /home   |   ②   |   首页   |
+|   /fast   |   1   |   快速问诊   |
+|   /fast/dep   |   1   |   选择科室   |
+|   /fast/illness   |   1   |   病情描述   |
+|   /consult/pay   |   1   |   问诊支付   |
+|   /consult/room   |   1   |   问诊室   |
+|   /consult   |   1   |   我的问诊   |
+|   /order/pay   |   1   |   药品订单支付   |
+|   /order/pay/result   |   1   |   药品订单支付结果   |
+|   /order   |   1   |   药品订单列表   |
+|   /order/:id   |   1   |   药品订单详情   |
+|   /order/logistics/:id   |   1   |   药品订单物流   |
+|   /article   |   ②    |   健康百科   |
+|   /notify   |   ②    |   消息通知   |
+
+小结：
+- `/` 是布局容器，是一级路由  `/home` `/article`  `/notify`  `/user` 是二级路由
+- 他们的配置需要嵌套，其他的页面路由都是一级路由
