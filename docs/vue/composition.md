@@ -1,6 +1,6 @@
 # CompositionAPI
 
-## 组合API介绍
+## 组合API介绍{#composition-api}
 > 介绍：什么是组合API，组合API的特点
 
 Vue3提供两种组织代码逻辑的写法：
@@ -88,7 +88,7 @@ export default {
 
 
 
-## setup函数
+## setup函数{#setup}
 > setup函数是组合API的入口函数
 
 - `setup` 函数是 `Vue3` 特有的选项，作为组合API的起点
@@ -129,7 +129,7 @@ export default {
 
 
 
-## reactive函数
+## reactive函数{#reactive}
 > 通常使用它定义 对象类型 响应式数据
 
 
@@ -177,7 +177,7 @@ export default {
 - 可以转换简单数据吗？不能
 
 
-## ref函数
+## ref函数{#ref-fn}
 
 > 通常使用它定义响应式数据，不限类型
 
@@ -227,7 +227,7 @@ export default {
 
 
 
-## reactive 与 ref 的选择
+## reactive 与 ref 的选择{#reactive-and-ref}
 
 > 知道：在定义响应式数据的时候如何选择reactive和ref
 
@@ -262,7 +262,7 @@ export default {
 
 
 
-## setup语法糖
+## setup语法糖{#setup-sugar}
 
 > 简化 setup 固定套路代码 ，让代码更简洁
 
@@ -326,7 +326,7 @@ export default {
 
 
 
-## computed函数
+## computed函数{#computed}
 
 > 掌握：使用 computed 函数定义计算属性
 
@@ -372,7 +372,7 @@ export default {
 
 
 
-## watch函数
+## watch函数{#watch}
 
 > 掌握：使用watch函数监听数据的变化
 
@@ -541,7 +541,7 @@ export default {
 
 
 
-## 生命周期函数
+## 生命周期函数{#cycle}
 
 
 
@@ -595,7 +595,7 @@ export default {
 
 
 
-## ref获取DOM元素
+## ref获取DOM元素{#ref-dom}
 
 > 元素上使用 ref属性关联响应式数据，获取DOM元素
 
@@ -635,7 +635,7 @@ const clickFn = () => {
 
 
 
-## ref操作组件-defineExpose
+## ref操作组件-defineExpose{#defineExpose}
 
 > 组件上使用 ref属性关联响应式数据，获取组件实例
 
@@ -698,7 +698,7 @@ const fn = () => {
 
 
 
-## 父传子-defineProps函数
+## 父传子-defineProps函数{#defineProps}
 
 > 目标：能够实现组件通讯中的父传子组件通讯
 
@@ -765,7 +765,7 @@ console.log(props.money)
 
 
 
-## 子传父-defineEmits函数
+## 子传父-defineEmits函数{#defineEmits}
 
 > 目标：能够实现组件通讯中的子传父组件通讯
 
@@ -824,7 +824,7 @@ const changeMoney = (num) => {
 
 
 
-## 跨级组件通讯provide与inject函数
+## 跨级组件通讯provide与inject函数{#provide-inject}
 
 
 
@@ -915,7 +915,7 @@ const updateCount = inject('updateCount');
 
 
 
-## 保持响应式-toRefs函数
+## 保持响应式-toRefs函数{#toRefs}
 
 > 掌握：在使用reactive创建的响应式数据被展开或解构的时候使用toRefs保持响应式
 

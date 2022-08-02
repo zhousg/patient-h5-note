@@ -2,7 +2,7 @@
 
 ![image-20220713190914689](./images/image-20220713190914689.png)
 
-## 基础准备
+## 基础准备{#case-pre}
 
 > 初始化代码安装element-plus组件库
 
@@ -29,7 +29,7 @@ import App from './App.vue'
 
 
 
-## 实现功能
+## 实现功能{#case-complete}
 
 ```vue
 <template>

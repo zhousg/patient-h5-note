@@ -2,7 +2,7 @@
 
 ![image-20220727135216489](./images/image-20220727135216489.png)
 
-## 基础结构
+## 基础结构{#case-html}
 
 > 完成：项目的基础结构搭建
 
@@ -171,7 +171,7 @@ import ArticleList from './components/ArticleList.vue'
 </template>
 ```
 
-## axios 与 TypeScript
+## axios 与 TypeScript{#axios-and-ts}
 >掌握：掌握axios配合泛型设置响应数据类型
 
 ```vue
@@ -210,7 +210,7 @@ axios
 - 提供的类型要注意啥？
   - 类型需要根据接口返回的数据类声明，或者根据接口文档
 
-## 频道渲染
+## 频道渲染{#case-channel}
 > 完成：axios获取数据后频道列表渲染
 
 步骤：
@@ -266,7 +266,7 @@ onMounted(async ()=>{
 </template>
 ```
 
-## 导航切换
+## 导航切换{#case-nav-toogel}
 
 > 完成：频道导航切换效果
 
@@ -340,7 +340,7 @@ const channelId = ref(0)
 <ChannelNav :channelId="channelId" @change-channel="channelId = $event"/>
 ```
 
-## 列表更新
+## 列表更新{#case-list}
 
 > 实现：频道切换后列表更新
 

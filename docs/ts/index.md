@@ -2,7 +2,7 @@
 
 
 
-## TypeScript 介绍
+## TypeScript 介绍{#intro}
 
 > 知道：TS是带类型语法的JS
 
@@ -36,7 +36,7 @@ let age: number = 18
 
 
 
-## TypeScript 作用
+## TypeScript 作用{#effect}
 
 > 知道：TS作用是在编译时进行类型检查提示错误
 
@@ -65,7 +65,7 @@ TS 优势：
 
 `Vue3 + TS` 最新的开发技术栈，你还在等什么？
 
-## TypeScript 编译
+## TypeScript 编译{#compile}
 
 > 知道：如何使用 tsc 编译 ts 代码
 
@@ -93,7 +93,7 @@ tsc -v
   - 在开发中：一般使用 `webpack` `vite` 等工具自动构建编译。
 
 
-## 创建 vue-ts 项目
+## 创建 vue-ts 项目{#vue-ts}
 
 > 创建一个基于 ts 的 vue 项目，来学习 ts 语法
 

@@ -1,6 +1,6 @@
 # 快速开始
 
-## vue3 现状介绍
+## vue3 现状介绍{#now}
 
 > 了解：vue3 的现状以及它特点
 
@@ -36,7 +36,7 @@
 
 
 
-## vite 构建工具
+## vite 构建工具{#vite}
 
 > 了解：vite工具作用和特点
 
@@ -62,7 +62,7 @@ vite的原理：
 
 
 
-## vite 创建项目
+## vite 创建项目{#vite-create-project}
 
 > 掌握：使用vite构建工具创建项目
 
@@ -99,7 +99,7 @@ pnpm create vite
 
 
 
-## 代码解析
+## 代码解析{#code-analysis}
 > 对vite初始化的代码进行分析
 
 1. 需要切换插件

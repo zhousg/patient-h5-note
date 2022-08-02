@@ -1,12 +1,12 @@
 # 优医问诊-项目起步
 
-## 项目介绍
+## 项目介绍{#intro}
 > 知道：整体项目概况，并且知道课程中会实现哪些功能
 
 - [产品原型](https://app.mockplus.cn/s/Y-U4_XHGRx)
 - [产品设计](https://app.mockplus.cn/s/S77krW4rKh)
 
-## 能学到什么
+## 能学到什么{#what}
 > 了解：在项目中会使用到哪些技术方案
 
 1. 基于vue3.0+typescript中大型项目开发解决方案
@@ -29,7 +29,7 @@
 17. css变量主题定制方案
 
 
-## pnpm介绍&安装
+## pnpm介绍&安装{#pnpm}
 > 掌握：pnpm 的安装和使用
 
 本质上他是一个包管理工具，和npm/yarn没有区别，主要优势在于
@@ -54,7 +54,7 @@ npm i pnpm -g
 小结：
 - pnpm 是一个高效的包管理工具，使用和npm和yarn基本相同
 
-## 项目创建
+## 项目创建{#create-vue}
 
 > 使用 create-vue 脚手架创建项目
 
@@ -94,7 +94,7 @@ Done. Now run:
 ```
 
 
-## vscode插件安装
+## vscode插件安装{#ext}
 
 > 安装：项目开发需要的一些插件
 
@@ -119,7 +119,7 @@ Done. Now run:
 
 
 
-## eslint 预制配置
+## eslint 预制配置{#eslint}
 
 > 使用：eslint的预制配置，且了解配置作用
 
@@ -161,7 +161,7 @@ vscode 开启 eslint  自动修复
 - https://prettier.io/docs/en/options.html 常见规则
 
 
-## 项目结构调整
+## 项目结构调整{#dir}
 
 > 了解：每一个目录结构的作用
 
@@ -191,7 +191,7 @@ pnpm add sass -D
 ```
 
 
-## 路由代码解析
+## 路由代码解析{#router}
 
 > 知道：默认生成的路由代码的含义
 
@@ -232,7 +232,7 @@ export default router
   - 项目的基础路径前缀，默认是 `/`
 
 
-## 约定路由规则
+## 约定路由规则{#router-rules}
 
 > 知道：约定项目的映射规则
 
@@ -269,7 +269,7 @@ export default router
 - 他们的配置需要嵌套，其他的页面路由都是一级路由
 
 
-## 用户状态仓库
+## 用户状态仓库{#store}
 
 > 完成：用户信息仓库创建，提供用户信息，修改用信息，删除用户信息的方法
 
@@ -310,7 +310,7 @@ export const useUserStore = defineStore('cp-user', () => {
 - 如果存储了数据，刷新页面后数据还在吗？
   - 不在，现在仅仅是js内存中，需要进行本地存储（持久化）
 
-## 数据持久化
+## 数据持久化{#persisted}
 
 > 掌握：使用 `pinia-plugin-persistedstate` 实现pinia仓库状态持久化，且完成测试
 
@@ -382,7 +382,7 @@ const store = useUserStore()
 
 
 
-## stores统一导出
+## stores统一导出{#stores-export}
 > 实现：仓库的导出统一从 `./stores`  代码简洁，职能单一，入口唯一
 
 - 抽取pinia实例代码，职能单一
@@ -433,9 +433,9 @@ export * from './user'
   - 一个模块下的所有资源通过index导出
 
 
-## 请求工具函数
+## 请求工具函数{#request}
 
-### 拦截器逻辑
+### 拦截器逻辑{#request-interceptors}
 
 > 实现：token请求头携带，错误响应处理，401错误处理
 
@@ -499,7 +499,7 @@ export { baseURL, instance }
 - 业务成功是什么意思？
   - 响应成功，且后台业务操作完毕
 
-### 工具函数封装
+### 工具函数封装{#request-fn}
 
 > 实现：导出一个通用的请求工具函数，支持设置响应数据类型
 
@@ -552,11 +552,11 @@ const reuqest = <T>(url: string, method = 'get', submitData: object) => {
 ```
 
 
-### 测试请求工具
+### 测试请求工具{#request-test}
 
 > 测试：封装好的请求工具函数
 
-## vant组件库
+## vant组件库{#vant}
 
 > 实现：完整使用vant组件库
 
@@ -608,7 +608,7 @@ app.mount('#app')
 ```
 
 
-## 移动端适配
+## 移动端适配{#vw}
 
 > 实现：使用 vw 完成移动端适配
 
@@ -644,7 +644,7 @@ module.exports = {
 
 - 有一个控制台警告可忽略，或者使用 `postcss-px-to-viewport-8-plugin` 代替当前插件
 
-## 自动按需加载
+## 自动按需加载{#auto-import}
 
 > 实现：实现自动按需加载，和自动导入
 
@@ -699,7 +699,7 @@ export default defineConfig({
   - `@` 是vite配置的，基于node提供的API，得到 `src` 的绝对路径
 
 
-## css变量主题定制
+## css变量主题定制{#css-var}
 
 > 实现：使用css变量定制项目主题，和修改vant主题
 
@@ -754,5 +754,4 @@ a {
 }
 </style>
 ```
-
 

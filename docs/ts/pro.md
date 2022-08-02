@@ -1,13 +1,13 @@
 # TypeScript 应用
 
-## ① TypeScript与Vue
+## ① TypeScript与Vue{#ts-vue}
 :::tip
 typescript 配合 Vue3 composition-api 使用
 
 https://staging-cn.vuejs.org/guide/typescript/composition-api.html
 :::
 
-## defineProps与Typescript
+## defineProps与Typescript{#ts-defineProps}
 > 掌握：ts中defineProps的使用
 
 1. defineProps的运行时写法
@@ -67,7 +67,7 @@ export default {
 
 
 
-## defineEmits与Typescript
+## defineEmits与Typescript{#ts-defineEmits}
 
 > 掌握：defineEmits的使用
 
@@ -88,7 +88,7 @@ const emit = defineEmits<{
 - 基于类型的声明使我们可以对所触发事件的类型进行更细粒度的控制。
 
 
-## ref与Typescript
+## ref与Typescript{#ts-ref}
 
 > 掌握：ts中ref函数如何使用
 
@@ -118,7 +118,7 @@ setTimeout(() => {
 })
 ```
 
-## reactive与TypeScript
+## reactive与TypeScript{#ts-reactive}
 > 掌握：ts中reactive函数的使用
 
 `reactive()` 也会隐式地从它的参数中推导类型：
@@ -147,7 +147,7 @@ const book: Book = reactive({ title: 'Vue 3 指引' })
 
 
 
-## computed与Typescript
+## computed与Typescript{#ts-computed}
 
 `computed()` 会从其计算函数的返回值上推导出类型：
 
@@ -172,7 +172,7 @@ const double = computed<number>(() => {
 ```
 
 
-## 事件处理与Typescript
+## 事件处理与Typescript{#ts-event}
 > 掌握：在ts中如何给事件处理加类型
 
 没加类型：
@@ -199,7 +199,7 @@ function handleChange(event: Event) {
 }
 ```
 
-## Template Ref与Typescript
+## Template Ref与Typescript{#ts-ref-attr}
 > 掌握：在ts中通过ref获取dom的操作
 
 模板 `ref` 需要通过一个显式指定的泛型参数和一个初始值 `null` 来创建：
@@ -224,12 +224,12 @@ onMounted(() => {
 - 这是因为直到组件被挂载前，这个 `ref` 的值都是初始的 `null`，并且在由于 `v-if` 的行为将引用的元素卸载时也可以被设置为 `null`。
 
 
-## ② TypeScript类型声明文件
+## ② TypeScript类型声明文件{#ts-declare}
 :::tip
 typescript 类型声明文件相关知识
 :::
 
-## 基本介绍
+## 基本介绍{#ts-declare-intro}
 > 知道：TS类型声明文件是什么以及作用
 
 项目中安装的第三方库里面都是打包后的JS代码，但是我们使用的时候却有对应的TS类型提示，这是为什么呢？
@@ -256,7 +256,7 @@ TS 中有两种文件类型：`.ts` 文件 `.d.ts` 文件作用是啥？
 - 如果要为 JS 库或者模块提供类型，就需要类型声明文件
 
 
-## 内置类型声明文件
+## 内置类型声明文件{#ts-declare-file}
 
 > 知道：什么是内置的类型什么文件
 
@@ -275,7 +275,7 @@ TypeScript 给 JS 运行时可用的所有标准化内置 API 都提供了声明
   - 查看 forEach 的类型声明，在 VSCode 中会自动跳转到 `lib.es5.d.ts` 类型声明文件中
   - 像 window、document 等 BOM、DOM API 也都有相应的类型声明文件 `lib.dom.d.ts`
 
-## 第三方库类型声明文件
+## 第三方库类型声明文件{#ts-declare-3th}
 
 > 掌握：给第三方库添加对应的类型声明文件
 
@@ -293,7 +293,7 @@ TypeScript 给 JS 运行时可用的所有标准化内置 API 都提供了声明
 https://www.typescriptlang.org/dt/search  可以搜索是否有对应的 `@types/*`
 
 
-## 自定义类型声明文件
+## 自定义类型声明文件{#ts-declare-custom}
 
 ### 共享类型 ☆☆☆
 > 掌握：使用类型声明文件提供需要共享的TS类型
@@ -325,7 +325,7 @@ const p: Person = {
 ```
 
 
-### 给JS文件提供类型
+### 给JS文件提供类型{#ts-declare-with-js}
 > 了解：使用类型声明文件给JS文件添加类型
 
 - 在导入 .js 文件时，TS 会自动加载与 .js 同名的 .d.ts 文件，以提供类型声明。

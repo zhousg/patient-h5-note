@@ -1,6 +1,6 @@
 # TypeScript 核心
 
-## 类型注解
+## 类型注解{#annotate}
 
 > 知道：TypeScript 类型注解
 
@@ -31,7 +31,7 @@ age = '19';
 - 类型注解作用？
   - 约定类型，明确提示
 
-## 原始类型
+## 原始类型{#base}
 
 > 知道：ts 有哪些类型，掌握：原始类型使用
 
@@ -55,7 +55,7 @@ let nullValue: null = null;
 let undefinedValue: undefined = undefined;
 ```
 
-## 数组类型
+## 数组类型{#array}
 
 > 掌握：数组类型的两种写法
 
@@ -79,7 +79,7 @@ let strings: Array<string> = ['a', 'b', 'c'];
 
 - 如果数组需要存储多种类型数据呢？
 
-## 联合类型
+## 联合类型{#union}
 
 > 掌握：通过联合类型将多个类型合并为一个类型
 
@@ -109,7 +109,7 @@ let arr: number | string[];
 // 这是什么类型？
 ```
 
-## 类型别名
+## 类型别名{#alias}
 
 > 掌握：使用类型别名语法给类型取别字
 
@@ -138,9 +138,9 @@ let arr: CustomArr = [1, 'a', 4];
 let arr2: CustomArr = [2, 'b', 8];
 ```
 
-## 函数类型
+## 函数类型{#fn}
 
-### 基本使用
+### 基本使用{#fn-base}
 
 > 掌握：给函数指定类型
 
@@ -177,7 +177,7 @@ const add: AddFn = (num1, num2) => {
 通过类似箭头函数形式的语法来为函数添加类型，只适用于 `函数表达式`
 :::
 
-### void 类型
+### void 类型{#fn-void}
 
 > 掌握：void 函数返回值类型
 
@@ -209,7 +209,7 @@ const add = (): undefined => {
 };
 ```
 
-### 可选参数
+### 可选参数{#fn-params}
 
 > 掌握： 使用 `?` 将参数标记为可选
 
@@ -239,9 +239,9 @@ mySlice(1, 2);
 - 必选参数不能位于可选参数后 `(start?: number, end: number)` 这样是不行的
   :::
 
-## 对象类型
+## 对象类型{#object}
 
-### 基本使用
+### 基本使用{#obj-base}
 
 > 掌握：对象类型语法
 
@@ -278,7 +278,7 @@ let person: {
 - 属性怎么写类型？`属性名: 类型`
 - 方法怎么写类型? `方法名(): 返回值类型`
 
-### 扩展用法
+### 扩展用法{#obj-ext}
 
 > 掌握：对象类型中，函数使用箭头函数类型，属性设置可选，使用类型别名。
 
@@ -326,9 +326,9 @@ const axios = (config: Config) => {};
 - 方法：学习、打游戏（可选）
   :::
 
-## 接口 interface
+## 接口 interface{#interface}
 
-### 基本使用
+### 基本使用{#interface-base}
 
 > 掌握：使用 interface 声明对象类型
 
@@ -355,7 +355,7 @@ let person: Person = {
 - 指定 `接口名称` 作为变量的类型使用。
 - 接口的每一行只能有 `一个` 属性或方法，每一行不需要加分号。
 
-### interface 继承
+### interface 继承{#interface-extends}
 
 > 掌握：使用 extends 实现接口继承，达到类型复用
 
@@ -396,7 +396,7 @@ interface Point3D extends Point2D {
 - 接口继承的语法：`interface 接口A extends 接口B {}`
 - 继承后 `接口A` 拥有 `接口B` 的所有属性和函数的类型声明
 
-### type 交叉类型
+### type 交叉类型{#type}
 
 > 掌握：使用 `交叉类型` 实现接口的继承效果
 
@@ -426,7 +426,7 @@ let o: Point3D = {
 
 - 使用 `&` 可以合并连接的对象类型，也叫：`交叉类型`
 
-### interface vs type
+### interface vs type{#interface-type}
 
 > 了解：interface 和 type 的相同点和区别
 
@@ -474,7 +474,7 @@ const p: Person = {
 - 它们都可以复用，interface 使用 `extends` , type 使用 `&`
 - type 不能重复定义，interface 可以重复会合并
 
-## 类型推断
+## 类型推断{#type-infer}
 
 > 知道：TS 的的类型推断机制作用
 
@@ -506,9 +506,9 @@ const add = (num1: number, num2: number) => {
 - 如果你不知道类型怎么写，可以把鼠标放至变量上，可以通过 `Vscode` 提示看到类型
   :::
 
-## 字面量类型
+## 字面量类型{#literal}
 
-### 字面量类型介绍
+### 字面量类型介绍{#literal-intro}
 
 > 知道：什么是字面量类型
 
@@ -535,7 +535,7 @@ const str2 = 'Hello TS';
 - 通过类型推断发现，str1 类型是 `string` ， str2 类型是 `Hello TS`
 - 原因：`str2` 是 `const` 声明的，值只能是 `Hello TS`，所以类型只能是 `Hello TS`
 
-### 字面量类型应用
+### 字面量类型应用{#literal-use}
 
 > 知道：字面量类型的应用场景
 
@@ -567,9 +567,9 @@ changeDirection('up')
 - 解释：参数 `direction` 的值只能是 `up/down/left/right` 中的任意一个
 - 优势：相比于 `string` 类型，使用字面量类型更加精确、严谨
 
-## 枚举类型
+## 枚举类型{#enum}
 
-### 枚举基本语法
+### 枚举基本语法{#enum-base}
 > 掌握：枚举的基本语法和使用细节
 
 - 作用：表示一组明确可选的值，和字面量类型配合联合类型类似。
@@ -598,7 +598,7 @@ changeDirection(Direction.Up)
   - `Up = 'Up'` 可以，但是后面的值都需要使用字符串。
 
 
-### 枚举使用场景
+### 枚举使用场景{#enum-intro}
 
 > 场景：用于一组没有语义的可选值，给它们添加类型。
 
@@ -637,7 +637,7 @@ showOrderStatus(OrderStatus.Complete)
 - 枚举一般使用在，表示一组明确可选的值，语义化不高的情况。
 - 如果这组可选值语义很高，如 ` unpay | payed | complete ` ，使用字面量配合联合类型更简单些。
 
-## any 类型
+## any 类型{#any}
 
 > 知道：any 类型的作用是逃避 TS 的类型检查
 
@@ -664,7 +664,7 @@ const fn = (n) => {}
 
 
 
-## 类型断言
+## 类型断言{#type-assert}
 
 有时候你会比 TS 更加明确一个值的类型，此时，可以使用类型断言来指定更具体的类型。 比如，
 
@@ -689,13 +689,13 @@ const img = document.getElementById('img') as HTMLImageElement
 // 如果不知道标签的类型：document.querySelector('div') 鼠标摸上去就可以看见
 ```
 
-## 泛型
+## 泛型{#generic}
 :::tip
 - 软件工程中，我们不仅要创建一致的定义良好的API，同时也要考虑**可重用性**。 组件不仅能够支持当前的数据类型，同时也能支持未来的数据类型，这在创建大型系统时为你提供了十分灵活的功能。 
 - 在TypeScript中，泛型是一种创建**可复用**代码组件的工具。这种组件不只能被一种类型使用，而是能被多种类型复用。类似于参数的作用，泛型是一种用以**增强类型（types）、接口（interfaces）、函数类型等**能力的非常可靠的手段。   
 :::
 
-### 泛型别名
+### 泛型别名{#generic-alias}
 > 掌握：泛型别名基本使用，实现类型复用
 
 ```ts
@@ -729,7 +729,7 @@ type GoodsData = Data<Goods>
 
 
 
-### 泛型接口
+### 泛型接口{#generic-interface}
 > 掌握：泛型接口基本使用，实现类型复用，了解内置泛型接口
 
 ```ts
@@ -757,7 +757,7 @@ arr.forEach((item) => console.log(item));
 
 
 
-### 泛型函数
+### 泛型函数{#generic-fn}
 
 > 掌握：泛型函数基本使用，保证函数内类型复用，且保证类型安全
 
@@ -787,7 +787,7 @@ let id2 = getId({name:'jack'})
 ```
 
 
-### 泛型约束
+### 泛型约束{#generic-constraint}
 > 
 > 了解：使用泛型约束，实现对泛型类型进行收缩
 

@@ -1,7 +1,7 @@
 # Pinia 核心
 
 
-## Pinia 介绍
+## Pinia 介绍{#intro}
 
 <img src="./images/logo.svg" alt="https://pinia.vuejs.org/logo.svg" style="zoom:50%;" />
 
@@ -29,7 +29,7 @@ Why should I use Pinia?
 - Pinia 是一个简单实用的状态管理工具，和菠萝一样 `香`
 
 
-## Pinia 15分钟上手
+## Pinia 15分钟上手{#start}
 
 > 掌握：实用Pinia使用，管理计数器的状态
 
@@ -117,7 +117,7 @@ const store = useCounterStore()
 - 使用Pinia与在组件中维护数据大体相同，这就是 `Pinia` 的状态管理基本使用
 
 
-## storeToRefs的使用
+## storeToRefs的使用 {#store-to-refs}
 
 > 掌握：使用 storeToRefs 解决解构仓库状态丢失响应式的问题
 
@@ -142,7 +142,7 @@ const { count, doubleCount } = storeToRefs(store)
 - 当你想从 store 中解构对应的状态使用，需要使用 `storeToRefs`
 
 
-## 使用 Pinia 改造头条
+## 使用 Pinia 改造头条{#case}
 
 > 掌握：使用 Pinia 维护头条需要共享的数据 当前频道ID
 
