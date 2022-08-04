@@ -7,7 +7,7 @@ typescript 配合 Vue3 composition-api 使用
 https://staging-cn.vuejs.org/guide/typescript/composition-api.html
 :::
 
-## defineProps与Typescript{#ts-defineProps}
+## defineProps与Typescript{#ts-define-props}
 > 掌握：ts中defineProps的使用
 
 1. defineProps的运行时写法
@@ -67,7 +67,7 @@ export default {
 
 
 
-## defineEmits与Typescript{#ts-defineEmits}
+## defineEmits与Typescript{#ts-define-emits}
 
 > 掌握：defineEmits的使用
 

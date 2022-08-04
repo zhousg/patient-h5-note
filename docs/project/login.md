@@ -71,7 +71,7 @@ import { Button as VanButton, Checkbox as VanCheckbox } from 'vant'
 }  
 ```
 
-或者安装：Vue 3 Snippets 插件，快捷键看插件文档。
+或者安装：Vue 3 Snippets 插件，快捷键可以看插件[文档](https://github.com/hollowtree/vscode-vue-snippets)。
 
 ## css变量主题定制{#css-var}
 
@@ -167,7 +167,7 @@ export default defineConfig({
     // 自动导入的插件，解析器可以是 vant element and-vue 
     Components({
       dts: false,
-      // vant已经内置了组件类型，不需要自动生成
+      // 原因：Toast Confirm 这类组件的样式还是需要单独引入，样式全局引入了，关闭自动引入
       resolvers: [VantResolver({ importStyle: false })]
     })
   ],
@@ -183,13 +183,425 @@ export default defineConfig({
 - 解释：
   - `@` 是vite配置的，基于node提供的API，得到 `src` 的绝对路径
 
-
-## 组件布局
-
-
-
-## 表单校验
+- 说明：
+  - 不开起自动生成声明文件 `dts: false`
+  - 引入了 vue-router 和 vant 后就拥有了它们组件的类型
+  - 后期我们自己有全局组件的时候，教大家如何提供组件类型
 
 
+## cp-nav-bar 组件结构{#cp-nav-bar-html}
+> 掌握：van-nav-bar组件的基础使用，抽取到 cp-nav-bar 组件，作为通用组件
 
-## 进行登录
+提取原因：
+- 样式需要需改
+- 项目中使用的 nav-bar 组件功能有相似之处
+
+组件使用：了解 van-nav-bar 组件的基本功能属性[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/nav-bar#api)
+
+抽离组件：`components/cp-nav-bar.vue`
+
+```vue
+<script setup lang="ts">
+// 一定有的功能：返回图标，返回效果，固定定位（组件内部实现）
+// 使用组件时候才能确定的功能：标题，右侧文字，点击右侧文字行为（props传入）
+const onClickLeft = () => {
+  //
+}
+const onClickRight = () => {
+  //
+}
+</script>
+
+<template>
+  <van-nav-bar
+    left-arrow
+    @click-left="onClickLeft"
+    fixed
+    title="注册"
+    right-text="注册"
+    @click-right="onClickRight"
+  ></van-nav-bar>
+</template>
+
+<style lang="scss" scoped>
+::v-deep() {
+  .van-nav-bar {
+    &__arrow {
+      font-size: 18px;
+      color: var(--cp-text1);
+    }
+    &__text {
+      font-size: 15px;
+    }
+  }
+}
+</style>
+```
+
+提问：
+- 怎么深度作用其他组件样式？
+  - `::v-deep(){  // 样式  }`
+
+## cp-nav-bar 组件功能{#cp-nav-bar-logic}
+
+> 实现：组件的返回功能，支持 title rightText 属性，支持 click-right 事件
+
+`components/cp-nav-bar.vue`
+```vue
+<script setup lang="ts">
+import { useRouter } from 'vue-router'
+
+//1. 一定有的功能：返回图标，返回效果，固定定位（组件内部实现）
+const router = useRouter()
+const onClickLeft = () => {
+  // 判断历史记录中是否有回退
+  if (history.state?.back) {
+    router.back()
+  } else {
+    router.push('/')
+  }
+}
+
+// 2. 使用组件时候才能确定的功能：标题，右侧文字，点击右侧文字行为（props传入）
+defineProps<{
+  title?: string
+  rightText?: string
+}>()
+const emit = defineEmits<{
+  (e: 'click-right'): void
+}>()
+const onClickRight = () => {
+  emit('click-right')
+}
+</script>
+
+<template>
+  <van-nav-bar
+    left-arrow
+    @click-left="onClickLeft"
+    fixed
+    :title="title"
+    :right-text="rightText"
+    @click-right="onClickRight"
+  ></van-nav-bar>
+</template>
+
+<style lang="scss" scoped>
+::v-deep() {
+  .van-nav-bar {
+    &__arrow {
+      font-size: 18px;
+      color: var(--cp-text1);
+    }
+    &__text {
+      font-size: 15px;
+    }
+  }
+}
+</style>
+```
+
+`views/Login/index.vue`
+
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="login-page">
+    <cp-nav-bar title="登录"></cp-nav-bar>
+  </div>
+</template>
+
+<style lang="scss" scoped></style>
+```
+
+提问：
+- 怎么在项目中判断是否可以回退？
+  - `history.state?.back`
+
+- 怎么定义属性，怎么定义事件
+  - `defineProps` `defineEmits`
+
+- 为什么可以直接使用组件，不导入不注册？
+  - 使用了 `unplugin-vue-components` 默认 `src/compoenents` 自动导入注册
+
+
+## cp-nav-bar 组件类型{#cp-nav-bar-type}
+
+> 解释：给组件添加类型，让写属性和事件可以有提示
+
+提问：
+- vant 的组件为啥有提示？
+  - 看下 vant 的组件类型声明文件
+
+发现：
+```ts
+// 核心代码
+// 1. 导入组件实例
+import NavBar from './NavBar.vue'
+// 2. 声明 vue 类型模块
+declare module 'vue' {
+    // 3. 给 vue  添加全局组件类型，interface 和之前的合并
+    interface GlobalComponents {
+        // 4. 定义具体组件类型，typeof 获取到组件实例类型
+        // typeof 作用是得到对应的TS类型
+        VanNavBar: typeof NavBar;
+    }
+}
+```
+
+给 `cp-nav-bar` 组件添加类型
+
+`types/components.d.ts`
+```ts
+import CpNavBar from '@/components/CpNavBar.vue'
+
+declare module 'vue' {
+  interface GlobalComponents {
+    CpNavBar: typeof CpNavBar
+  }
+}
+```
+
+验证：看看属性提示，事件提示，鼠标放上去有没有类型。
+
+
+小结：
+- 怎么给全局的组件提供类型？
+  - 写一个类型声明文件，`declare module 'vue'` 声明一个 vue 类型模块
+  - 然后 `interface GlobalComponents` 书写全局组件的类型
+  - key组件名称支持大驼峰，value是组件类型,通过 typeof 组件实例得到
+
+
+## 页面布局-头底{#login-html}
+> 实现：页面的基础布局，定制 `van-cell` 的样式
+
+- 基础布局 `vies/Login/index.vue`
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="login-page">
+    <cp-nav-bar right-text="注册" @click-right="$router.push('/register')"></cp-nav-bar>
+    <div class="login-head">
+      <h3>密码登录</h3>
+      <router-link to="/login/mobile">
+        <span>短信验证码登录</span>
+        <van-icon name="arrow"></van-icon>
+      </router-link>
+    </div>
+    <!-- form 表单 -->
+    <div class="login-other">
+      <van-divider>第三方登录</van-divider>
+      <div class="icon">
+        <img src="@/assets/qq.svg" alt="" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.login {
+  &-page {
+    padding-top: 46px;
+  }
+  &-head {
+    padding: 30px 30px 50px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    line-height: 1;
+    h3 {
+      font-weight: normal;
+      font-size: 24px;
+    }
+    a {
+      font-size: 15px;
+    }
+  }
+  &-other {
+    margin-top: 60px;
+    padding: 0 30px;
+    .icon {
+      display: flex;
+      justify-content: center;
+      img {
+        width: 36px;
+        height: 36px;
+        padding: 4px;
+      }
+    }
+  }
+}
+</style>
+```
+
+- 全局样式
+`styles/main.scss`
+```scss
+// 全局样式
+body {
+  font-size: 14px;
+  color: var(--cp-text1);
+}
+a {
+  color: var(--cp-text2);
+}
+h1,h2,h3,h4,h5,h6,p,ul,ol {
+  margin: 0;
+  padding: 0;
+}
+```
+
+小结：
+- 使用 `van-icon` `van-divider` 组件完成登录，头部和底部布局。
+
+## 页面布局-表单{#login-form}
+> 实现：表单的绘制，以及表单根据项目需要进行定制
+
+- css变量定制表单
+`styles/main.scss`
+```scss{3-8}
+  // 覆盖vant主体色
+  --van-primary-color: var(--cp-primary);
+  // 单元格上下间距
+  --van-cell-vertical-padding: 14px;
+  // 复选框大小
+  --van-checkbox-size: 14px;
+  // 默认按钮文字大小
+  --van-button-normal-font-size: 16px;
+```
+- 组件结构 `Login/index.vue`
+
+```ts
+import { ref } from 'vue'
+
+const agree = ref(false)
+```
+```html
+    <van-form autocomplete="off">
+      <van-field placeholder="请输入手机号"></van-field>
+      <van-field placeholder="请输入密码" type="password"></van-field>
+      <div class="cp-cell">
+        <van-checkbox v-model="agree">
+          <span>我已同意</span>
+          <a href="javascript:;">用户协议</a>
+          <span>及</span>
+          <a href="javascript:;">隐私条款</a>
+        </van-checkbox>
+      </div>
+      <div class="cp-cell">
+        <van-button block round type="primary" class="disabled">登 录</van-button>
+      </div>
+      <div class="cp-cell">
+        <a href="javascript:;">忘记密码？</a>
+      </div>
+    </van-form>
+```
+```scss
+.van-form {
+  padding: 0 14px;
+  .cp-cell {
+    height: 52px;
+    line-height: 24px;
+    padding: 14px 16px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    .van-checkbox {
+      a {
+        color: var(--cp-primary);
+        padding: 0 5px;
+      }
+    }
+  }
+  .van-button {
+    &.disabled {
+      opacity: 1;
+      background: #fafafa;
+      color: #d9dbde;
+      border: #fafafa;
+    }
+  }
+}
+```
+
+小结：
+- 覆盖 vant 的样式方式有？
+  - `css变量（通用）`，组件内直接样式覆盖（局部）
+- 如果要显示正常按钮样式？
+  - 控制 `disabled` class即可
+- 不用dasabled属性？
+  - 灰色也能点击
+
+
+## 图标组件-打包svg地图{#svg-plugin}
+
+> 实现：根据 icons 文件svg图片打包到项目中，通过组件使用图标
+
+[参考文档](https://github.com/vbenjs/vite-plugin-svg-icons)
+
+- 安装插件
+
+```bash
+yarn add vite-plugin-svg-icons -D
+# or
+npm i vite-plugin-svg-icons -D
+# or
+pnpm install vite-plugin-svg-icons -D
+```
+
+- 使用插件
+
+`vite.config.ts`
+```diff
+import { VantResolver } from 'unplugin-vue-components/resolvers'
++import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
++import path from 'path'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    vue(),
+    Components({
+      dts: false,
+      resolvers: [VantResolver({ importStyle: false })]
+    }),
++    createSvgIconsPlugin({
++      // 指定图标文件夹，绝对路径（NODE代码）
++      iconDirs: [path.resolve(process.cwd(), 'src/icons')]
++    })
+  ],
+```
+
+- 导入到main
+
+```diff
+import router from './router'
++import 'virtual:svg-icons-register'
+
+import 'vant/lib/index.css'
+```
+
+- 使用svg精灵地图
+
+```html
+    <svg aria-hidden="true">
+      <!-- #icon-文件夹名称-图片名称 -->
+      <use href="#icon-login-eye-off" />
+    </svg>
+```
+
+小结：
+- icons文件打包的产物？
+  - 会生成一个 svg 结构（js创建的）包含所有图标，理解为 `精灵图`
+
+- 怎么使用svg图标？
+  - 通过 svg 标签 `#icon-文件夹名称-图片名称` 指定图片，理解 `精灵图定位坐标`
+
+
+## 图标组件-封装svg组件{#svg-com}
+
+> 实现：把 svg 标签使用图标封装起来，提高复用
+
+## 进行登录{#login-logic}

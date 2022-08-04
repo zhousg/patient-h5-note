@@ -258,7 +258,7 @@ export default {
 
 **总结：**
 
-- 在定义响应式数据的函数选择上，遵循：确定字段的对象使用 `reactive` 其他都使用 `ref` 函数
+- 在定义响应式数据的函数选择上，遵循：尽量使用 `ref` 函数支持所有场景，确定字段的对象使用 `reactive` 可以省去`.value`。
 
 
 
@@ -635,7 +635,7 @@ const clickFn = () => {
 
 
 
-## ref操作组件-defineExpose{#defineExpose}
+## ref操作组件-defineExpose{#define-expose}
 
 > 组件上使用 ref属性关联响应式数据，获取组件实例
 
@@ -698,7 +698,7 @@ const fn = () => {
 
 
 
-## 父传子-defineProps函数{#defineProps}
+## 父传子-defineProps函数{#define-props}
 
 > 目标：能够实现组件通讯中的父传子组件通讯
 
@@ -765,7 +765,7 @@ console.log(props.money)
 
 
 
-## 子传父-defineEmits函数{#defineEmits}
+## 子传父-defineEmits函数{#define-emits}
 
 > 目标：能够实现组件通讯中的子传父组件通讯
 
@@ -915,7 +915,7 @@ const updateCount = inject('updateCount');
 
 
 
-## 保持响应式-toRefs函数{#toRefs}
+## 保持响应式-toRefs函数{#to-refs}
 
 > 掌握：在使用reactive创建的响应式数据被展开或解构的时候使用toRefs保持响应式
 
