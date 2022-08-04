@@ -491,7 +491,7 @@ const agree = ref(false)
         </van-checkbox>
       </div>
       <div class="cp-cell">
-        <van-button block round type="primary" class="disabled">登 录</van-button>
+        <van-button block round type="primary">登 录</van-button>
       </div>
       <div class="cp-cell">
         <a href="javascript:;">忘记密码？</a>
@@ -515,24 +515,12 @@ const agree = ref(false)
       }
     }
   }
-  .van-button {
-    &.disabled {
-      opacity: 1;
-      background: #fafafa;
-      color: #d9dbde;
-      border: #fafafa;
-    }
-  }
 }
 ```
 
 小结：
 - 覆盖 vant 的样式方式有？
   - `css变量（通用）`，组件内直接样式覆盖（局部）
-- 如果要显示正常按钮样式？
-  - 控制 `disabled` class即可
-- 不用dasabled属性？
-  - 灰色也能点击
 
 
 ## 图标组件-打包svg地图{#svg-plugin}
@@ -602,6 +590,129 @@ import 'vant/lib/index.css'
 
 ## 图标组件-封装svg组件{#svg-com}
 
-> 实现：把 svg 标签使用图标封装起来，提高复用
+> 实现：把 svg 标签使用图标封装起来，使用组件完成密码可见切换功能。
+
+- 组件 `components/CpIcon.vue`
+
+```vue
+<script setup lang="ts">
+// 提供name属性即可
+defineProps<{
+  name: string
+}>()
+</script>
+
+<template>
+  <svg aria-hidden="true" class="cp-icon">
+    <use :href="`#icon-${name}`" />
+  </svg>
+</template>
+
+<style lang="scss" scoped>
+.cp-icon {
+  // 和字体一样大
+  width: 1em;
+  height: 1em;
+}
+</style>
+```
+
+- 类型 `types/components.d.ts`
+
+```ts{2,7}
+import CpNavBar from '@/components/CpNavBar.vue'
+import CpIcon from '@/components/CpIcon.vue'
+
+declare module 'vue' {
+  interface GlobalComponents {
+    CpNavBar: typeof CpNavBar
+    CpIcon: typeof CpIcon
+  }
+}
+```
+
+提示：
+- 有些图标可以根据 style 中 `color` 的值来设置颜色，图标是否有这个功能取决于 UI 做图片时否开启。
+
+
+实现切换密码可见功能：`Login/index.vue`
+```ts
+// 表单数据
+const mobile = ref('')
+const password = ref('')
+// 控制密码是否显示
+const show = ref(false)
+```
+```html
+<van-field v-model="mobile" placeholder="请输入手机号"></van-field>
+<van-field v-model="password" placeholder="请输入密码" :type="show ? 'text' : 'password'">
+  <template #button>
+    <cp-icon @click="show = !show" :name="`login-eye-${show ? 'on' : 'off'}`"></cp-icon>
+  </template>
+</van-field>
+```
+小结：
+- 表单绑定数据后，通过 show 切换 text 和 password，对应切换图标组件的 name 即可。
+
+
+## 表单校验{#login-form-validate}
+
+> 实现：单个表单项校验，以及整体表单校验
+
+- 提取表单校验规则（为了其他页面复用）`utils/rules.ts`
+
+```ts
+// 表单校验
+const mobileRules = [
+  { required: true, message: '请输入手机号' },
+  { pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确' }
+]
+
+const passwordRules = [
+  { required: true, message: '请输入密码' },
+  { pattern: /^\w{8,24}$/, message: '密码需8-24个字符' }
+]
+
+export { mobileRules, passwordRules }
+```
+- 单个表单项校验 `Login/index.vue`
+
+```ts
+import { mobileRules, passwordRules } from '@/utils/rules'
+```
+```diff
++      <van-field v-model="mobile" :rules="mobileRules" placeholder="请输入手机号"></van-field>
+      <van-field
+        v-model="password"
++        :rules="passwordRules"
+        placeholder="请输入密码"
+        :type="show ? 'text' : 'password'"
+      >
+```
+
+- 以及整体表单校验 `Login/index.vue`
+
+设置button组件为原生 submit 类型按钮
+```html
+<van-button block round type="primary" native-type="submit"> 登 录 </van-button>
+```
+监听表单校验成功后 submit 事件
+```html
+<van-form autocomplete="off" @submit="login">
+```
+```ts
+// 表单提交
+const login = () => {
+  if (!agree.value) return Toast('请勾选我已同意')
+  // 验证完毕，进行登录
+}
+```
+
+小结：
+- 怎么给单个表单加校验？
+  - reules 属性，规则和  element-ui 类似
+- 怎么给整个表单加校验？
+  - 按钮组件设置 `native-type="submit"`，表单组件绑定 `@submit` 事件
+
 
 ## 进行登录{#login-logic}
