@@ -4,7 +4,9 @@
 
 <template>
   <div class="super-doctor-page">
-
+    <div class="wrapper">
+      <iframe src="https://consult-doc-client.itheima.net/"></iframe>
+    </div>
   </div>
 </template>
 
@@ -19,6 +21,7 @@
   transform: scale(0.8);
   transform-origin: 0 0;
   background: url(./phone.png) no-repeat -5px -10px;
+  overflow: hidden;
   &::before {
     content: '';
     width: 180px;
@@ -29,6 +32,17 @@
     transform: translateX(-50%);
     border-bottom-right-radius: 12px;
     border-bottom-left-radius: 12px;
+  }
+  .wrapper {
+    height: 100%;
+    box-sizing: border-box;
+    overflow-y: auto;
+    padding-top: 24px;
+    iframe {
+      border: 0;
+      width: 100%;
+      height: 100%;
+    }
   }
 }
 

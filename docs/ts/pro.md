@@ -202,13 +202,13 @@ function handleChange(event: Event) {
 ## Template Ref与Typescript{#ts-ref-attr}
 > 掌握：在ts中通过ref获取dom的操作
 
-模板 `ref` 需要通过一个显式指定的泛型参数和一个初始值 `null` 来创建：
+模板 `ref` 需要通过一个显式指定的泛型参数，（）不设置默认值
 
 ```vue
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-const el = ref<HTMLInputElement | null>(null)
+const el = ref<HTMLInputElement>()
 
 onMounted(() => {
   el.value?.focus()

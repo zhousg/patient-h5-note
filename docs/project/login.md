@@ -385,10 +385,10 @@ declare module 'vue' {
     <cp-nav-bar right-text="注册" @click-right="$router.push('/register')"></cp-nav-bar>
     <div class="login-head">
       <h3>密码登录</h3>
-      <router-link to="/login/mobile">
+      <a href="javascript:;">
         <span>短信验证码登录</span>
         <van-icon name="arrow"></van-icon>
-      </router-link>
+      </a>
     </div>
     <!-- form 表单 -->
     <div class="login-other">
@@ -715,4 +715,286 @@ const login = () => {
   - 按钮组件设置 `native-type="submit"`，表单组件绑定 `@submit` 事件
 
 
-## 进行登录{#login-logic}
+## 密码登录{#login-logic}
+
+> 实现：通过手机号和密码进行登录
+
+登录逻辑：
+- 定义一个 api 接口函数
+- 登录成功：
+  - 存储用户信息
+  - 回跳页面，或者进入个人中心
+  - 提示
+
+落地代码：
+
+- api函数 `services/user.ts`
+
+```ts
+import type { User } from '@/types/user'
+import { reuqest } from '@/utils/request'
+
+// 密码登录
+export const loginByPassword = (mobile: string, password: string) =>
+  reuqest<User>('/login/password', 'POST', { mobile, password })
+```
+
+- 进行登录 `Login/index.vue`
+
+```ts
+import { loginByPassword } from '@/services/login'
+import { useUserStore } from '@/stores'
+import { useRoute, useRouter } from 'vue-router'
+```
+```ts
+const store = useUserStore()
+const router = useRouter()
+const route = useRoute()
+// 表单提交
+const login = async () => {
+  if (!agree.value) return Toast('请勾选我已同意')
+  // 验证完毕，进行登录
+  const res = await loginByPassword(mobile.value, password.value)
+  store.setUser(res.data)
+  // 如果有回跳地址就进行回跳，没有跳转到个人中心
+  router.push((route.query.returnUrl as string) || '/user')
+  Toast.success('登录成功')
+}
+```
+
+## 短信登录-切换效果
+> 实现：添加短信登录与密码登录界面切换，添加code的校验
+
+步骤：
+- 完成界面切换
+- 完成code校验
+
+代码：
+
+1）完成界面切换 `Login/index.vue`
+
+- 切换数据
+```ts
+const isPass = ref(true)
+```
+- 标题切换
+```html
+    <div class="login-head">
+      <h3>{{ isPass ? '密码登录' : '短信验证码登录' }}</h3>
+      <a href="javascript:;" @click="isPass = !isPass">
+        <span>{{ !isPass ? '密码登录' : '短信验证码登录' }}</span>
+        <van-icon name="arrow"></van-icon>
+      </a>
+    </div>
+```
+- 表单项切换
+```html{2,12-16}
+      <van-field
+        v-if="isPass"
+        v-model="password"
+        :rules="passwordRules"
+        placeholder="请输入密码"
+        :type="show ? 'text' : 'password'"
+      >
+        <template #button>
+          <cp-icon @click="show = !show" :name="`login-eye-${show ? 'on' : 'off'}`"></cp-icon>
+        </template>
+      </van-field>
+      <van-field v-else placeholder="短信验证码">
+        <template #button>
+          <span class="btn-send">发送验证码</span>
+        </template>
+      </van-field>
+```
+
+2）完成code校验
+
+- 校验规则 `utils/rules.ts`
+```ts
+const codeRules = [
+  { required: true, message: '请输入验证码' },
+  { pattern: /^\d{6}$/, message: '验证码6个数字' }
+]
+
+export { mobileRules, passwordRules, codeRules }
+```
+- 使用规则 `Login/index.vue`
+
+```ts
+import { mobileRules, passwordRules, codeRules } from '@/utils/rules'
+```
+```ts
+const code = ref('')
+```
+```html
+<van-field v-else v-model="code" :rules="codeRules" placeholder="短信验证码">
+```
+
+小结：
+- 接下来就是实现 `发送短信` 和  `合并短信登录` 的功能了
+
+## 短信登录-发送短信
+> 实现：点击按钮发送验证码功能
+
+步骤：
+- API 接口函数
+- 发送验证码逻辑
+- 倒计时逻辑
+
+代码：
+
+1）API 接口函数
+- 类型 `types/user.d.ts`
+```ts
+// 短信验证码类型
+export type CodeType = 'login' | 'register' | 'changeMobile' | 'forgetPassword' | 'bindMobile'
+```
+- 接口 `services/user.ts`
+
+```diff
++import type { CodeType, User } from '@/types/user'
+import { reuqest } from '@/utils/request'
+
+// 密码登录
+export const loginByPassword = (mobile: string, password: string) =>
+  reuqest<User>('/login/password', 'POST', { mobile, password })
+
++// 发送验证码
++export const sendMobileCode = (mobile: string, type: CodeType) =>
++  reuqest('/code', 'GET', { mobile, type })
+```
+
+2）发送验证码逻辑
+- 校验没在倒计时
+```html
+<span class="btn-send" @click="send">发送验证码</span>
+```
+```ts
+const time = ref(0)
+const send = async () => {
+  // 已经倒计时time的值大于0，此时不能发送验证码
+  if (time.value > 0) return
+}
+```
+- 校验手机表单项
+使用 form 组件的函数 [参考文档](https://vant-contrib.gitee.io/vant/#/zh-CN/form#fang-fa)
+
+```diff
+      <van-field
+        v-model="mobile"
++        name="mobile"
+        :rules="mobileRules"
+        placeholder="请输入手机号"
+      ></van-field>
+```
+```ts
+import { Toast, type FormInstance } from 'vant'
+```
+```diff
++const form = ref<FormInstance>()
+const time = ref(0)
+const send = async () => {
+  if (time.value > 0) return
++  // 验证不通过报错，阻止程序继续执行
++  await form.value?.validate('mobile')
+}
+```
+
+- 发送短信验证码
+
+```ts
+import { loginByPassword, sendMobileCode } from '@/services/user'
+```
+```diff
+const send = async () => {
+  if (time.value > 0) return
+  await form.value?.validate('mobile')
++  await sendMobileCode(mobile.value, 'login')
++  Toast.success('发送成功')
+}
+```
+
+3）倒计时逻辑
+
+- 逻辑代码
+```diff
+const form = ref<FormInstance>()
+const time = ref(0)
++let timeId: number | undefined
+const send = async () => {
+  if (time.value > 0) return
+  await form.value?.validate('mobile')
+  await sendMobileCode(mobile.value, 'login')
+  Toast.success('发送成功')
+  time.value = 60
++  // 倒计时
++  clearInterval(timeId)
++  timeId = setInterval(() => {
++    time.value--
++    if (time.value <= 0) clearInterval(timeId)
++  }, 1000)
+}
++onUnmounted(() => {
++  clearInterval(timeId)
++})
+```
+注意：组件卸载关闭定时器
+
+- 界面展示
+```html
+<span class="btn-send" :class="{ active: time > 0 }" @click="send">
+  {{ time > 0 ? `${time}s后再次发送` : '发送验证码' }}
+</span>
+```
+
+## 短信登录-进行登录
+
+> 实现：通过短信进行登录
+
+步骤：
+- api 接口函数
+- 合并到密码登录逻辑中
+
+代码：
+
+- 接口API
+`services/user.ts`
+```ts
+// 短信登录
+export const loginByMobile = (mobile: string, code: string) =>
+  reuqest<User>('/login', 'POST', { mobile, code })
+```
+
+- 合并短信登录
+```ts
+import { loginByPassword, sendMobileCode, loginByMobile } from '@/services/user'
+```
+```diff
+// 表单提交
+const login = async () => {
+  if (!agree.value) return Toast('请勾选我已同意')
+  // 验证完毕，进行登录
++  const res = isPass.value
++    ? await loginByPassword(mobile.value, password.value)
++    : await loginByMobile(mobile.value, code.value)
+  store.setUser(res.data)
+  // 如果有回跳地址就进行回跳，没有跳转到个人中心
+  router.push((route.query.returnUrl as string) || '/user')
+  Toast.success('登录成功')
+}
+```
+小结：
+- 处理接口和传参不一样，成功后的逻辑都一样的。
+
+## QQ登录-流程分析
+
+
+
+## QQ登录-登录回跳
+
+
+
+## QQ登录-绑定手机
+
+
+

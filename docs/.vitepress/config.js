@@ -74,7 +74,6 @@ module.exports = {
             { text: '7. 订单模块', link: '/project/order' }, 
             { text: '8. 项目上线', link: '/project/end' }, 
             { text: '辅助-超级医生', link: '/project/super-doctor' },
-            { text: '辅助-在线代码', link: '/project/code' },
           ]
         }
       ],
