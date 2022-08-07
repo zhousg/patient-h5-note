@@ -649,13 +649,10 @@ const login = async () => {
 | ---- | ---- | ---- |
 |   /register   |   1   |   注册   |
 |   /login   |   1  |   登录   |
-|   /login/mobile   |   1   |   手机登录   |
-|   /login/callback   |   1   |   QQ登录回跳   |
 |   /   |   1    |  布局容器    |
 |   /user   |   ②    |   个人中心   |
 |   /user/patient   |   1   |   家庭档案   |
 |   /user/address   |   1   |   地址管理   |
-|   /user/profile   |   1   |   个人资料   |
 |   /home   |   ②   |   首页   |
 |   /fast   |   1   |   快速问诊   |
 |   /fast/dep   |   1   |   选择科室   |
@@ -668,6 +665,7 @@ const login = async () => {
 |   /order   |   1   |   药品订单列表   |
 |   /order/:id   |   1   |   药品订单详情   |
 |   /order/logistics/:id   |   1   |   药品订单物流   |
+|   /login/callback   |   1   |   QQ登录回跳   |
 |   /article   |   ②    |   健康百科   |
 |   /notify   |   ②    |   消息通知   |
 
