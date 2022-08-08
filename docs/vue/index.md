@@ -21,8 +21,8 @@
 
 2. 相关文档
 
-   1. Vue3 中文文档(新) https://staging-cn.vuejs.org/
-   2. ~~Vue3 中文文档(旧) https://v3.cn.vuejs.org/~~
+   1. Vue3 中文文档(新) https://cn.vuejs.org/
+   2. ~~Vue2 中文文档(旧) https://v2.cn.vuejs.org/~~
    3. Vue3 设计理念 https://vue3js.cn/vue-composition/
 
 3. 了解框架优点特点
