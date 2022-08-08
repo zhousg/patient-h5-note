@@ -1,10 +1,13 @@
 // 注释
-module.exports = {
+import { defineConfig } from 'vitepress'
+
+export default defineConfig({
   title: '优医问诊H5',
   description: '最新Vue3技术栈,Vue3,TS,Pinia,Vant,在线问诊项目,H5',
   markdown: {
     lineNumbers: true
   },
+  head: [['link', { rel: 'icon', type: 'image/svg+xml', href: './logo2.png' }]],
   base: '/patient-h5-note/',
   lastUpdated: true,
   themeConfig: {
@@ -15,12 +18,12 @@ module.exports = {
       indexName: 'patient-h5'
     },
     nav: [
-      { text: 'Vue3.0', link: '/vue/' },
+      { text: 'vue3', link: '/vue/' },
       { text: 'TypeScript', link: '/ts/' },
       { text: 'Pinia', link: '/pinia/' },
       { text: '优医问诊', link: '/project/' },
     ],
-    search: true,
+    // search: true,
     socialLinks: [
       { icon: 'github', link: 'http://git.itcast.cn/heimaqianduan/consult-patients-h5-vue3' },
     ],
@@ -28,16 +31,14 @@ module.exports = {
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2022-present Allen Zhou'
     },
-    themeConfig: {
-      lastUpdatedText: 'Updated Date'
-    },
+    lastUpdatedText: '更新',
     sidebar: {
       '/vue/': [
         {
           text: 'Vue3核心',
           items: [
             { text: '快速开始', link: '/vue/' }, 
-            { text: '组合API', link: '/vue/composition' },
+            { text: '组合式API', link: '/vue/composition' },
             { text: '综合案例', link: '/vue/case' },
           ]
         }
@@ -79,4 +80,4 @@ module.exports = {
       ],
     }
   }
-}
+})

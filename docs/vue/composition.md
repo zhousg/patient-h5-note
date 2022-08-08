@@ -1,12 +1,12 @@
 # CompositionAPI
 
-## 组合API介绍{#composition-api}
-> 介绍：什么是组合API，组合API的特点
+## 组合式API介绍{#composition-api}
+> 介绍：什么是组合式API，组合式API的特点
 
 Vue3提供两种组织代码逻辑的写法：
 
-- 通过data、methods、watch 等配置选项组织代码逻辑是`选项API`写法
-- 所有逻辑在setup函数中，使用 ref、watch 等函数组织代码是`组合API`写法
+- 通过data、methods、watch 等配置选项组织代码逻辑是`选项式API`写法
+- 所有逻辑在setup函数中，使用 ref、watch 等函数组织代码是`组合式API`写法
 
 
 
@@ -53,7 +53,7 @@ export default {
   计数器：{{ count }} <button @click="increment">累加</button>
 </template>
 <script>
-// ref 就是一个组合API  
+// ref 就是一个组合式API  
 import { ref } from 'vue';
 export default {
   setup () {
@@ -79,9 +79,9 @@ export default {
 
 ::: tip 总结
 
-- 在setup中通过vue提供的函数组织代码实现功能，就是组合API写法。
-- 组合API有什么好处？可复用，可维护
-- ref 是不是一个组合API？是
+- 在setup中通过vue提供的函数组织代码实现功能，就是组合式API写法。
+- 组合式API有什么好处？可复用，可维护
+- ref 是不是一个组合式API？是
 
 :::
 
@@ -89,9 +89,9 @@ export default {
 
 
 ## setup函数{#setup}
-> setup函数是组合API的入口函数
+> setup函数是组合式API的入口函数
 
-- `setup` 函数是 `Vue3` 特有的选项，作为组合API的起点
+- `setup` 函数是 `Vue3` 特有的选项，作为组合式API的起点
 - 从组件生命周期看，它在 `beforeCreate` 之前执行
 - 函数中 `this` 不是组件实例，是 `undefined`
 - 如果数据或者函数在模板中使用，需要在 `setup` 返回

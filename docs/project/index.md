@@ -9,13 +9,13 @@
 ## 能学到什么{#what}
 > 了解：在项目中会使用到哪些技术方案
 
-1. 基于vue3.0+typescript中大型项目开发解决方案
+1. 基于vue3+typescript中大型项目开发解决方案
 2. 基于vant组件库快速构建H5界面解决方案
 3. 基于vue-router的前端路由解决方案
-4. 基于vite的create-vue构建vue3.0项目解决方案
+4. 基于vite的create-vue构建vue3项目解决方案
 5. 基于pinia的状态管理解决方案
 6. 基于pinia-plugin-persistedstate状态持久化解决方案
-7. 基于@vuecore/use的组合API工具库解决方案
+7. 基于@vuecore/use的组合式API工具库解决方案
 7. 基于id-validator的身份证信息校验解决方案
 8. 基于postcss-px-to-viewport移动端适配解决方案
 9.  基于vite-plugin-svg-icons的svg图标组件解决方案

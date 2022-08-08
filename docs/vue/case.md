@@ -23,7 +23,7 @@ import App from './App.vue'
 
 
 
-- 需求说明，使用组合API实现
+- 需求说明，使用组合式API实现
   - 列表渲染
   - 删除数据
 
