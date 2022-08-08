@@ -1,5 +1,7 @@
 // 注释
-module.exports = {
+import { defineConfig } from 'vitepress'
+
+export default defineConfig({
   title: '优医问诊H5',
   description: '最新Vue3技术栈,Vue3,TS,Pinia,Vant,在线问诊项目,H5',
   markdown: {
@@ -21,7 +23,7 @@ module.exports = {
       { text: 'Pinia', link: '/pinia/' },
       { text: '优医问诊', link: '/project/' },
     ],
-    search: true,
+    // search: true,
     socialLinks: [
       { icon: 'github', link: 'http://git.itcast.cn/heimaqianduan/consult-patients-h5-vue3' },
     ],
@@ -29,9 +31,7 @@ module.exports = {
       message: 'Released under the MIT License.',
       copyright: 'Copyright © 2022-present Allen Zhou'
     },
-    themeConfig: {
-      lastUpdatedText: 'Updated Date'
-    },
+    lastUpdatedText: '更新',
     sidebar: {
       '/vue/': [
         {
@@ -80,4 +80,4 @@ module.exports = {
       ],
     }
   }
-}
+})
