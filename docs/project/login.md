@@ -978,8 +978,8 @@ const login = async () => {
 +    ? await loginByPassword(mobile.value, password.value)
 +    : await loginByMobile(mobile.value, code.value)
   store.setUser(res.data)
-  // 如果有回跳地址就进行回跳，没有跳转到个人中心
-  router.push((route.query.returnUrl as string) || '/user')
+  // 如果有回跳地址就进行回跳，没有跳转到个人中心，replace目的 a => login  => b  变成 a => b
+  router.replace((route.query.returnUrl as string) || '/user')
   Toast.success('登录成功')
 }
 ```
