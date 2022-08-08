@@ -16,7 +16,7 @@ module.exports = {
       indexName: 'patient-h5'
     },
     nav: [
-      { text: 'Vue3.0', link: '/vue/' },
+      { text: 'vue3', link: '/vue/' },
       { text: 'TypeScript', link: '/ts/' },
       { text: 'Pinia', link: '/pinia/' },
       { text: '优医问诊', link: '/project/' },
