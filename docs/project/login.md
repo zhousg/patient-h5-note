@@ -106,6 +106,7 @@ a {
   --cp-disable: #D9DBDE;
   --cp-line: #EDEDED;
   --cp-bg: #F6F7F9;
+  --cp-price: #EB5757;
   // 覆盖vant主体色
   --van-primary-color: var(--cp-primary);
 }

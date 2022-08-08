@@ -1,7 +1,13 @@
 # 用户模块
 
 
+
+## 布局容器{#layout}
+
+![image-20220808185458747](./images/image-20220808185458747.png)
+
 ## 布局容器-组件路由{#layout-routes}
+
 > 实现：首页，健康百科，消息通知，我的，布局容器的搭建
 
 - 基础组件
@@ -249,7 +255,79 @@ declare module 'vue-router' {
 }
 ```
 
-## 个人中心-用户信息类型定义{#user-types}
+
+
+## 个人中心{#user}
+
+![image-20220808185103327](./images/image-20220808185103327.png)
+
+## 个人中心-用户信息类型{#user-types}
+
+> 掌握：Pick 与 Omit 从现有类型中得到可复用类型
+
+场景：
+- 有 `User` 对象类型，现在需要 `UserInfo` 类型，字段多一些
+- 使用 交叉类型  可以复用 `User` 类型，但是不需要 token 属性
+
+Pick 与 Omit TS内置类型
+
+- Pick 可以从一个对象类型中 取出某些属性
+```ts
+type Person = {
+  name: string
+  age: number
+}
+type PickPerson = Pick<Person, 'age'>
+// PickPerson === { age: string }
+```
+- Omit 可以从一个对象类型中 排出某些属性
+```ts
+type Person = {
+  name: string
+  age: number
+}
+type OmitPerson = Omit<Person, 'age'>
+// OmitPerson === { name: string }
+```
+
+
+落地代码：
+```ts{13-26}
+// 用户信息
+export type User = {
+  token: string
+  id: string
+  account: string
+  mobile: string
+  avatar: string
+}
+
+// 短信验证码类型
+export type CodeType = 'login' | 'register' | 'changeMobile' | 'forgetPassword' | 'bindMobile'
+
+// 个人信息
+type OmitUser = Omit<User, 'token'>
+export type UserInfo = OmitUser & {
+  likeNumber: number
+  collectionNumber: number
+  score: number
+  couponNumber: number
+  orderInfo: {
+    paidNumber: number
+    receivedNumber: number
+    shippedNumber: number
+    finishedNumber: number
+  }
+}
+```
+小结：
+- `Pick` 作用？
+  - 从类型对象中取出指定的属性类型
+- `Omit` 作用？
+  - 从类型对象中排出指定的属性类型，得到剩余的
+
+
+
 
 ## 个人中心-头部展示{#user-head-render}
 > 实现：头部个人信息展示与订单卡片布局
@@ -408,18 +486,353 @@ declare module 'vue-router' {
 ```
 
 2）定义API函数
+```ts
+import type { CodeType, User, UserInfo } from '@/types/user'
 
+// ... 省略 ...
+
+// 获取个人信息
+export const getUserInfo = () => reuqest<UserInfo>('/patient/myUser')
+```
 
 
 3）获取数据进行渲染
+
+```ts
+import { getUserInfo } from '@/services/user'
+import type { UserInfo } from '@/types/user'
+import { onMounted, ref } from 'vue'
+
+const user = ref<UserInfo>()
+onMounted(async () => {
+  const res = await getUserInfo()
+  user.value = res.data
+})
+```
+
+```diff
++<div class="user-page" v-if="user">
+    <div class="user-page-head">
+      <div class="top">
++        <van-image round fit="cover" :src="user.avatar" />
+        <div class="name">
++          <p>{{ user.account }}</p>
+          <p><van-icon name="edit" /></p>
+        </div>
+      </div>
+      <van-row>
+        <van-col span="6">
++          <p>{{ user.collectionNumber }}</p>
+          <p>收藏</p>
+        </van-col>
+        <van-col span="6">
++          <p>{{ user.likeNumber }}</p>
+          <p>关注</p>
+        </van-col>
+        <van-col span="6">
++          <p>{{ user.score }}</p>
+          <p>积分</p>
+        </van-col>
+        <van-col span="6">
++          <p>{{ user.couponNumber }}</p>
+          <p>优惠券</p>
+        </van-col>
+      </van-row>
+    </div>
+    <div class="user-page-order">
+      <div class="head">
+        <h3>药品订单</h3>
+        <router-link to="/order">全部订单 <van-icon name="arrow" /></router-link>
+      </div>
+      <van-row>
+        <van-col span="6">
++          <van-badge :content="user.orderInfo.paidNumber || ''">
+            <cp-icon name="user-paid" />
++          </van-badge>
+          <p>待付款</p>
+        </van-col>
+        <van-col span="6">
++          <van-badge :content="user.orderInfo.shippedNumber || ''">
+            <cp-icon name="user-shipped" />
++          </van-badge>
+          <p>待发货</p>
+        </van-col>
+        <van-col span="6">
++          <van-badge :content="user.orderInfo.receivedNumber || ''">
+            <cp-icon name="user-received" />
++          </van-badge>
+          <p>待收货</p>
+        </van-col>
+        <van-col span="6">
++          <van-badge :content="user.orderInfo.finishedNumber || ''">
+            <cp-icon name="user-finished" />
++          </van-badge>
+          <p>已完成</p>
+        </van-col>
+      </van-row>
+    </div>
+  </div>
+```
 
 
 
 ## 个人中心-快捷工具{#user-tools}
 > 实现：快捷工具栏目渲染
 
+步骤：
+- 准备初始化结构
+- 准备初始化数据
+- 遍历
+
+代码：
+1）准备初始化结构
+```html
+    <div class="user-page-group">
+      <h3>快捷工具</h3>
+      <van-cell title="标题" is-link :border="false" >
+        <template #icon><cp-icon name="user-tool-01" /></template>
+      </van-cell>
+      <van-cell title="标题" is-link :border="false" >
+        <template #icon><cp-icon name="user-tool-01" /></template>
+      </van-cell>
+    </div>
+```
+```scss
+  // 分组
+  &-group {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    h3 {
+      padding-left: 16px;
+      line-height: 44px;
+    }
+    .van-cell {
+      align-items: center;
+    }
+    .cp-icon {
+      font-size: 17px;
+      margin-right: 10px;
+    }
+  }
+```
+
+2）准备初始化数据
+
+```ts
+const tools = [
+  { label: '我的问诊', path: '/consult' },
+  { label: '我的处方', path: '/' },
+  { label: '家庭档案', path: '/user/patient' },
+  { label: '地址管理', path: '/user/address' },
+  { label: '我的评价', path: '/' },
+  { label: '官方客服', path: '/' },
+  { label: '设置', path: '/' }
+]
+```
+
+3）遍历
+
+```html
+    <div class="user-page-group">
+      <h3>快捷工具</h3>
+      <van-cell
+        :title="item.label"
+        is-link
+        :to="item.path"
+        :border="false"
+        v-for="(item, i) in tools"
+        :key="i"
+      >
+        <template #icon><cp-icon :name="`user-tool-0${i + 1}`" /></template>
+      </van-cell>
+    </div>
+```
 
 ## 个人中心-退出登录{#user-logout}
 > 实现：退出功能
+
+步骤：
+- 准备按钮
+- 实现退出
+  - 确认框
+  - 清除token
+  - 跳转登录
+
+代码：
+
+1）准备按钮
+```html
+<a class="logout" href="javascript:;">退出登录</a>
+```
+```scss
+  .logout {
+    display: block;
+    margin: 20px auto;
+    width: 100px;
+    text-align: center;
+    color: var(--cp-price);
+  }
+```
+
+2）实现退出
+
+```ts
+import { useUserStore } from '@/stores/index'
+
+// ... 胜省略 ...
+
+const store = useUserStore()
+const router = useRouter()
+const logout = async () => {
+  await Dialog.confirm({
+    title: '温馨提示',
+    message: '您确认要退出优医问诊吗？',
+    cancelButtonText: '取消',
+    confirmButtonText: '确认'
+  })
+  store.delUser()
+  router.push('/login')
+}
+```
+
+
+
+## 家庭档案{#patient}
+
+![image-20220808184827626](./images/image-20220808184827626.png)
+
+## 家庭档案-路由与组件{#patient-html}
+
+
+
+> 实现：路由的配置与组件基础布局
+
+- 路由 `router/index.ts`
+```ts
+    {
+      path: '/user/patient',
+      component: () => import('@/views/User/PatientPage.vue'),
+      meta: { title: '家庭档案' }
+    }
+```
+注意是一级路由
+
+- 组件
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="patient-page">
+    <cp-nav-bar title="家庭档案" />
+    <div class="patient-list">
+      <div class="patient-item">
+        <div class="info">
+          <span class="name">李富贵</span>
+          <span class="id">321***********6164</span>
+          <span>男</span>
+          <span>32岁</span>
+        </div>
+        <div class="icon"><cp-icon name="user-edit" /></div>
+        <div class="tag">默认</div>
+      </div>
+      <div class="patient-item">
+        <div class="info">
+          <span class="name">李富贵</span>
+          <span class="id">321***********6164</span>
+          <span>男</span>
+          <span>32岁</span>
+        </div>
+        <div class="icon"><cp-icon name="user-edit" /></div>
+      </div>
+      <div class="patient-add">
+        <cp-icon name="user-add" />
+        <p>添加患者</p>
+      </div>
+      <div class="patient-tip">最多可添加 6 人</div>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.patient-page {
+  padding: 46px 0 80px;
+}
+.patient-list {
+  padding: 15px;
+}
+.patient-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  background-color: var(--cp-bg);
+  border-radius: 8px;
+  margin-bottom: 15px;
+  position: relative;
+  border: 1px solid var(--cp-bg);
+  transition: all 0.3s;
+  overflow: hidden;
+  .info {
+    display: flex;
+    flex-wrap: wrap;
+    flex: 1;
+    span {
+      color: var(--cp-tip);
+      margin-right: 20px;
+      line-height: 30px;
+      &.name {
+        font-size: 16px;
+        color: var(--cp-text1);
+      }
+      &.id {
+        color: var(--cp-text2);
+        width: 200px;
+      }
+    }
+  }
+  .icon {
+    color: var(--cp-tag);
+    width: 20px;
+    text-align: center;
+  }
+  .tag {
+    position: absolute;
+    right: 60px;
+    top: 21px;
+    width: 30px;
+    height: 16px;
+    font-size: 10px;
+    color: #fff;
+    background-color: var(--cp-primary);
+    border-radius: 2px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  &.selected {
+    border-color: var(--cp-primary);
+    background-color: var(--cp-plain);
+    .icon {
+      color: var(--cp-primary);
+    }
+  }
+}
+.patient-add {
+  background-color: var(--cp-bg);
+  color: var(--cp-primary);
+  text-align: center;
+  padding: 15px 0;
+  border-radius: 8px;
+  .cp-icon {
+    font-size: 24px;
+  }
+}
+.patient-tip {
+  color: var(--cp-tag);
+  padding: 12px 0;
+}
+</style>
+```
+
 
 
