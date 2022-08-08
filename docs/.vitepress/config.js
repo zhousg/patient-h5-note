@@ -38,7 +38,7 @@ module.exports = {
           text: 'Vue3核心',
           items: [
             { text: '快速开始', link: '/vue/' }, 
-            { text: '组合API', link: '/vue/composition' },
+            { text: '组合式API', link: '/vue/composition' },
             { text: '综合案例', link: '/vue/case' },
           ]
         }

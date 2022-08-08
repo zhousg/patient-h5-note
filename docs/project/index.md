@@ -15,7 +15,7 @@
 4. 基于vite的create-vue构建vue3.0项目解决方案
 5. 基于pinia的状态管理解决方案
 6. 基于pinia-plugin-persistedstate状态持久化解决方案
-7. 基于@vuecore/use的组合API工具库解决方案
+7. 基于@vuecore/use的组合式API工具库解决方案
 7. 基于id-validator的身份证信息校验解决方案
 8. 基于postcss-px-to-viewport移动端适配解决方案
 9.  基于vite-plugin-svg-icons的svg图标组件解决方案
