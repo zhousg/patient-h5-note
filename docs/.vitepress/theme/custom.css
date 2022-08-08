@@ -39,3 +39,8 @@ img {
     padding: 25px;
   }
 }
+
+
+.vp-doc blockquote{
+  border-left-color: var(--vp-c-brand);
+}
