@@ -833,6 +833,115 @@ const logout = async () => {
 }
 </style>
 ```
+定制化比较高的页面还是需要自己写，目前项目阶段大家知道结构即可。
+
+## 家庭档案-展示患者{#patient-list}
+
+> 实现：患者的查询操作业务逻辑
+
+步骤：
+- 定义 api 函数，以及对应类型
+- 实现查询患者业务
+
+代码：
+
+1）定义 api 函数，以及对应类型
+
+- 定义类型
+`types/user.d.ts`
+```ts
+// 家庭档案-患者信息
+export type Patient = {
+  id: string
+  name: string
+  idCard: string
+  defaultFlag: '0' | '1'
+  gender: '0' | '1'
+  genderValue: string
+  age: number
+}
+
+// 家庭档案-患者信息列表
+export type PatientList = Patient[]
+```
+- 定义API
+
+```ts
+import type { CodeType, PatientList, User, UserInfo } from '@/types/user'
+// ... 省略 ...
+// 获患者信息列表
+export const getPatientList = () => reuqest<PatientList>('/patient/mylist')
+```
+
+
+2）实现查询患者业务
+
+- 获取数据
+```ts
+import { getPatientList } from '@/services/user.js'
+import type { PatientList } from '@/types/user'
+import { onMounted, ref } from 'vue'
+
+// 1. 页面初始化加载数据
+const list = ref<PatientList>([])
+const loadList = async () => {
+  const res = await getPatientList()
+  list.value = res.data
+}
+onMounted(() => {
+  loadList()
+})
+```
+
+- 进行渲染
+
+```html
+      <div class="patient-item" v-for="item in list" :key="item.id">
+        <div class="info">
+          <span class="name">{{ item.name }}</span>
+          <span class="id">{{ item.idCard.replace(/^(.{6})(?:\w+)(.{4})$/, '\$1******\$2') }}</span>
+          <span>{{ item.genderValue }}</span>
+          <span>{{ item.age }}岁</span>
+        </div>
+        <div class="icon"><cp-icon name="user-edit" /></div>
+        <div class="tag" v-if="item.defaultFlag === '1'">默认</div>
+      </div>
+      <div class="patient-add" v-if="list.length < 6">
+```
+身份证脱敏处理：`/^(.{6})(?:\w+)(.{4})$/` 匹配第一个$1 匹配第二个$2 自行拼接*号
+
+
+
+## 家庭档案-添加患者{#patient-add}
+
+> 实现：患者的添加操作业务逻辑
+
+步骤：
+- 使用 `popup` 组件实现侧滑栏效果
+- 绘制表单，添加校验
+- 定义 api 函数，以及对应类型
+- 实现添加患者业务
+
+代码：
+1）使用 `popup` 组件实现侧滑栏效果
+
+2）绘制表单，添加校验
+
+3）定义 api 函数，以及对应类型
+
+4）实现添加患者业务
+
+
+## 家庭档案-编辑患者{#patient-edit}
+
+> 实现：患者的编辑操作业务逻辑
+
+
+
+
+## 家庭档案-删除患者{#patient-del}
+
+> 实现：患者的删除操作业务逻辑
 
 
 
