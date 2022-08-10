@@ -72,8 +72,9 @@ export default defineConfig({
             { text: '4. 首页模块', link: '/project/home' }, 
             { text: '5. 快速问诊模块', link: '/project/fast' }, 
             { text: '6. 问诊室模块', link: '/project/room' }, 
-            { text: '7. 订单模块', link: '/project/order' }, 
-            { text: '8. 其他扩展', link: '/project/end' }, 
+            { text: '7. 地址管理', link: '/project/address' }, 
+            { text: '8. 订单模块', link: '/project/order' }, 
+            { text: '9. 其他扩展', link: '/project/end' }, 
             { text: '辅助-超级医生', link: '/project/super-doctor' },
           ]
         }

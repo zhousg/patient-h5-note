@@ -1,3 +1,4 @@
+
 # 用户模块
 
 
@@ -845,26 +846,26 @@ const logout = async () => {
 
 代码：
 
-1）定义 api 函数，以及对应类型
+1）定义 api 函数，以及对应类型 
 
-- 定义类型
+- 定义类型 `types/user.d.ts`
 `types/user.d.ts`
 ```ts
 // 家庭档案-患者信息
 export type Patient = {
-  id: string
+  id?: string
   name: string
   idCard: string
   defaultFlag: '0' | '1'
   gender: '0' | '1'
-  genderValue: string
-  age: number
+  genderValue?: string
+  age?: number
 }
 
 // 家庭档案-患者信息列表
 export type PatientList = Patient[]
 ```
-- 定义API
+- 定义API `services/user.ts`
 
 ```ts
 import type { CodeType, PatientList, User, UserInfo } from '@/types/user'
@@ -874,11 +875,11 @@ export const getPatientList = () => reuqest<PatientList>('/patient/mylist')
 ```
 
 
-2）实现查询患者业务
+2）实现查询患者业务 `User/PatientPage.vue`
 
 - 获取数据
 ```ts
-import { getPatientList } from '@/services/user.js'
+import { getPatientList } from '@/services/user'
 import type { PatientList } from '@/types/user'
 import { onMounted, ref } from 'vue'
 
@@ -899,7 +900,7 @@ onMounted(() => {
       <div class="patient-item" v-for="item in list" :key="item.id">
         <div class="info">
           <span class="name">{{ item.name }}</span>
-          <span class="id">{{ item.idCard.replace(/^(.{6})(?:\w+)(.{4})$/, '\$1******\$2') }}</span>
+          <span class="id">{{ item.idCard.replace(/^(.{6})(?:\d+)(.{4})$/, '\$1******\$2') }}</span>
           <span>{{ item.genderValue }}</span>
           <span>{{ item.age }}岁</span>
         </div>
@@ -908,7 +909,485 @@ onMounted(() => {
       </div>
       <div class="patient-add" v-if="list.length < 6">
 ```
-身份证脱敏处理：`/^(.{6})(?:\w+)(.{4})$/` 匹配第一个$1 匹配第二个$2 自行拼接*号
+身份证脱敏处理：`/^(.{6})(?:\d+)(.{4})$/`
+- 匹配第一个$1 `^(.{6})` 
+- `?:` 不作为匹配结果存储
+- 匹配第二个$2 `(.{4})$`
+
+
+## 家庭档案-v-model语法糖{#v-model}
+> 掌握：vue3中v-model语法糖原理
+
+回顾：
+- vue2 中父子组件数据同步 父→子 子→父 如何实现？
+  - `v-model="count"` 或者 `xxx.sync="msg"`
+- v-model 语法糖 完整写法？
+  - `:value="count"` 和 `@input="count=$event"`
+- xxx.sync 语法糖 完整写法？
+  - `:xxx="msg"` 和 `@update:xxx="msg=$event"`
+
+现在：一个 v-model 指令搞定，不需要记忆两种语法
+- vue3 中 `v-model` 语法糖
+```html
+<com-a v-model="count"></com-a>
+<!-- 等价 -->
+<com-a :modelValue="count" @update:modelValue="count=$event"></com-a>
+```
+```html
+<com-a v-model:msg="str"></com-a>
+<!-- 等价 -->
+<com-a :msg="str" @update:msg="str=$event"></com-a>
+```
+小结：
+- vue3中只需要 `v-model` 指令可以支持对个数据在父子组件同步，不再支持 `.sync` 语法。
+
+提问：
+- vue3 中 v-model 语法糖？
+  - `:modelValue="count"` 和 `@update:modelValue="count=$event"`
+- vue3 中 v-model:xxx 语法糖？
+  - `:xxx="count"` 和 `@update:xxx="count=$event"`
+
+
+## 家庭档案-侧边栏显示隐藏{#patient-popup}
+> 实现：使用 van-popup 完成侧边栏效果
+
+需求：
+- 使用 van-popup 组件，实现显示隐藏
+- 不使用 v-model 实现父子数据同步，理解语法糖
+- 扩展 cp-nav-bar 组件，支持自定义返回
+
+代码：
+
+1）使用 van-popup 组件，实现显示隐藏 `User/PatientPage.vue`
+
+```ts
+// 2. 打开侧滑栏
+const show = ref(false)
+const showPopup = () => {
+  show.value = true
+}
+```
+```html
+    <!-- 侧边栏 -->
+    <van-popup v-model:show="show" position="right">
+      <cp-nav-bar title="添加患者" right-text="保存"></cp-nav-bar>
+    </van-popup>
+```
+```scss
+.patient-page {
+  padding: 46px 0 80px;
+  ::v-deep() {
+    .van-popup {
+      width: 80%;
+      height: 100%;
+    }
+  }
+}
+```
+
+2) 不使用 v-model 实现父子数据同步，理解语法糖
+
+```html
+    <van-popup :show="show" @update:show="show=$event" position="right">
+      <cp-nav-bar title="添加患者" right-text="保存"></cp-nav-bar>
+    </van-popup>
+```
+这种写法麻烦，知道写法即可，一般使用 `v-model:show="show"`
+
+3) 扩展 cp-nav-bar 组件，支持自定义返回
+
+扩展 back 属性，如果有就执行 back 对应的函数。
+
+```diff
+const router = useRouter()
+const onClickLeft = () => {
++  if (props.back) {
++    return props.back()
++  }
+  // 判断历史记录中是否有回退
+  if (history.state?.back) {
+    router.back()
+  } else {
+    router.push('/')
+  }
+}
+
+// 2. 使用组件时候才能确定的功能：标题，右侧文字，点击右侧文字行为（props传入）
++const props = defineProps<{
+  title?: string
+  rightText?: string
++  back?: () => void
+}>()
+```
+
+`User/PatientPage.vue` 全屏展示，空出导航栏
+
+```html
+<cp-nav-bar :back="() => (show = false)" title="添加患者" right-text="保存"></cp-nav-bar>
+```
+```scss
+.patient-page {
+  padding: 46px 0 80px;
+  ::v-deep() {
+    .van-popup {
+      width: 80%;
+      height: 100%;
+      padding-top: 46px;
+      box-sizing: border-box;
+    }
+  }
+}
+```
+
+小结：
+- 属性可以传函数吗？
+  - 可以
+- popup 组件怎么双向绑定？
+  - v-model:show
+
+## cp-radio-btn 组件封装{#patient-cp-radio-btn}
+> 实现：按钮组单选框组件
+
+需求：
+- 实现基础布局
+- 实现组件的渲染
+- 默认选中
+- 切换选中
+- 改用 v-model 写法
+
+代码：
+
+1）实现基础布局 `components/CpRadioBtn.vue`
+ 
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="cp-radio-btn">
+    <a class="item" href="javascript:;">男</a>
+    <a class="item" href="javascript:;">女</a>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.cp-radio-btn {
+  display: flex;
+  flex-wrap: wrap;
+  .item {
+    height: 32px;
+    min-width: 70px;
+    line-height: 30px;
+    padding: 0 14px;
+    text-align: center;
+    border: 1px solid var(--cp-bg);
+    background-color: var(--cp-bg);
+    margin-right: 10px;
+    box-sizing: border-box;
+    color: var(--cp-text2);
+    margin-bottom: 10px;
+    border-radius: 4px;
+    &.active {
+      border-color: var(--cp-primary);
+      background-color: var(--cp-plain);
+    }
+  }
+}
+</style>
+```
+
+```diff
+import CpNavBar from '@/components/CpNavBar.vue'
+import CpIcon from '@/components/CpIcon.vue'
++import CpRadioBtn from '@/components/CpRadioBtn.vue'
+
+declare module 'vue' {
+  interface GlobalComponents {
+    CpNavBar: typeof CpNavBar
+    CpIcon: typeof CpIcon
++    CpRadioBtn: typeof CpRadioBtn
+  }
+}
+```
+
+2）实现组件的渲染
+- 使用传入数组额方式动态展示需要显示的按钮
+
+`components/CpRadioBtn.vue`
+```vue
+<script setup lang="ts">
+defineProps<{
+  options: {
+    label: string
+    value: string | number
+  }[]
+}>()
+</script>
+
+<template>
+  <div class="cp-radio-btn">
+    <a class="item" href="javascript:;" v-for="item in options" :key="item.value">
+      {{ item.label }}
+    </a>
+  </div>
+</template>
+```
+
+`User/PatientPage.vue`
+```ts
+const options = [
+  { label: '男', value: '1' },
+  { label: '女', value: '0' }
+]
+```
+```html
+  <cp-radio-btn :options="options"></cp-radio-btn>
+```
+
+
+3）默认选中
+
+使用组件：`User/PatientPage.vue`
+```ts
+const gender = ref('1')
+```
+```html
+<cp-radio-btn :options="options" :modelValue="gender"></cp-radio-btn>
+```
+定义组件：`components/CpRadioBtn.vue`
+```vue{7,18}
+<script setup lang="ts">
+defineProps<{
+  options: {
+    label: string
+    value: string | number
+  }[]
+  modelValue: string | number
+}>()
+</script>
+
+<template>
+  <div class="cp-radio-btn">
+    <a
+      class="item"
+      href="javascript:;"
+      v-for="item in options"
+      :key="item.value"
+      :class="{ active: modelValue === item.value }"
+    >
+      {{ item.label }}
+    </a>
+  </div>
+</template>
+```
+
+
+4）切换效果
+
+使用组件：`User/PatientPage.vue`  暂时不管类型校验，这种写法不常用
+```html
+            <cp-radio-btn
+              :options="options"
+              :modelValue="gender"
+              @update:model-value="gender = $event"
+            ></cp-radio-btn>
+```
+
+定义组件：`components/CpRadioBtn.vue`
+```ts
+const emit = defineEmits<{
+  (e: 'update:modelValue', value: string | number): void
+}>()
+const toggleItem = (value: string | number) => {
+  // 触发自定义事件把数据给父组件
+  emit('update:modelValue', value)
+}
+```
+```diff
+    <a
+      class="item"
+      href="javascript:;"
+      v-for="item in options"
+      :key="item.value"
+      :class="{ active: modelValue === item.value }"
++      @click="toggleItem(item.value)"
+    >
+      {{ item.label }}
+    </a>
+```
+
+5）改用 v-model 写法
+
+```html
+  <cp-radio-btn
+    :options="options"
+    v-model="gender"
+  ></cp-radio-btn>
+```
+
+提问：
+- `options` 作用是？
+  - 提供可选项
+- `v-model` 语法糖，拆分写法？
+  - `:modelValue="count"` 和 `@update:modelValue="count=$event"`
+
+
+## 家庭档案-准备表单{#patient-form}
+
+> 实现：患者信息录入的表单和绑定数据
+
+需求：
+- 绘制表单
+- 绑定数据
+- 打开侧滑栏重置表单
+
+代码：`User/PatientPage.vue` 
+
+1）绘制表单
+```html
+<van-form autocomplete="off">
+  <van-field label="真实姓名" placeholder="请输入真实姓名" />
+  <van-field label="身份证号" placeholder="请输入身份证号" />
+  <van-field label="性别">
+    <!-- 单选按钮组件 -->
+    <template #input>
+      <cp-radio-btn :options="options"></cp-radio-btn>
+    </template>
+  </van-field>
+  <van-field label="默认就诊人">
+    <template #input>
+      <van-checkbox round />
+    </template>
+  </van-field>
+</van-form>
+```
+
+2）绑定数据
+```ts
+import type { Patient, PatientList } from '@/types/user'
+import { computed, onMounted, ref } from 'vue'
+```
+```ts
+const patient = ref<Patient>({
+  name: '',
+  idCard: '',
+  gender: '1',
+  defaultFlag: '0'
+})
+// 默认值需要转换
+const defaultFlag = computed({
+  get() {
+    return patient.value.defaultFlag === '1' ? true : false
+  },
+  set(value) {
+    patient.value.defaultFlag = value ? '1' : '0'
+  }
+})
+```
+
+3）打开侧滑栏重置表单
+```ts
+const initPatient: Patient = {
+  name: '',
+  idCard: '',
+  gender: '1',
+  defaultFlag: '0'
+}
+const patient = ref<Patient>({ ...initPatient })
+```
+```diff
+// 2. 打开侧滑栏
+const show = ref(false)
+const showPopup = () => {
++  patient.value = { ...initPatient }
+  show.value = true
+}
+```
+
+小结：
+- 为什么使用计算属性 get set 写法？
+  - 组件需要的是 布尔 类型，需要通过计算属性转换一下
+- 为什么要解构初始数据？
+  - 克隆一份新数据，要不然是同一个对象。
+
+
+## 家庭档案-身份证校验{#patient-validate}
+
+> 实现：提交的时候校验表单，身份证需要校验格式
+
+需求：
+- 点击保存按钮进行校验
+  - 名字非空，身份证非空
+  - 身份证格式，性别需要和填写的一致
+
+代码：
+
+1）名字非空，身份证非空
+```html{5}
+      <cp-nav-bar
+        :back="() => (show = false)"
+        title="添加患者"
+        right-text="保存"
+        @click-right="submit"
+      ></cp-nav-bar>
+```
+```ts
+const submit = () => {
+  if (!patient.value.name) return Toast('请输入真实姓名')
+  if (!patient.value.idCard) return Toast('请输入身份证号')
+}
+```
+
+2）身份证格式，性别需要和填写的一致
+- 测试号 
+- 110101198307212600 
+- 110101196107145504 
+- 11010119890512132X 
+- 110101196501023433
+- 110101197806108758
+- 110101198702171378
+- 110101198203195893
+- 如有雷同纯属巧合，可删除。
+
+[身份证验证](https://github.com/mc-zone/IDValidator) 
+
+```bash
+npm i id-validator --save
+```
+
+由于是比较老的库，没有提供类型，自己定义类型 `types/id-validator`
+```ts
+declare module 'id-validator' {
+  // 默认导出的，class是es6的类语法，对应 es5 的构造函数
+  export default class {
+    // es6 类中的方法，对应 es5 的原型方法
+    isValid(id: tring): boolean
+    getInfo(id: tring): {
+      sex: number
+    }
+  }
+}
+```
+
+`User/PatientPage.vue` 使用库进行校验
+
+```ts
+import { Toast } from 'vant'
+import Validator from 'id-validator'
+```
+```ts{4-7}
+const submit = () => {
+  if (!patient.value.name) return Toast('请输入真实姓名')
+  if (!patient.value.idCard) return Toast('请输入身份证号')
+  const validate = new Validator()
+  if (!validate.isValid(patient.value.idCard)) return Toast('身份证格式错误')
+  const { sex } = validate.getInfo(patient.value.idCard)
+  if (+patient.value.gender !== sex) return Toast('性别和身份证不符')
+}
+```
+
+小结：
+- 模块默认返回是构造函数怎么写类型声明文件？
+  - `declare module 'id-validate' { export default class {}  }`
 
 
 
@@ -917,19 +1396,43 @@ onMounted(() => {
 > 实现：患者的添加操作业务逻辑
 
 步骤：
-- 使用 `popup` 组件实现侧滑栏效果
-- 绘制表单，添加校验
 - 定义 api 函数，以及对应类型
 - 实现添加患者业务
 
 代码：
-1）使用 `popup` 组件实现侧滑栏效果
 
-2）绘制表单，添加校验
+1）定义 api 函数
 
-3）定义 api 函数，以及对应类型
+```ts
+import type { CodeType, Patient, PatientList, User, UserInfo } from '@/types/user'
 
-4）实现添加患者业务
+// 添加患者信息
+export const addPatient = (patient: Patient) => reuqest('/patient/add', 'POST', patient)
+```
+
+
+2）实现添加患者业务
+
+```diff
++import { addPatient, getPatientList } from '@/services/user'
+
+// ... 省略 ...
+
+const submit = async () => {
+  if (!patient.value.name) return Toast('请输入真实姓名')
+  if (!patient.value.idCard) return Toast('请输入身份证号')
+  const validate = new Validator()
+  if (!validate.isValid(patient.value.idCard)) return Toast('身份证格式错误')
+  const { sex } = validate.getInfo(patient.value.idCard)
+  if (+patient.value.gender !== sex) return Toast('性别和身份证不符')
+
++  // 添加
++  await addPatient(patient.value)
++  show.value = false
++  loadList()
++  Toast.success('添加成功')
+}
+```
 
 
 ## 家庭档案-编辑患者{#patient-edit}
