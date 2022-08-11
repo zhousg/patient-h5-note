@@ -1439,6 +1439,70 @@ const submit = async () => {
 
 > 实现：患者的编辑操作业务逻辑
 
+步骤：
+- 打开对话框的时候，显示编辑患者信息界面
+  - 传入当前编辑的患者信息用于表单回显和界面展示
+- 编写 api 函数
+- 提交时候合并编辑请求
+
+代码：
+- 打开对话框，区分编辑和添加
+
+```html
+<div class="patient-add" v-if="list.length < 6" @click="showPopup()">
+```
+```html
+<div @click="showPopup(item)" class="icon"><cp-icon name="user-edit" /></div>
+```
+```ts
+const showPopup = (item?: Patient) => {
+  if (item) {
+    // 如果点的是编辑，解构出后台需要的数据
+    const { id, gender, name, idCard, defaultFlag } = item
+    patient.value = { id, gender, name, idCard, defaultFlag }
+  } else {
+    patient.value = { ...initPatient }
+  }
+  show.value = true
+}
+```
+```diff
+      <cp-nav-bar
+        :back="() => (show = false)"
++        :title="patient.id ? '编辑患者' : '添加患者'"
+        right-text="保存"
+        @click-right="submit"
+      ></cp-nav-bar>
+```
+
+- api 函数
+
+```ts
+// 编辑患者信息
+export const editPatient = (patient: Patient) => reuqest('/patient/update', 'PUT', patient)
+```
+
+- 合并编辑患者请求
+
+```ts
+import { addPatient, getPatientList, editPatient } from '@/services/user'
+```
+```ts{9-13}
+const submit = async () => {
+  if (!patient.value.name) return Toast('请输入真实姓名')
+  if (!patient.value.idCard) return Toast('请输入身份证号')
+  const validate = new Validator()
+  if (!validate.isValid(patient.value.idCard)) return Toast('身份证格式错误')
+  const { sex } = validate.getInfo(patient.value.idCard)
+  if (+patient.value.gender !== sex) return Toast('性别和身份证不符')
+
+  // 添加 & 修改
+  patient.value.id ? await editPatient(patient.value) : await addPatient(patient.value)
+  show.value = false
+  loadList()
+  Toast.success(patient.value.id ? '编辑成功' : '添加成功')
+}
+```
 
 
 
@@ -1446,5 +1510,62 @@ const submit = async () => {
 
 > 实现：患者的删除操作业务逻辑
 
+步骤：
+- 准备按钮
+- 定义API函数
+- 点击删除，弹出确认框，确认删除
 
+代码：
 
+- 准备按钮
+
+```diff
+      </van-form>
++      <van-action-bar>
++        <van-action-bar-button>删除</van-action-bar-button>
++      </van-action-bar>
+    </van-popup>
+```
+```scss
+// 底部操作栏
+.van-action-bar {
+  padding: 0 10px;
+  margin-bottom: 10px;
+  .van-button {
+    color: var(--cp-price);
+    background-color: var(--cp-bg);
+  }
+}
+```
+- 定义API
+
+```ts
+// 删除患者信息
+export const delPatient = (id: string) => reuqest(`/patient/del/${id}`, 'DELETE')
+```
+
+- 点击删除，弹出确认框，确认删除
+
+```html
+      <van-action-bar v-if="patient.id">
+        <van-action-bar-button @click="remove">删除</van-action-bar-button>
+      </van-action-bar>
+```
+```ts
+import { addPatient, getPatientList, editPatient, delPatient } from '@/services/user'
+// ... 省略 ...
+const remove = async () => {
+  if (patient.value.id) {
+    await Dialog.confirm({
+      title: '温馨提示',
+      message: `您确认要删除 ${patient.value.name} 患者信息吗 ？`,
+      cancelButtonText: '取消',
+      confirmButtonText: '确认'
+    })
+    await delPatient(patient.value.id)
+    show.value = false
+    loadList()
+    Toast.success('删除成功')
+  }
+}
+```
