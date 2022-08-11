@@ -735,11 +735,11 @@ const login = () => {
 
 ```ts
 import type { User } from '@/types/user'
-import { reuqest } from '@/utils/request'
+import { request } from '@/utils/request'
 
 // 密码登录
 export const loginByPassword = (mobile: string, password: string) =>
-  reuqest<User>('/login/password', 'POST', { mobile, password })
+  request<User>('/login/password', 'POST', { mobile, password })
 ```
 
 - 进行登录 `Login/index.vue`
@@ -856,15 +856,15 @@ export type CodeType = 'login' | 'register' | 'changeMobile' | 'forgetPassword' 
 
 ```diff
 +import type { CodeType, User } from '@/types/user'
-import { reuqest } from '@/utils/request'
+import { request } from '@/utils/request'
 
 // 密码登录
 export const loginByPassword = (mobile: string, password: string) =>
-  reuqest<User>('/login/password', 'POST', { mobile, password })
+  request<User>('/login/password', 'POST', { mobile, password })
 
 +// 发送验证码
 +export const sendMobileCode = (mobile: string, type: CodeType) =>
-+  reuqest('/code', 'GET', { mobile, type })
++  request('/code', 'GET', { mobile, type })
 ```
 
 2）发送验证码逻辑
@@ -965,7 +965,7 @@ const send = async () => {
 ```ts
 // 短信登录
 export const loginByMobile = (mobile: string, code: string) =>
-  reuqest<User>('/login', 'POST', { mobile, code })
+  request<User>('/login', 'POST', { mobile, code })
 ```
 
 - 合并短信登录

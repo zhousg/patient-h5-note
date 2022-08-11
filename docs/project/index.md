@@ -488,7 +488,7 @@ module.exports = {
 
 > 实现：token请求头携带，错误响应处理，401错误处理
 
-`utils/reuqest.ts`
+`utils/request.ts`
 ```ts
 import { useUserStore } from '@/stores'
 import router from '@/router'
@@ -557,7 +557,7 @@ export { baseURL, instance }
 - 导出一个通用的请求工具函数
 ```ts
 // 4. 请求工具函数
-const reuqest = (url: string, method = 'get', submitData?: object) => {
+const request = (url: string, method = 'get', submitData?: object) => {
   return instance.request({
     url,
     method,
@@ -581,7 +581,7 @@ type Data<T> = {
   data: T
 }
 // 4. 请求工具函数
-const reuqest = <T>(url: string, method: Method = 'get', submitData?: object) => {
+const request = <T>(url: string, method: Method = 'get', submitData?: object) => {
   return instance.request<T, Data<T>>({
     url,
     method,
@@ -599,21 +599,21 @@ const reuqest = <T>(url: string, method: Method = 'get', submitData?: object) =>
 `App.vue`
 ```vue
 <script setup lang="ts">
-import { reuqest } from '@/utils/request'
+import { request } from '@/utils/request'
 import type { User } from './types/user'
 import { Button as VanButton } from 'vant'
 import { useUserStore } from './stores'
 
 // 测试，请求拦截器，是否携带token，响应拦截器401拦截到登录地址
 const getUserInfo = async () => {
-  const res = await reuqest('/patient/myUser')
+  const res = await request('/patient/myUser')
   console.log(res)
 }
 
 // 测试，响应拦截器，出现非10000的情况，和返回剥离后的数据
 const store = useUserStore()
 const login = async () => {
-  const res = await reuqest<User>('/login/password', 'POST', {
+  const res = await request<User>('/login/password', 'POST', {
     mobile: '13211112222',
     // 密码 abc123456 测试：出现非10000的情况
     password: 'abc12345'

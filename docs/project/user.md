@@ -493,7 +493,7 @@ import type { CodeType, User, UserInfo } from '@/types/user'
 // ... 省略 ...
 
 // 获取个人信息
-export const getUserInfo = () => reuqest<UserInfo>('/patient/myUser')
+export const getUserInfo = () => request<UserInfo>('/patient/myUser')
 ```
 
 
@@ -856,8 +856,8 @@ export type Patient = {
   id?: string
   name: string
   idCard: string
-  defaultFlag: '0' | '1'
-  gender: '0' | '1'
+  defaultFlag: 0 | 1
+  gender: 0 | 1
   genderValue?: string
   age?: number
 }
@@ -871,7 +871,7 @@ export type PatientList = Patient[]
 import type { CodeType, PatientList, User, UserInfo } from '@/types/user'
 // ... 省略 ...
 // 获患者信息列表
-export const getPatientList = () => reuqest<PatientList>('/patient/mylist')
+export const getPatientList = () => request<PatientList>('/patient/mylist')
 ```
 
 
@@ -905,7 +905,7 @@ onMounted(() => {
           <span>{{ item.age }}岁</span>
         </div>
         <div class="icon"><cp-icon name="user-edit" /></div>
-        <div class="tag" v-if="item.defaultFlag === '1'">默认</div>
+        <div class="tag" v-if="item.defaultFlag === 1">默认</div>
       </div>
       <div class="patient-add" v-if="list.length < 6">
 ```
@@ -1135,8 +1135,8 @@ defineProps<{
 `User/PatientPage.vue`
 ```ts
 const options = [
-  { label: '男', value: '1' },
-  { label: '女', value: '0' }
+  { label: '男', value: 1 },
+  { label: '女', value: 0 }
 ]
 ```
 ```html
@@ -1270,16 +1270,16 @@ import { computed, onMounted, ref } from 'vue'
 const patient = ref<Patient>({
   name: '',
   idCard: '',
-  gender: '1',
-  defaultFlag: '0'
+  gender: 1,
+  defaultFlag: 0
 })
 // 默认值需要转换
 const defaultFlag = computed({
   get() {
-    return patient.value.defaultFlag === '1' ? true : false
+    return patient.value.defaultFlag === 1 ? true : false
   },
   set(value) {
-    patient.value.defaultFlag = value ? '1' : '0'
+    patient.value.defaultFlag = value ? 1 : 0
   }
 })
 ```
@@ -1289,8 +1289,8 @@ const defaultFlag = computed({
 const initPatient: Patient = {
   name: '',
   idCard: '',
-  gender: '1',
-  defaultFlag: '0'
+  gender: 1,
+  defaultFlag: 0
 }
 const patient = ref<Patient>({ ...initPatient })
 ```
@@ -1381,7 +1381,7 @@ const submit = () => {
   const validate = new Validator()
   if (!validate.isValid(patient.value.idCard)) return Toast('身份证格式错误')
   const { sex } = validate.getInfo(patient.value.idCard)
-  if (+patient.value.gender !== sex) return Toast('性别和身份证不符')
+  if (patient.value.gender !== sex) return Toast('性别和身份证不符')
 }
 ```
 
@@ -1407,7 +1407,7 @@ const submit = () => {
 import type { CodeType, Patient, PatientList, User, UserInfo } from '@/types/user'
 
 // 添加患者信息
-export const addPatient = (patient: Patient) => reuqest('/patient/add', 'POST', patient)
+export const addPatient = (patient: Patient) => request('/patient/add', 'POST', patient)
 ```
 
 
@@ -1424,7 +1424,7 @@ const submit = async () => {
   const validate = new Validator()
   if (!validate.isValid(patient.value.idCard)) return Toast('身份证格式错误')
   const { sex } = validate.getInfo(patient.value.idCard)
-  if (+patient.value.gender !== sex) return Toast('性别和身份证不符')
+  if (patient.value.gender !== sex) return Toast('性别和身份证不符')
 
 +  // 添加
 +  await addPatient(patient.value)
@@ -1479,7 +1479,7 @@ const showPopup = (item?: Patient) => {
 
 ```ts
 // 编辑患者信息
-export const editPatient = (patient: Patient) => reuqest('/patient/update', 'PUT', patient)
+export const editPatient = (patient: Patient) => request('/patient/update', 'PUT', patient)
 ```
 
 - 合并编辑患者请求
@@ -1494,7 +1494,7 @@ const submit = async () => {
   const validate = new Validator()
   if (!validate.isValid(patient.value.idCard)) return Toast('身份证格式错误')
   const { sex } = validate.getInfo(patient.value.idCard)
-  if (+patient.value.gender !== sex) return Toast('性别和身份证不符')
+  if (patient.value.gender !== sex) return Toast('性别和身份证不符')
 
   // 添加 & 修改
   patient.value.id ? await editPatient(patient.value) : await addPatient(patient.value)
@@ -1541,7 +1541,7 @@ const submit = async () => {
 
 ```ts
 // 删除患者信息
-export const delPatient = (id: string) => reuqest(`/patient/del/${id}`, 'DELETE')
+export const delPatient = (id: string) => request(`/patient/del/${id}`, 'DELETE')
 ```
 
 - 点击删除，弹出确认框，确认删除
