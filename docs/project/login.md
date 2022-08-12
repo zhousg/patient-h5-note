@@ -923,7 +923,7 @@ const send = async () => {
 ```diff
 const form = ref<FormInstance>()
 const time = ref(0)
-+let timeId: number | undefined
++let timeId: number
 const send = async () => {
   if (time.value > 0) return
   await form.value?.validate('mobile')
@@ -932,16 +932,19 @@ const send = async () => {
   time.value = 60
 +  // 倒计时
 +  clearInterval(timeId)
-+  timeId = setInterval(() => {
++  timeId = window.setInterval(() => {
 +    time.value--
-+    if (time.value <= 0) clearInterval(timeId)
++    if (time.value <= 0) window.clearInterval(timeId)
 +  }, 1000)
 }
 +onUnmounted(() => {
-+  clearInterval(timeId)
++  window.clearInterval(timeId)
 +})
 ```
-注意：组件卸载关闭定时器
+注意：
+- 组件卸载关闭定时器
+- 定时器相关函数是 window 去调用，因为 node 也有定时器返回类型不一样。
+
 
 - 界面展示
 ```html

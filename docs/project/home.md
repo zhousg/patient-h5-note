@@ -194,7 +194,7 @@
   - van-swipe 
 
 
-## 首页模块-知识列表搭建{#home-knowledge-html}
+## 首页模块-切换知识列表{#home-knowledge-html}
 > 实现：tab切换效果，准备知识列表组件
 
 步骤：
@@ -312,11 +312,11 @@
       }
     }
     .btn {
-      padding: 0 16px;
+      padding: 0 12px;
       border-color: var(--cp-primary);
       color: var(--cp-primary);
       height: 28px;
-      width: 70px;
+      width: 72px;
     }
   }
   .body {
@@ -339,12 +339,12 @@
       color: var(--cp-text3);
     }
     .imgs {
-      margin-top: 6px;
+      margin-top: 7px;
       display: flex;
       .van-image {
         width: 106px;
         height: 106px;
-        margin-right: 16px;
+        margin-right: 12px;
         border-radius: 12px;
         overflow: hidden;
         &:last-child {
@@ -387,7 +387,8 @@ import KnowledgeList from './components/KnowledgeList.vue'
 
 `types/fast.d.ts`
 ```ts
-
+// 文章类型
+export type KnowledgeType = 'like' | 'recommend' | 'fatReduction' | 'food'
 ```
 
 `Home/index.vue`
@@ -412,18 +413,9 @@ const active = ref<KnowledgeType>('recommend')
   - 将来查询知识问诊列表的类型，局限于4个值。
 
 
+## 首页模块-知识加载-效果{#home-knowledge-load}
 
-## 首页模块-知识列表加载{#home-knowledge-load}
-> 实现：识列表组件滚动加载
-
-步骤：
-- 使用 van-list 组件实现上拉加载更多效果
-- 定义 api 函数
-- 实现加载数据和渲染
-
-代码：
-
-1）使用 van-list 组件实现上拉加载更多效果 `Home/components/KnowledgeList.vue`
+> 实现：使用 van-list 组件完成加载更多效果
 
 ```vue
 <script setup lang="ts">
@@ -434,18 +426,28 @@ const finished = ref(false)
 const onLoad = () => {
   // 加载数据
   console.log('loading')
-  // 1. 发请求获取的数据（默认第一页）追加到数组
-  // 2. 判断是否还有数据（当前页是否等于总页数）
-  // 2.1 有，当前页+1
-  // 2.2 没，设置为已完成所有数据加载
-  // 3 结束加载效果
+  // 模拟加载更多
+  setTimeout(() => {
+    const data = [1, 2, 3, 4, 5]
+    list.value.push(...data)
+    // 模拟加载完毕
+    if (list.value.length > 20) {
+      finished.value = true
+    }
+    loading.value = false
+  }, 1000)
 }
 </script>
 
 <template>
   <div class="knowledge-list">
-    <van-list v-model:loading="loading" v-model:finished="finished" @load="onLoad">
-      <div class="knowledge-item van-hairline--bottom" v-for="i in 5" :key="i">
+    <van-list
+      v-model:loading="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onLoad"
+    >
+      <div class="knowledge-item van-hairline--bottom" v-for="(item, i) in list" :key="i">
         <!-- ...省略... -->
       </div>
     </van-list>
@@ -453,16 +455,564 @@ const onLoad = () => {
 </template>
 ```
 
-2）定义 api 函数
+小结：
+- v-model:loading 数据？
+  - 控制加载中效果
+- :finished 数据？
+  - 控制全部数据是否加载完成，true就不在触发加载
+- 触发加载事件，做什么？
+  - 发请求，追加数据，判断是否加载完成
+
+## 首页模块-知识数据-类型{#home-knowledge-type}
+
+> 实现：接口是分页，数据类型的定和传参类型的定义
+
+```ts
+// 文章信息类型
+export type Knowledge = {
+  id: string
+  title: string
+  coverUrl: string[]
+  topics: string[]
+  collectionNumber: number
+  commentNumber: number
+  creatorName: string
+  creatorAvatar: string
+  creatorHospatalName: string
+  likeFlag: 0 | 1
+  content: string
+  creatorDep: string
+  creatorTitles: string
+  creatorId: string
+}
+
+// 文章列表
+export type KnowledgeList = Knowledge[]
+
+// 文章列表带分页
+export type KnowledgePage = {
+  pageTotal: number
+  total: number
+  rows: KnowledgeList
+}
+
+// 文章列表查询参数
+export type KnowledgeParams = {
+  type: KnowledgeType
+  current: number
+  pageSize: number
+}
+```
+小结：
+- 拆分类型的目的？
+  - 尽量复用
+
+
+
+## 首页模块-知识加载-实现{#home-knowledge-logic}
+> 实现：知识列表组件滚动加载
+
+步骤：
+- 给组件传入 type 查询类型
+- 定义 api 函数
+- 实现加载数据和渲染
+
+代码：
+
+1）给组件传入 type 查询类型
+`Home/components/KnowledgeList.vue`
+```ts
+const props = defineProps<{
+  type: KnowledgeType
+}>()
+```
+`Home/index.vue`
+```html
+    <van-tabs shrink sticky v-model:active="active">
+      <van-tab title="关注" name="like"><knowledge-list type="like" /> </van-tab>
+      <van-tab title="推荐" name="recommend"><knowledge-list type="recommend" /></van-tab>
+      <van-tab title="减脂" name="fatReduction"><knowledge-list type="fatReduction" /></van-tab>
+      <van-tab title="饮食" name="food"><knowledge-list type="food" /></van-tab>
+    </van-tabs>
+```
+
+2）定义 api 函数 `services/fast.ts`
+```ts
+import type { KnowledgePage, KnowledgeParams } from '@/types/fast'
+import { request } from '@/utils/request'
+
+export const getKnowledgePage = (params: KnowledgeParams) =>
+  request<KnowledgePage>('/patient/home/knowledge', 'GET', { params })
+```
+
+
+3）实现加载数据和渲染
+
+```vue
+<script setup lang="ts">
+import { getKnowledgePage } from '@/services/fast'
+import type { KnowledgeList, KnowledgeParams, KnowledgeType } from '@/types/fast'
+import { ref } from 'vue'
+
+const props = defineProps<{
+  type: KnowledgeType
+}>()
+
+const loading = ref(false)
+const finished = ref(false)
+
+const list = ref<KnowledgeList>([])
+const params = ref<KnowledgeParams>({
+  type: props.type,
+  current: 1,
+  pageSize: 10
+})
+const onLoad = async () => {
+  // 加载更多
+  const res = await getKnowledgePage(params.value)
+  list.value.push(...res.data.rows)
+  if (params.value.current >= res.data.pageTotal) {
+    finished.value = true
+  } else {
+    params.value.current++
+  }
+  loading.value = false
+}
+</script>
+
+<template>
+  <div class="knowledge-list">
+    <van-list
+      v-model:loading="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onLoad"
+    >
+      <div class="knowledge-item van-hairline--bottom" v-for="item in list" :key="item.id">
+        <div class="head">
+          <van-image round class="avatar" :src="item.creatorAvatar"></van-image>
+          <div class="info">
+            <p class="name">{{ item.creatorName }}</p>
+            <p class="dep van-ellipsis">
+              {{ item.creatorHospatalName }} {{ item.creatorDep }} {{ item.creatorTitles }}
+            </p>
+          </div>
+          <van-button class="btn" size="small" round>
+            {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
+          </van-button>
+        </div>
+        <div class="body">
+          <h3 class="title van-ellipsis">{{ item.title }}</h3>
+          <p class="tag">
+            <span v-for="(tag, i) in item.topics" :key="i"># {{ tag }}</span>
+          </p>
+          <p class="intro van-multi-ellipsis--l2">{{ item.content }}</p>
+          <div class="imgs" :class="{ large: item.coverUrl.length === 1 }">
+            <van-image v-for="(url, i) in item.coverUrl" :key="i" :src="url" />
+          </div>
+          <p class="logs">
+            <span>{{ item.collectionNumber }} 收藏</span>
+            <span>{{ item.commentNumber }} 评论</span>
+          </p>
+        </div>
+      </div>
+    </van-list>
+  </div>
+</template>
+```
+
+
+## 首页模块-推荐关注医生-结构{#home-doctor}
+> 实现：在关注医生的文章列表下加上医生列表
+
+步骤：
+- 提取组件，定义组件基本结构
+- 查看 van-swipe 组件的使用
+- 添加医生卡片基本结构
+- 去除 指示器，关闭 无缝滚动，色值一次滚动一个卡片
+
+代码：
+
+1）提取组件，定义组件基本结构 
+
+定义组件，`Home/components/FollowDoctor.vue`
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="follow-doctor">
+    <div className="head">
+      <p>推荐关注</p>
+      <a href="javascript:;"> 查看更多<i class="van-icon van-icon-arrow" /></a>
+    </div>
+    <div class="body">
+      <!-- swipe 组件 -->
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.follow-doctor {
+  background-color: var(--cp-bg);
+  height: 250px;
+  .head {
+    display: flex;
+    justify-content: space-between;
+    height: 45px;
+    align-items: center;
+    padding: 0 15px;
+    font-size: 13px;
+    > a {
+      color: var(--cp-tip);
+    }
+  }
+  .body {
+    width: 100%;
+    overflow: hidden;
+  }
+}
+</style>
+```
+使用组件，`Home/index.vue`
+```ts
+import FollowDoctor from './components/FollowDoctor.vue'
+```
+```html
+      <van-tab title="关注" name="like">
+        <follow-doctor></follow-doctor>
+        <knowledge-list type="like" />
+      </van-tab>
+```
+
+2）查看 van-swipe 组件的使用
+```html
+      <van-swipe >
+        <van-swipe-item v-for="item in 5" :key="item">
+          {{ item }}
+        </van-swipe-item>
+      </van-swipe>
+````
+
+3) 添加医生卡片基本结构
+```html
+  <div class="doctor-card">
+    <van-image
+      round
+      src="https://yanxuan-item.nosdn.127.net/3cb61b3fd4761555e56c4a5f19d1b4b1.png"
+    />
+    <p class="name">周医生</p>
+    <p>积水潭医院 神经内科</p>
+    <p>副主任医师</p>
+    <van-button round size="small" type="primary">+ 关注</van-button>
+  </div>
+```
+```scss
+.doctor-card {
+  width: 135px;
+  height: 190px;
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0px 0px 11px 0px rgba(229, 229, 229, 0.2);
+  text-align: center;
+  padding: 15px;
+  margin-left: 15px;
+  display: inline-block;
+  box-sizing: border-box;
+  > .van-image {
+    width: 58px;
+    height: 58px;
+    vertical-align: top;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+  }
+  > p {
+    margin-bottom: 0;
+    font-size: 11px;
+    color: var(--cp-tip);
+    &.name {
+      font-size: 13px;
+      color: var(--cp-text1);
+      margin-bottom: 5px;
+    }
+  }
+  > .van-button {
+    padding: 0 12px;
+    height: 28px;
+    margin-top: 8px;
+    width: 72px;
+  }
+}
+```
+4）去除 指示器，关闭 无缝滚动，色值一次滚动一个卡片
+```html
+ <van-swipe :width="150" :show-indicators="false" :loop="false">
+```
+
+问题：
+- 150 宽度的滚动距离，适配有问题，切换设备试试。
+
+
+## 首页模块-@vueuse/core{#home-vueuse}
+
+> 介绍 @vueuse/core 组合api库，使用 useXxx 函数获取设备宽度，动态设置滚动距离
+
+
+@vueuse/core 介绍：[文档](https://vueuse.org/functions.html)
+- 是一个基于 组合API 封装的库
+- 提供了一些网站开发常用的工具函数，切得到的是响应式数据
+
+需求：
+- 在 375 宽度设备，滚动宽度为 150
+- 在其他设备需要等比例设置滚动的宽度
+- scrollWidth = 150 / 375 * deviceWidth 就可以适配
+
+代码：
+
+```ts
+import { onMounted, ref } from 'vue'
+
+onMounted(() => {
+  width.value = window.innerWidth
+})
+window.addEventListener('resize', () => {
+  width.value = window.innerWidth
+})
+```
+```html
+<van-swipe :width="(150 / 375) * width" :show-indicators="false" :loop="false">
+```
+
+@vueuse/core 应用：
+
+```bash
+pnpm add @vueuse/core
+```
+
+```ts
+import { useWindowSize } from '@vueuse/core'
+
+const { width } = useWindowSize()
+```
+
+小结：
+- 如果遇见一些常见的需求可以先看看 @vueuse/core 是否提供，这样可以提高开发效率。
+  - 如果：窗口尺寸，滚动距离，是否进入可视区，倒计时，...等等。
+
+作业：
+- 使用 useIntervalFn 实现下发验证码倒计时业务
+
+
+## 首页模块-推荐关注医生-展示{#home-like-render}
+> 完成关注tab下，推荐关注的医生列表展示
+
+步骤：
+- 定义 医生卡片数据 类型
+- 定义 获取推荐关注医生 接口函数
+- 实现 推荐关注的医生
+
+
+代码：
+
+1）定义 医生卡片数据 类型 `fast.d.ts`
+```ts
+// 通用的分页查询参数
+export type PageParams = {
+  current: number
+  pageSize: number
+}
+
+// 文章列表查询参数
+export type KnowledgeParams = PageParams & {
+  type: KnowledgeType
+}
+
+// 医生卡片
+export type Doctor = {
+  id: string
+  name: string
+  avatar: string
+  hospitalName: string
+  gradeName: string
+  depName: string
+  positionalTitles: string
+  likeFlag: 0 | 1
+  serviceFee: number
+  consultationNum: number
+  score: number
+  major: string
+}
+
+// 医生列表
+export type DoctorList = Doctor[]
+
+// 医生分页
+export type DoctorPage = {
+  pageTotal: number
+  total: number
+  rows: DoctorList
+}
+```
+2）定义 获取推荐关注医生 接口函数 `fast.ts`
+```ts 
+import type { DoctorPage, KnowledgePage, KnowledgeParams, PageParams } from '@/types/fast'
+import { request } from '@/utils/request'
+
+export const getDoctorPage = (params: PageParams) =>
+  request<DoctorPage>('/home/page/doc', 'GET', params)
+```
+
+3）实现 推荐关注的医生展示
+```vue
+<script setup lang="ts">
+import { getDoctorPage } from '@/services/fast'
+import type { DoctorList } from '@/types/fast'
+import { useWindowSize } from '@vueuse/core'
+import { onMounted, ref } from 'vue'
+
+const { width } = useWindowSize()
+
+const list = ref<DoctorList>()
+const loadData = async () => {
+  const res = await getDoctorPage({ current: 1, pageSize: 5 })
+  list.value = res.data.rows
+}
+onMounted(() => loadData())
+</script>
+
+<template>
+  <div class="follow-doctor">
+    <div className="head">
+      <p>推荐关注</p>
+      <a href="javascript:;"> 查看更多<i class="van-icon van-icon-arrow" /></a>
+    </div>
+    <div class="body">
+      <van-swipe :width="(150 / 375) * width" :show-indicators="false" :loop="false">
+        <van-swipe-item v-for="item in list" :key="item.id">
+          <div class="doctor-card">
+            <van-image round :src="item.avatar" />
+            <p class="name">{{ item.name }}</p>
+            <p>{{ item.hospitalName }} {{ item.depName }}</p>
+            <p>{{ item.positionalTitles }}</p>
+            <van-button round size="small" type="primary">
+              {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
+            </van-button>
+          </div>
+        </van-swipe-item>
+      </van-swipe>
+    </div>
+  </div>
+</template>
+```
+
+
+
+## 首页模块-关注医生{#home-like}
+> 实现：关注医生业务
+
+步骤：
+- 定义关注与取消关注API
+- 实现关注和取消关注逻辑
+
+代码：
+
+- 定义关注与取消关注API
+
+`types/fast.d.ts`
+```ts
+// 关注的类型
+export type FollowType = 'doc' | 'knowledge' | 'topic' | 'disease'
+```
+`service/fast.ts`
+```ts
+
+export const followDoctor = (id: string, type: FollowType = 'doc') =>
+  request('https://mock.boxuegu.com/mock/3180/like', 'POST', { id, type })
+```
+
+- 实现关注和取消关注逻辑
+```html
+<van-button :loading="loading" @click="follow(item)" round size="small" type="primary">
+              {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
+            </van-button>
+```
+```ts
+import { followDoctor, getDoctorPage } from '@/services/fast'
+import type { Doctor, DoctorList } from '@/types/fast'
+
+
+// 关注逻辑
+const loading = ref(false)
+const follow = async (doc: Doctor) => {
+  loading.value = true
+  try {
+    await followDoctor(doc.id)
+    doc.likeFlag = doc.likeFlag === 1 ? 0 : 1
+  } finally {
+    loading.value = false
+  }
+}
+```
 
 
 
 
 
-## 首页模块-关注列表{#home-like}
+## 首页模块-逻辑复用{#home-like-logic}
+> 利用组合API，实现关注医生业务逻辑复用
 
+封装：
 
+`composable/index.ts`
+```ts
+import { ref } from 'vue'
+import { followDoctor } from '@/services/fast'
+import type { FollowType } from '@/types/fast'
 
+// 封装逻辑，规范 useXxx，表示使用某功能
+export const useFollow = (type: FollowType = 'doc') => {
+  const loading = ref(false)
+  // {a, b} 类型，传值得时候 {a, b, c} 也可以，这是类型兼容：多的可以给少的
+  const follow = async (obj: { id: string; likeFlag: 0 | 1 }) => {
+    loading.value = true
+    try {
+      await followDoctor(obj.id, type)
+      obj.likeFlag = obj.likeFlag === 1 ? 0 : 1
+    } finally {
+      loading.value = false
+    }
+  }
+  return { loading, follow }
+}
+```
+
+使用：
+
+`FollowDoctor.vue`
+
+```ts
+import { useFollow } from '@/composable'
+```
+```ts
+// 关注逻辑
+const { loading, follow } = useFollow()
+```
+
+`KnowledgeList.vue`
+```ts
+import { useFollow } from '@/composable'
+```
+```ts
+const { loading: followLoading, follow } = useFollow('knowledge')
+```
+```html
+ <van-button :loading="loading" @click="follow(item)" round size="small" type="primary">
+              {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
+            </van-button>
+```
+
+小结：
+- 是组合API封装逻辑复用的函数，一般叫 hook 函数，是一种逻辑复用的思想
+- 对象类型多的可以传递给少的，叫：类型兼容
 
 ## 枚举类型{#enum}
 
