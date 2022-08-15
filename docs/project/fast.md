@@ -139,10 +139,10 @@ export enum ConsultTime {
 import { ConsultType, IllnessTime } from '@/enums'
 
 // 图片列表
-export type Images = {
+export type Image = {
   id: string
   url: string
-}[]
+}
 // 问诊记录
 export type Consult = {
   id: string
@@ -152,7 +152,7 @@ export type Consult = {
   illnessDesc: string
   illnessTime: ConsultTime
   consultFlag: 0 | 1
-  pictures: Images
+  pictures: Image[]
   patientId: string
 }
 
@@ -189,7 +189,7 @@ export type PartialConsult = Partial<Consult>
 
 ```ts
 import { ConsultType } from '@/enums'
-import type { PartialConsult, Consult } from '@/types/fast'
+import type { PartialConsult } from '@/types/fast'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -205,7 +205,7 @@ export const useConsultStore = defineStore(
     const setDep = (id: string) => (consult.value.depId = id)
     // 设置病情描述
     const setIllnes = (
-      illness: Pick<Consult, 'illnessDesc' | 'illnessTime' | 'consultFlag' | 'pictures'>
+      illness: Pick<PartialConsult, 'illnessDesc' | 'illnessTime' | 'consultFlag' | 'pictures'>
     ) => {
       consult.value.illnessDesc = illness.illnessDesc
       consult.value.illnessTime = illness.illnessTime
@@ -216,7 +216,7 @@ export const useConsultStore = defineStore(
     const setPatient = (id: string) => (consult.value.patientId = id)
     // 清空记录
     const clear = () => (consult.value = {})
-    return { consult, setType, setIllnessType, setDep, setIllnes, setPatient, clear }
+    return { consult, setType, setIllnessType, setDep, setIllness, setPatient, clear }
   },
   {
     persist: true
@@ -666,7 +666,7 @@ import avatar from '@/assets/avatar-doctor.svg'
 ```ts
 // 问诊记录-病情描述全部必填
 export type ConsultIllness = Pick<
-  Consult,
+  PartialConsult,
   'illnessDesc' | 'illnessTime' | 'consultFlag' | 'pictures'
 >
 ```
@@ -676,11 +676,11 @@ import type { PartialConsult, ConsultIllness } from '@/types/fast'
 ```
 ```diff
     // 设置病情描述
-+    const setIllnes = (illness: ConsultIllness) => {
-      consult.value.illnessDesc = illness.illnessDesc
-      consult.value.illnessTime = illness.illnessTime
-      consult.value.consultFlag = illness.consultFlag
-      consult.value.pictures = illness.pictures
++    const setIllness = (illness: ConsultIllness) => {
+      consult.value.illnessDesc = illnesss.illnessDesc
+      consult.value.illnessTime = illnesss.illnessTime
+      consult.value.consultFlag = illnesss.consultFlag
+      consult.value.pictures = illnesss.pictures
     }
 ```
 `Fast/ConsultIllness.vue`
@@ -690,10 +690,10 @@ import { ref } from 'vue'
 import { IllnessTime } from '@/enums'
 
 const timeOptions = [
-  { label: '一周内', value: 1 },
-  { label: '一月内', value: 2 },
-  { label: '半年内', value: 3 },
-  { label: '大于半年', value: 4 }
+  { label: '一周内', value: IllnessTime.Week },
+  { label: '一月内', value: IllnessTime.Month },
+  { label: '半年内', value: IllnessTime.HalfYear },
+  { label: '大于半年', value: IllnessTime.More }
 ]
 const flagOptions = [
   { label: '就诊过', value: 0 },
@@ -701,8 +701,8 @@ const flagOptions = [
 ]
 const form = ref<ConsultIllness>({
   illnessDesc: '',
-  illnessTime: IllnessTime.Week,
-  consultFlag: 0,
+  illnessTime: undefined,
+  consultFlag: undefined,
   pictures: []
 })
 ```
@@ -713,6 +713,7 @@ const form = ref<ConsultIllness>({
         type="textarea"
         rows="3"
         placeholder="请详细描述您的病情，病情描述不能为空"
+        v-model="form.illnessDesc"
       ></van-field>
       <div class="item">
         <p>本次患病多久了？</p>
@@ -743,7 +744,237 @@ const form = ref<ConsultIllness>({
 }
 ```
 
-## 病情描述-图片上传{#illness-img}
+## 病情描述-图片上传-组件{#illness-img}
+> 实现：使用 van-upload 组件，进行样式和功能配置
+
+步骤：
+- 组件基础结构
+- 配置文字和图标
+- 配置最多数量和最大体积
+- 支持双向数据绑定，支持选择图片后触发函数，支持点击删除事件函数
+
+
+代码：
+
+1）组件基础结构
+
+```html
+      <div class="illness-img">
+        <van-uploader></van-uploader>
+        <p class="tip" >上传内容仅医生可见,最多9张图,最大5MB</p>
+      </div>
+```
+```scss
+.illness-img {
+  padding-top: 16px;
+  margin-bottom: 40px;
+  display: flex;
+  align-items: center;
+  .tip {
+    font-size: 12px;
+    color: var(--cp-tip);
+  }
+  ::v-deep() {
+    .van-uploader {
+      &__preview {
+        &-delete {
+          left: -6px;
+          top: -6px;
+          border-radius: 50%;
+          background-color: var(--cp-primary);
+          width: 20px;
+          height: 20px;
+          &-icon {
+            transform: scale(0.9) translate(-22%, 22%);
+          }
+        }
+        &-image {
+          border-radius: 8px;
+          overflow: hidden;
+        }
+      }
+      &__upload {
+        border-radius: 8px;
+      }
+      &__upload-icon {
+        color: var(--cp-text3);
+      }
+    }
+  }
+```
+
+2）配置文字和图标
+
+```diff
+        <van-uploader
++          upload-icon="photo-o"
++          upload-text="上传图片"
+        ></van-uploader>
+```
+
+3）配置最多数量和最大体积
+
+```diff
+        <van-uploader
++          max-count="9"
++          :max-size="5 * 1024 * 1024"
+          upload-icon="photo-o"
+          upload-text="上传图片"
+        ></van-uploader>
+```
+
+4）支持双向数据绑定，支持选择图片后触发函数，支持点击删除事件函数
+
+```diff
+        <van-uploader
++          :after-read="onAfterRead"
++          @delete="onDeleteImg"
++          v-model="fileList"
+          max-count="9"
+          :max-size="5 * 1024 * 1024"
+          upload-icon="photo-o"
+          upload-text="上传图片"
+        ></van-uploader>
+```
+```ts
+import type { UploaderAfterRead, UploaderFileListItem } from 'vant/lib/uploader/types'
+```
+```ts
+const fileList = ref([])
+const onAfterRead: UploaderAfterRead = (item) => {
+  // TODO 上传图片
+}
+const onDeleteImg = (item: UploaderFileListItem) => {
+  // TODO 删除图片
+}
+```
+
+小结：
+- fileList 是配置组件使用的，同步 form 中的 pictures
+- 读取成功后，需要自己调用接口上传
+- 删除成功后触发的事件，需要去删除 form 中的数据
+
+
+## 病情描述-图片上传-业务{#illness-img-logic}
+> 实现：上传图片与删除图片功能
+
+步骤：
+- 定义 api 函数
+- 实现上传
+- 实现删除
+
+
+代码：
+
+1）定义 api 函数 `services/fast.ts`
+  
+```diff
+import type {
+  DoctorPage,
+  FollowType,
++  Image,
+  KnowledgePage,
+  KnowledgeParams,
+  PageParams,
+  TopDep
+} from '@/types/fast'
+```
+```ts
+export const uploadImage = (file: File) => {
+  const fd = new FormData()
+  fd.append('file', file)
+  return request<Image>('/upload', 'POST', fd)
+}
+```
+
+2）实现上传 `Fast/ConsultIllness.vue`
+
+```ts
+import { uploadImage } from '@/services/fast'
+```
+
+```ts
+const onAfterRead: UploaderAfterRead = (item) => {
+  if (Array.isArray(item)) return
+  if (!item.file) return
+  // 开始上传
+  item.status = 'uploading'
+  item.message = '上传中...'
+  uploadImage(item.file)
+    .then((res) => {
+      item.status = 'done'
+      item.message = undefined
+      item.url = res.data.url
+      form.value.pictures?.push(res.data)
+    })
+    .catch(() => {
+      item.status = 'failed'
+      item.message = '上传失败'
+    })
+}
+```
+
+3）实现删除
+
+```ts
+const onDeleteImg = (item: UploaderFileListItem) => {
+  form.value.pictures = form.value.pictures?.filter((pic) => pic.url !== item.url)
+}
+```
+
+小结：
+- 给 item 加上 url 是为了删除可以根据 url 进行删除
 
 
 ## 病情描述-保存数据{#illness-data}
+> 实现：按钮点亮，提交校验，保存数据，跳转选择患者
+
+1）按钮点亮
+```html
+<van-button :class={disabled} @click="next" type="primary" block round>下一步</van-button>
+```
+```scss
+.van-button {
+  font-size: 16px;
+  margin-bottom: 30px;
+  &.disabled {
+    opacity: 1;
+    background: #fafafa;
+    color: #d9dbde;
+    border: #fafafa;
+  }
+}
+```
+```ts
+import { computed, ref } from 'vue'
+// ... 省略 ...
+const disabled = computed(
+  () =>
+    !form.value.illnessDesc ||
+    form.value.illnessTime === undefined ||
+    form.value.consultFlag === undefined
+)
+```
+
+2）提交校验 保存数据，跳转选择患者 
+```ts
+import { useRouter } from 'vue-router'
+import { Toast } from 'vant'
+import { useConsultStore } from '@/stores'
+```
+
+```ts
+const store = useConsultStore()
+const router = useRouter()
+const next = () => {
+  if (!form.value.illnessDesc) return Toast('请输入病情描述')
+  if (form.value.illnessTime === undefined) return Toast('请选择症状持续时间')
+  if (form.value.consultFlag === undefined) return Toast('请选择是否已经就诊')
+  store.setIllness(form.value)
+  // 跳转档案管理，需要根据 isChange 实现选择功能
+  router.push('/user/patient?isChange=1')
+}
+```
+
+
+## 病情描述-回显数据{#illness-show}
