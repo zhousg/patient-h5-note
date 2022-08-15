@@ -70,7 +70,7 @@ export default defineConfig({
             { text: '2. 登录模块', link: '/project/login' }, 
             { text: '3. 用户模块', link: '/project/user' }, 
             { text: '4. 首页模块', link: '/project/home' }, 
-            { text: '5. 快速问诊模块', link: '/project/fast' }, 
+            { text: '5. 极速问诊模块', link: '/project/fast' }, 
             { text: '6. 问诊室模块', link: '/project/room' }, 
             { text: '7. 地址管理', link: '/project/address' }, 
             { text: '8. 订单模块', link: '/project/order' }, 

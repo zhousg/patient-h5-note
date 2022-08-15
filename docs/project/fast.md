@@ -1,15 +1,15 @@
-# 快速问诊模块
+# 极速问诊模块
 
-## 快速问诊-需求分析{#fast-product}
-> 理解：快速问诊阶段流程分析
+## 极速问诊-需求分析{#fast-product}
+> 理解：极速问诊阶段流程分析
 
 ![image-20220813195713860](./images/image-20220813195713860.png)
 
-快速问诊阶段：
+极速问诊阶段：
 
-1. 快速问诊（记录-问诊类型）
+1. 极速问诊（记录-问诊类型）
 
-2. 三甲图文问诊 或 普通图文问诊（记录-快速问诊类型）
+2. 三甲图文问诊 或 普通图文问诊（记录-极速问诊类型）
 
 3. 选择科室（记录-疾病科室）
 
@@ -106,7 +106,7 @@ showOrderStatus(OrderStatus.Complete)
   - 不能，有值的需要写在 ts 文件中
 
 
-## 快速问诊-定义类型{#fast-type}
+## 极速问诊-定义类型{#fast-type}
 > 定义问诊记录数据相关类型
 
 步骤：
@@ -168,20 +168,20 @@ export type PartialConsult = Partial<Consult>
 注意：
 - 枚举类型需要在 ts 文件中，因为枚举会编译成 js 代码
 
-## 快速问诊-问诊记录仓库{#fast-consult-store}
+## 极速问诊-问诊记录仓库{#fast-consult-store}
 > 实现：病情描述仓库的定义，实现问诊记录分步修改
 
 步骤：
 - 定义仓库，提供
   - 问诊记录状态
   - 修改问诊类型
-  - 修改快速问诊类型
+  - 修改极速问诊类型
   - 修改科室
   - 修改病情描述相关信息
   - 修改患者
   - 清空记录
 - 导出仓库
-- 首页点击快速问诊记录问诊类型且跳转页面
+- 首页点击极速问诊记录问诊类型且跳转页面
 
 代码：
 
@@ -199,7 +199,7 @@ export const useConsultStore = defineStore(
     const consult = ref<PartialConsult>({})
     // 设置问诊类型
     const setType = (type: ConsultType) => (consult.value.type = type)
-    // 设置快速问诊类型
+    // 设置极速问诊类型
     const setIllnessType = (type: 0 | 1) => (consult.value.illnessType = type)
     // 设置科室
     const setDep = (id: string) => (consult.value.depId = id)
@@ -229,7 +229,7 @@ export const useConsultStore = defineStore(
 export * from './modules/consult'
 ```
 
-3）首页点击快速问诊记录问诊类型且跳转页面 `views/Home/index.vue`
+3）首页点击极速问诊记录问诊类型且跳转页面 `views/Home/index.vue`
 
 ```ts
 import { useConsultStore } from '@/stores'
@@ -242,18 +242,508 @@ const store = useConsultStore()
 <router-link to="/fast" @click="store.setType(ConsultType.Fast)" class="nav">
 ```
 
+## 极速问诊-选择极速问诊类型{#fast-consult-type}
 
-## 快速问诊-选择快速问诊类型{#fast-consult-type}
+![image-20220815133500165](./images/image-20220815133500165.png)
+
+> 完成选择三甲还是普通问诊页面，点击后记录对应的类型，跳转到选择科室路由
+
+步骤：
+- 路由和组件
+- 编写页面布局
+- 点击入口记录极速问诊类型
+
+代码：
+
+1）路由和组件 
+
+`Fast/index.vue`
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="fast-page">fast</div>
+</template>
+
+<style lang="scss" scoped></style>
+```
+`router/index.ts`
+```ts
+    {
+      path: '/fast',
+      component: () => import('@/views/Fast/index.vue'),
+      meta: { title: '极速问诊' }
+    }
+```
+
+2）编写页面布局
+
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="fast-page">
+    <cp-nav-bar title="极速问诊" right-text="问诊记录"></cp-nav-bar>
+    <div class="fast-logo">
+      <img class="img" src="@/assets/fast-consult.png" alt="" />
+      <p class="text"><span>20s</span> 快速匹配专业医生</p>
+    </div>
+    <div class="fast-type">
+      <router-link to="/fast/dep" class="item">
+        <cp-icon class="pic" name="fast-doctor"></cp-icon>
+        <div class="info">
+          <p>三甲图文问诊</p>
+          <p>三甲主治及以上级别医生</p>
+        </div>
+        <van-icon name="arrow"></van-icon>
+      </router-link>
+      <router-link to="/fast/dep" class="item">
+        <cp-icon class="pic" name="fast-message"></cp-icon>
+        <div class="info">
+          <p>普通图文问诊</p>
+          <p>二甲主治及以上级别医生</p>
+        </div>
+        <van-icon name="arrow"></van-icon>
+      </router-link>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.fast-page {
+  padding-top: 46px;
+  .fast-logo {
+    padding: 30px 0;
+    text-align: center;
+    .img {
+      width: 240px;
+    }
+    .text {
+      font-size: 16px;
+      margin-top: 10px;
+      > span {
+        color: var(--cp-primary);
+      }
+    }
+  }
+  .fast-type {
+    padding: 15px;
+    .item {
+      display: flex;
+      padding: 16px;
+      border-radius: 4px;
+      align-items: center;
+      margin-bottom: 16px;
+      border: 0.5px solid var(--cp-line);
+    }
+    .pic {
+      width: 40px;
+      height: 40px;
+    }
+    .info {
+      margin-left: 12px;
+      flex: 1;
+      > p:first-child {
+        font-size: 16px;
+        color: var(--cp-text1);
+        margin-bottom: 4px;
+      }
+      > p:last-child {
+        font-size: 13px;
+        color: var(--cp-tag);
+      }
+    }
+    .van-icon {
+      color: var(--cp-tip);
+    }
+  }
+}
+</style>
+```
 
 
-## 快速问诊-选择科室{#fast-consult-dep}
+3）点击入口记录极速问诊类型
+
+```ts
+<script setup lang="ts">
+import { useConsultStore } from '@/stores'
+
+const store = useConsultStore()
+</script>
+```
+
+```html
+      <router-link to="/fast/dep" class="item" @click="store.setIllnessType(1)">
+```
+
+```html
+      <router-link to="/fast/dep" class="item" @click="store.setIllnessType(0)">
+```
+
+
+## 极速问诊-选择科室-布局{#fast-consult-dep-html}
+> 实现：路由与组件，和基础结构
+
+步骤：
+- 组件与路由
+- 一级科室使用 sidebar 组件
+- 二级科室绘制
+
+代码：
+
+1）路由与组件
+
+`Fast/ConsultDep.vue`
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="consult-dep-page">consult-dep</div>
+</template>
+
+<style lang="scss" scoped></style>
+```
+`router/index.ts`
+```ts
+    {
+      path: '/fast/dep',
+      component: () => import('@/views/Fast/ConsultDep.vue'),
+      meta: { title: '选择科室' }
+    }
+```
+
+1) 页面布局-一级科室
+
+```vue
+<script setup lang="ts">
+import { ref } from 'vue'
+
+const active = ref(0)
+</script>
+
+<template>
+  <div class="consult-dep-page">
+    <cp-nav-bar title="选择科室" />
+    <div class="wrapper">
+      <van-sidebar v-model="active">
+        <van-sidebar-item title="内科" />
+        <van-sidebar-item title="外科" />
+        <van-sidebar-item title="皮肤科" />
+        <van-sidebar-item title="骨科" />
+      </van-sidebar>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.van-sidebar {
+  width: 114px;
+  &-item {
+    padding: 14px;
+    color: var(--cp-tag);
+    &--select {
+      color: var(--cp-main);
+      font-weight: normal;
+      &::before {
+        display: none;
+      }
+    }
+  }
+}
+.consult-dep-page {
+  padding-top: 46px;
+}
+</style>
+```
+
+3) 页面布局-二级科室
+```html
+      <div class="sub-dep">
+        <router-link to="/fast/illness">科室一</router-link>
+        <router-link to="/fast/illness">科室二</router-link>
+        <router-link to="/fast/illness">科室三</router-link>
+      </div>
+```
+```scss
+.wrapper {
+  height: calc(100vh - 46px);
+  overflow: hidden;
+  display: flex;
+  .sub-dep {
+    flex: 1;
+    height: 100%;
+    overflow-y: auto;
+    > a {
+      display: block;
+      padding: 14px 30px;
+      color: var(--cp-dark);
+    }
+  }
+}
+```
+
+小结
+- 需要实现一级科室的切换要绑定数据
+
+## 极速问诊-选择科室-业务{#fast-consult-dep-logic}
+> 实现：科室切换以及跳转到病情描述
+
+步骤：
+
+- 编写科室需要的类型
+- 准备API函数
+- 实现一级科室切换
+- 实现二级科室切换
+- 跳转时记录科室到问诊记录
+
+
+代码：
+
+1）编写科室需要的类型 `types/fast.d.ts`
+```ts
+// 科室
+export type SubDep = {
+  id: string
+  name: string
+}
+
+export type TopDep = SubDep & {
+  child: SubDep[]
+}
+```
+
+2）准备API函数 `services/fast.ts`
+```diff
+import type {
+  DoctorPage,
+  FollowType,
+  KnowledgePage,
+  KnowledgeParams,
+  PageParams,
++  TopDep
+} from '@/types/fast'
+
++export const getAllDep = () => request<TopDep[]>('/dep/all')
+```
+
+3）实现一级科室切换 `Fast/ConsultDep.vue`
+
+```ts
+import { getAllDep } from '@/services/fast'
+import type { TopDep } from '@/types/fast'
+import { onMounted, ref } from 'vue'
+```
+```ts
+// 一级科室
+const allDep = ref<TopDep[]>([])
+onMounted(async () => {
+  const res = await getAllDep()
+  allDep.value = res.data
+})
+```
+```html
+      <van-sidebar v-model="active">
+        <van-sidebar-item :title="top.name" v-for="top in allDep" :key="top.id" />
+      </van-sidebar>
+```
+
+4）实现二级科室切换
+```ts
+import { computed, onMounted, ref } from 'vue'
+```
+```ts
+// 二级科室，注意：组件初始化没有数据 child 可能拿不到
+const subDep = computed(() => allDep.value[active.value]?.child)
+```
+```html
+      <div class="sub-dep">
+        <router-link to="/fast/illness" v-for="sub in subDep" :key="sub.id">
+          {{ sub.name }}
+        </router-link>
+      </div>
+```
+
+5）跳转时记录科室到问诊记录
+```ts
+import { useConsultStore } from '@/stores'
+
+const store = useConsultStore()
+```
+
+```diff
+        <router-link
+          to="/fast/illness"
+          v-for="sub in subDep"
+          :key="sub.id"
++          @click="store.setDep(sub.id)"
+        >
+          {{ sub.name }}
+        </router-link>
+```
+
 
 
 ## 病情描述-基础布局{#illness-html}
+> 实现：路由和组件以及页面的基础布局（医生提示，描述，症状时间，是否已就诊）
 
 
-## 病情描述-收集数据{#illness-data}
+1）路由与组件
 
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="consult-illness-page">
+    <cp-nav-bar title="图文问诊" />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.consult-illness-page {
+  padding-top: 46px;
+}
+</style>
+```
+
+2) 病情描述头部提示
+
+```ts
+import avatar from '@/assets/avatar-doctor.svg'
+```
+```html
+    <!-- 医生提示 -->
+    <div class="illness-tip van-hairline--bottom">
+      <van-image :src="avatar"></van-image>
+      <div class="info">
+        <p class="tit">在线医生</p>
+        <p class="tip">请描述你的疾病或症状、是否用药、就诊经历，需要我听过什么样的帮助</p>
+        <p class="safe"><cp-icon name="fast-safe" /><span>内容仅医生可见</span></p>
+      </div>
+    </div>
+```
+```scss
+.illness-tip {
+  display: flex;
+  padding: 15px;
+  .van-image {
+    width: 52px;
+    height: 52px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 10px;
+  }
+  .info {
+    flex: 1;
+    padding-left: 12px;
+    .tit {
+      font-size: 16px;
+      margin-bottom: 5px;
+    }
+    .tip {
+      padding: 12px;
+      background: var(--cp-bg);
+      color: var(--cp-text3);
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+    .safe {
+      font-size: 10px;
+      color: var(--cp-text3);
+      display: flex;
+      align-items: center;
+      .cp-icon {
+        font-size: 12px;
+        margin-right: 2px;
+      }
+    }
+  }
+}
+```
+
+2）准备表单数据
+
+`types/fast.d.ts`
+```ts
+// 问诊记录-病情描述全部必填
+export type ConsultIllness = Pick<
+  Consult,
+  'illnessDesc' | 'illnessTime' | 'consultFlag' | 'pictures'
+>
+```
+`stores/modules/consult.ts`
+```ts
+import type { PartialConsult, ConsultIllness } from '@/types/fast'
+```
+```diff
+    // 设置病情描述
++    const setIllnes = (illness: ConsultIllness) => {
+      consult.value.illnessDesc = illness.illnessDesc
+      consult.value.illnessTime = illness.illnessTime
+      consult.value.consultFlag = illness.consultFlag
+      consult.value.pictures = illness.pictures
+    }
+```
+`Fast/ConsultIllness.vue`
+```ts
+import type { ConsultIllness } from '@/types/fast'
+import { ref } from 'vue'
+import { IllnessTime } from '@/enums'
+
+const timeOptions = [
+  { label: '一周内', value: 1 },
+  { label: '一月内', value: 2 },
+  { label: '半年内', value: 3 },
+  { label: '大于半年', value: 4 }
+]
+const flagOptions = [
+  { label: '就诊过', value: 0 },
+  { label: '没就诊过', value: 1 }
+]
+const form = ref<ConsultIllness>({
+  illnessDesc: '',
+  illnessTime: IllnessTime.Week,
+  consultFlag: 0,
+  pictures: []
+})
+```
+```html
+<!-- 表单 -->
+    <div class="illness-form">
+      <van-field
+        type="textarea"
+        rows="3"
+        placeholder="请详细描述您的病情，病情描述不能为空"
+      ></van-field>
+      <div class="item">
+        <p>本次患病多久了？</p>
+        <cp-radio-btn :options="timeOptions" v-model="form.illnessTime" />
+      </div>
+      <div class="item">
+        <p>此次病情是否去医院就诊过？</p>
+        <cp-radio-btn :options="flagOptions" v-model="form.consultFlag" />
+      </div>
+    </div>
+```
+
+```scss
+.illness-form {
+  padding: 15px;
+  .van-field {
+    padding: 0;
+    &::after {
+      border-bottom: none;
+    }
+  }
+  .item {
+    > p {
+      color: var(--cp-text3);
+      padding: 15px 0;
+    }
+  }
+}
+```
 
 ## 病情描述-图片上传{#illness-img}
 
+
+## 病情描述-保存数据{#illness-data}
