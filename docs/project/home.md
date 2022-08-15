@@ -232,15 +232,33 @@
 }
 ```
 
-2）提取 knowledge-list 组件展示知识文章列表
+2）提取 knowledge-list knowledge-card 组件展示知识文章列表
 
 `Home/components/KnowledgeList.vue`
+```vue
+<script setup lang="ts">
+import KnowledgeCard from './KnowledgeCard.vue'
+</script>
+
+<template>
+  <div class="knowledge-list">
+    <knowledge-card v-for="i in 5" :key="i"></knowledge-card>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.knowledge-list {
+  padding: 0 15px;
+}
+</style>
+```
+
+`Home/components/KnowledgeCard.vue`
 ```vue
 <script setup lang="ts"></script>
 
 <template>
-  <div class="knowledge-list">
-    <div class="knowledge-item van-hairline--bottom" v-for="i in 5" :key="i">
+    <div class="knowledge-card van-hairline--bottom">
       <div class="head">
         <van-image
           round
@@ -283,14 +301,10 @@
         </p>
       </div>
     </div>
-  </div>
 </template>
 
 <style lang="scss" scoped>
-.knowledge-list {
-  padding: 0 15px;
-}
-.knowledge-item {
+.knowledge-card {
   padding: 20px 0 16px;
   .head {
     display: flex;
@@ -370,6 +384,8 @@
 }
 </style>
 ```
+
+`Home/index.vue`
 ```ts
 import KnowledgeList from './components/KnowledgeList.vue'
 ```
@@ -447,9 +463,7 @@ const onLoad = () => {
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <div class="knowledge-item van-hairline--bottom" v-for="(item, i) in list" :key="i">
-        <!-- ...省略... -->
-      </div>
+      <knowledge-card v-for="(item, i) in list" :key="i" />
     </van-list>
   </div>
 </template>
@@ -548,6 +562,7 @@ export const getKnowledgePage = (params: KnowledgeParams) =>
 
 3）实现加载数据和渲染
 
+`Home/components/KnowledgeList.vue`
 ```vue
 <script setup lang="ts">
 import { getKnowledgePage } from '@/services/fast'
@@ -588,35 +603,47 @@ const onLoad = async () => {
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <div class="knowledge-item van-hairline--bottom" v-for="item in list" :key="item.id">
-        <div class="head">
-          <van-image round class="avatar" :src="item.creatorAvatar"></van-image>
-          <div class="info">
-            <p class="name">{{ item.creatorName }}</p>
-            <p class="dep van-ellipsis">
-              {{ item.creatorHospatalName }} {{ item.creatorDep }} {{ item.creatorTitles }}
-            </p>
-          </div>
-          <van-button class="btn" size="small" round>
-            {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
-          </van-button>
-        </div>
-        <div class="body">
-          <h3 class="title van-ellipsis">{{ item.title }}</h3>
-          <p class="tag">
-            <span v-for="(tag, i) in item.topics" :key="i"># {{ tag }}</span>
-          </p>
-          <p class="intro van-multi-ellipsis--l2">{{ item.content }}</p>
-          <div class="imgs" :class="{ large: item.coverUrl.length === 1 }">
-            <van-image v-for="(url, i) in item.coverUrl" :key="i" :src="url" />
-          </div>
-          <p class="logs">
-            <span>{{ item.collectionNumber }} 收藏</span>
-            <span>{{ item.commentNumber }} 评论</span>
-          </p>
-        </div>
-      </div>
+      <knowledge-card v-for="item in list" :key="item.id" :item="item" />
     </van-list>
+  </div>
+</template>
+```
+`Home/components/KnowledgeCard.vue`
+```vue
+<script setup lang="ts">
+import type { Knowledge } from '@/types/fast'
+
+defineProps<{ item: Knowledge }>()
+</script>
+
+<template>
+  <div class="knowledge-card van-hairline--bottom">
+    <div class="head">
+      <van-image round class="avatar" :src="item.creatorAvatar"></van-image>
+      <div class="info">
+        <p class="name">{{ item.creatorName }}</p>
+        <p class="dep van-ellipsis">
+          {{ item.creatorHospatalName }} {{ item.creatorDep }} {{ item.creatorTitles }}
+        </p>
+      </div>
+      <van-button class="btn" size="small" round>
+        {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
+      </van-button>
+    </div>
+    <div class="body">
+      <h3 class="title van-ellipsis">{{ item.title }}</h3>
+      <p class="tag">
+        <span v-for="(tag, i) in item.topics" :key="i"># {{ tag }}</span>
+      </p>
+      <p class="intro van-multi-ellipsis--l2">{{ item.content }}</p>
+      <div class="imgs" :class="{ large: item.coverUrl.length === 1 }">
+        <van-image v-for="(url, i) in item.coverUrl" :key="i" :src="url" />
+      </div>
+      <p class="logs">
+        <span>{{ item.collectionNumber }} 收藏</span>
+        <span>{{ item.commentNumber }} 评论</span>
+      </p>
+    </div>
   </div>
 </template>
 ```
@@ -694,7 +721,12 @@ import FollowDoctor from './components/FollowDoctor.vue'
 ````
 
 3) 添加医生卡片基本结构
-```html
+
+`Home/components/DoctorCard.vue`
+
+```vue
+<script lang="ts" setup></script>
+<template>
   <div class="doctor-card">
     <van-image
       round
@@ -705,8 +737,8 @@ import FollowDoctor from './components/FollowDoctor.vue'
     <p>副主任医师</p>
     <van-button round size="small" type="primary">+ 关注</van-button>
   </div>
-```
-```scss
+</template>
+<style scoped lang="scss" >
 .doctor-card {
   width: 135px;
   height: 190px;
@@ -742,8 +774,20 @@ import FollowDoctor from './components/FollowDoctor.vue'
     width: 72px;
   }
 }
+</style>
 ```
+`Home/components/FollowDoctor.vue`
+```ts
+import DoctorCard from './DoctorCard.vue'
+```
+```html
+<van-swipe-item v-for="item in list" :key="item.id">
+  <doctor-card />
+</van-swipe-item>          
+```
+
 4）去除 指示器，关闭 无缝滚动，色值一次滚动一个卡片
+
 ```html
  <van-swipe :width="150" :show-indicators="false" :loop="false">
 ```
@@ -862,6 +906,8 @@ export const getDoctorPage = (params: PageParams) =>
 ```
 
 3）实现 推荐关注的医生展示
+
+`Home/components/FollowDoctor.vue`
 ```vue
 <script setup lang="ts">
 import { getDoctorPage } from '@/services/fast'
@@ -888,15 +934,7 @@ onMounted(() => loadData())
     <div class="body">
       <van-swipe :width="(150 / 375) * width" :show-indicators="false" :loop="false">
         <van-swipe-item v-for="item in list" :key="item.id">
-          <div class="doctor-card">
-            <van-image round :src="item.avatar" />
-            <p class="name">{{ item.name }}</p>
-            <p>{{ item.hospitalName }} {{ item.depName }}</p>
-            <p>{{ item.positionalTitles }}</p>
-            <van-button round size="small" type="primary">
-              {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
-            </van-button>
-          </div>
+          <doctor-card :item="item" />
         </van-swipe-item>
       </van-swipe>
     </div>
@@ -904,6 +942,25 @@ onMounted(() => loadData())
 </template>
 ```
 
+`Home/components/DoctorCard.vue`
+```vue
+<script lang="ts" setup>
+import type { Doctor } from '@/types/fast'
+
+defineProps<{ item: Doctor }>()
+</script>
+<template>
+  <div class="doctor-card">
+    <van-image round :src="item.avatar" />
+    <p class="name">{{ item.name }}</p>
+    <p>{{ item.hospitalName }} {{ item.depName }}</p>
+    <p>{{ item.positionalTitles }}</p>
+    <van-button round size="small" type="primary">
+      {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
+    </van-button>
+  </div>
+</template>
+```
 
 
 ## 首页模块-关注医生{#home-like}
@@ -926,19 +983,23 @@ export type FollowType = 'doc' | 'knowledge' | 'topic' | 'disease'
 ```ts
 
 export const followDoctor = (id: string, type: FollowType = 'doc') =>
-  request('https://mock.boxuegu.com/mock/3180/like', 'POST', { id, type })
+  request('/like', 'POST', { id, type })
 ```
 
 - 实现关注和取消关注逻辑
+
+`Home/components/DoctorCard.vue`
 ```html
 <van-button :loading="loading" @click="follow(item)" round size="small" type="primary">
               {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
             </van-button>
 ```
 ```ts
-import { followDoctor, getDoctorPage } from '@/services/fast'
-import type { Doctor, DoctorList } from '@/types/fast'
+import type { Doctor } from '@/types/fast'
+import { followDoctor } from '@/services/fast'
+import { ref } from 'vue'
 
+defineProps<{ item: Doctor }>()
 
 // 关注逻辑
 const loading = ref(false)
@@ -987,22 +1048,34 @@ export const useFollow = (type: FollowType = 'doc') => {
 
 使用：
 
-`FollowDoctor.vue`
+`DoctorCard.vue`
 
-```ts
+```vue
+<script lang="ts" setup>
+import type { Doctor } from '@/types/fast'
 import { useFollow } from '@/composable'
-```
-```ts
+
+defineProps<{ item: Doctor }>()
+
 // 关注逻辑
 const { loading, follow } = useFollow()
+</script>
+<template>
+  <div class="doctor-card">
+    <van-image round :src="item.avatar" />
+    <p class="name">{{ item.name }}</p>
+    <p>{{ item.hospitalName }} {{ item.depName }}</p>
+    <p>{{ item.positionalTitles }}</p>
+    <van-button :loading="loading" @click="follow(item)" round size="small" type="primary">
+      {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
+    </van-button>
+  </div>
+</template>
 ```
 
-`KnowledgeList.vue`
+`KnowledgeCard.vue`
 ```ts
-import { useFollow } from '@/composable'
-```
-```ts
-const { loading: followLoading, follow } = useFollow('knowledge')
+const { loading, follow } = useFollow('knowledge')
 ```
 ```html
  <van-button :loading="loading" @click="follow(item)" round size="small" type="primary">
@@ -1014,72 +1087,4 @@ const { loading: followLoading, follow } = useFollow('knowledge')
 - 是组合API封装逻辑复用的函数，一般叫 hook 函数，是一种逻辑复用的思想
 - 对象类型多的可以传递给少的，叫：类型兼容
 
-## 枚举类型{#enum}
 
-### 枚举基本语法{#enum-base}
-> 掌握：枚举的基本语法和使用细节
-
-- 作用：表示一组明确可选的值，和字面量类型配合联合类型类似。
-- 解释：枚举可以定义一组常量，使用该类型后，约定只能使用这组常量中的其中一个。
-
-```ts
-// 创建枚举类型
-enum Direction { Up, Down, Left, Right }
-
-// 使用枚举类型
-const changeDirection = (direction: Direction) => {
-  console.log(direction)
-}
-
-// 调用函数时，需要应该传入：枚举 Direction 成员的任意一个
-// 类似于 JS 中的对象，直接通过 点（.）语法 访问枚举的成员
-changeDirection(Direction.Up)
-```
-
-问题：
-- 通过枚举访问其成员，成员的值是什么？
-  - 默认从 0 开始自增的数值
-- 可以修改其成员的值吗？
-  - `Up = 10` , 后面是从 10 开始自增
-- 成员的值可以使用字符串吗？
-  - `Up = 'Up'` 可以，但是后面的值都需要使用字符串。
-
-
-### 枚举使用场景{#enum-intro}
-
-> 场景：用于一组没有语义的可选值，给它们添加类型。
-
-比如：
-- 后台给的数据： 0 是男  1 是女  ----   1 是待付款  5 是已付款  8 是已完成
-- 好处，通过枚举可以让成员更加语义化，提高代码可读性
-
-代码：
-```ts
-// 性别
-enum GenderType {
-  Boy,
-  Girl
-}
-const showGender = (gender: GenderType) => {
-  if (gender === GenderType.Boy) {
-    console.log('性别：男')
-  }
-}
-showGender(GenderType.Boy)
-// 订单状态
-enum OrderStatus {
-  UnPay = 1,
-  Payed = 5,
-  Complete = 8
-}
-const showOrderStatus = (status: OrderStatus) => {
-  if (status === OrderStatus.Complete) {
-    console.log('状态：已完成')
-  }
-}
-showOrderStatus(OrderStatus.Complete)
-```
-
-小结：
-- 枚举一般使用在，表示一组明确可选的值，语义化不高的情况。
-- 如果这组可选值语义很高，如 ` unpay | payed | complete ` ，使用字面量配合联合类型更简单些。
