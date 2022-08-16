@@ -867,7 +867,7 @@ const onDeleteImg = (item: UploaderFileListItem) => {
 代码：
 
 1）定义 api 函数 `services/fast.ts`
-  
+
 ```diff
 import type {
   DoctorPage,
@@ -1033,6 +1033,7 @@ closeOnPopstate: false
 - 默认选中效果
 
     
+
 代码：`User/PatientPage.vue`
 
 1）界面兼容选择患者
@@ -1186,3 +1187,255 @@ const next = async () => {
 
 小结：
 - 提交给后台之后，后台就生成了问诊记录，前端存储的使命结束了
+
+
+## 问诊支付-页面渲染{#pay-html}
+> 实现：问诊页面的基础布局，和业务需求情况。
+
+
+1）组件与路由
+
+组件 `Fast/ConsultPay.vue`
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="consult-pay-page">
+    <cp-nav-bar title="支付" />
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.consult-pay-page {
+  padding: 46px 0 50px 0;
+}
+</style>
+```
+路由 `router/index.ts`
+
+```ts
+    {
+      path: '/fast/pay',
+      component: () => import('@/views/Fast/ConsultPay.vue'),
+      meta: { title: '问诊支付' }
+    }
+```
+
+2）基础布局
+
+```html
+<div class="pay-info">
+      <p class="tit">图文问诊 49 元</p>
+      <img class="img" src="@/assets/avatar-doctor.svg" />
+      <p class="desc">
+        <span>极速问诊</span>
+        <span>自动分配医生</span>
+      </p>
+    </div>
+```
+```scss
+.pay-info {
+  display: flex;
+  padding: 15px;
+  flex-wrap: wrap;
+  align-items: center;
+  .tit {
+    width: 100%;
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+  .img {
+    margin-right: 10px;
+    width: 38px;
+    height: 38px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .desc {
+    flex: 1;
+    > span {
+      display: block;
+      color: var(--cp-tag);
+      &:first-child {
+        font-size: 16px;
+        color: var(--cp-text2);
+      }
+    }
+  }
+}
+```
+
+支付信息
+```html
+    <van-cell-group>
+      <van-cell title="优惠券" value="-¥10.00" />
+      <van-cell title="积分抵扣" value="-¥10.00" />
+      <van-cell title="实付款" value="¥29.00" class="pay-price" />
+    </van-cell-group>
+    <div class="pay-space"></div>
+```
+```scss
+.pay-price {
+  ::v-deep() {
+    .vam-cell__title {
+      font-size: 16px;
+    }
+    .van-cell__value {
+      font-size: 16px;
+      color: var(--cp-price);
+    }
+  }
+}
+.pay-space {
+  height: 12px;
+  background-color: var(--cp-bg);
+}
+```
+
+患者信息
+
+```html
+<van-cell-group>
+      <van-cell title="患者信息" value="李富贵 | 男 | 30岁"></van-cell>
+      <van-cell title="病情描述" label="头痛，头晕，恶心"></van-cell>
+    </van-cell-group>
+    <div class="pay-schema">
+      <van-checkbox>我已同意 <span class="text">支付协议</span></van-checkbox>
+    </div>
+```
+```scss
+.pay-schema {
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  .text {
+    color: var(--cp-primary);
+  }
+}
+```
+
+底部按钮
+
+```html
+    <van-submit-bar button-type="primary" :price="2900" button-text="立即支付" text-align="left" />
+```
+```scss
+::v-deep() {
+  .van-submit-bar__button {
+    font-weight: normal;
+    width: 160px;
+  }
+}
+```
+
+3）定义 API 函数，获取预支付信息
+
+`types/fast.d.ts`
+```ts
+// 问诊订单预支付信息
+export type ConsultOrderPre = Consult & {
+  patientInfo: Patient
+  payment: number
+  pointDeduction: number
+  couponDeduction: number
+  payment: number
+  couponId: number
+  actualPayment: number
+}
+```
+`services/fast.ts`
+```diff
+import type {
++  ConsultOrderPre,
+  DoctorPage,
+  FollowType,
+  Image,
+  KnowledgePage,
+  KnowledgeParams,
+  PageParams,
+  PartialConsult,
+  TopDep
+} from '@/types/fast'
+```
+```ts
+export const getConsultOrderPre = (id: string) =>
+  request<ConsultOrderPre>('/patient/consult/order/pre', 'POST', { id })
+```
+
+4）获取数据渲染 `Fast/ConsultPay.vue`
+```vue
+<script setup lang="ts">
+import { getConsultOrderPre } from '@/services/fast'
+import type { ConsultOrderPre } from '@/types/fast'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+
+const order = ref<ConsultOrderPre>()
+const route = useRoute()
+const loadData = async () => {
+  const res = await getConsultOrderPre(route.query.consultId as string)
+  order.value = res.data
+}
+onMounted(() => loadData())
+
+const agree = ref(false)
+</script>
+
+<template>
+  <div class="consult-pay-page" v-if="order">
+    <cp-nav-bar title="支付" />
+    <div class="pay-info">
+      <p class="tit">图文问诊 {{ order?.payment }} 元</p>
+      <img class="img" src="@/assets/avatar-doctor.svg" />
+      <p class="desc">
+        <span>极速问诊</span>
+        <span>自动分配医生</span>
+      </p>
+    </div>
+    <van-cell-group>
+      <van-cell title="优惠券" :value="`-¥${order.couponDeduction}`" />
+      <van-cell title="积分抵扣" :value="`-¥${order.pointDeduction}`" />
+      <van-cell title="实付款" :value="`¥${order.actualPayment}`" class="pay-price" />
+    </van-cell-group>
+    <div class="pay-space"></div>
+    <van-cell-group>
+      <van-cell
+        title="患者信息"
+        :value="`${order.patientInfo.name} | ${order.patientInfo.genderValue} | ${order.patientInfo.age}岁`"
+      ></van-cell>
+      <van-cell title="病情描述" :label="order.illnessDesc"></van-cell>
+    </van-cell-group>
+    <div class="pay-schema">
+      <van-checkbox v-model="agree">我已同意 <span class="text">支付协议</span></van-checkbox>
+    </div>
+    <van-submit-bar
+      button-type="primary"
+      :price="order.actualPayment * 100"
+      button-text="立即支付"
+      text-align="left"
+    />
+  </div>
+</template>
+```
+
+
+
+## 问诊支付-流程讲解{#pay-line}
+
+![image-20220816220114053](./images/image-20220816220114053.png)
+
+
+支付流程：
+- 点击支付按钮，调用生成订单接口，得到订单ID，打开选择支付方式对话框
+- 选择支付方式，调用获取支付地址接口，得到支付地址，跳转到支付宝页面
+  - 使用支付宝APP支付（在手机上且安装沙箱支付宝）
+  - 使用浏览器账号密码支付 （测试推荐）
+- 支付成功回跳到问诊室页面
+
+
+
+## 问诊支付-进行支付{#pay-logic}
+
+
+

@@ -6,7 +6,7 @@ specifiers:
   ant-design-vue: ^3.2.10
   emmet: ^2.3.6
   sass: ^1.53.0
-  vitepress: 1.0.0-alpha.5
+  vitepress: 1.0.0-alpha.4
 
 dependencies:
   '@stackblitz/sdk': 1.8.0
@@ -16,7 +16,7 @@ dependencies:
 
 devDependencies:
   sass: 1.53.0
-  vitepress: 1.0.0-alpha.5_sass@1.53.0
+  vitepress: 1.0.0-alpha.4_sass@1.53.0
 
 packages:
 
@@ -982,8 +982,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitepress/1.0.0-alpha.5_sass@1.53.0:
-    resolution: {integrity: sha512-bhUfmTzd+i5fm2rInBR1Q/1RBhT0xTXM+vPqVWJdHmIc8XnWF/O7lT6kai38rOTNTt/KyPDk2SRRourPVhQJMA==}
+  /vitepress/1.0.0-alpha.4_sass@1.53.0:
+    resolution: {integrity: sha512-bOAA4KW6vYGlkbcrPLZLTKWTgXVroObU+o9xj9EENyEl6yg26WWvfN7DGA4BftjdM5O8nR93Z5khPQ3W/tFE7Q==}
     engines: {node: '>=14.6.0'}
     hasBin: true
     dependencies:
