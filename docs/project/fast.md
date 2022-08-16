@@ -978,3 +978,211 @@ const next = () => {
 
 
 ## 病情描述-回显数据{#illness-show}
+
+> 实现：进入页面时候提示用户是否回显之前填写的病情描述信息
+
+
+1）进入页面，如果有记录数据，弹出确认框
+```ts
+import { computed, onMounted, ref } from 'vue'
+```
+```ts
+// 回显数据
+onMounted(() => {
+  if (store.consult.illnessDesc) {
+    Dialog.confirm({
+      title: '温馨提示',
+      message: '是否恢复您之前填写的病情信息呢？',
+      confirmButtonColor: 'var(--cp-primary)'
+    }).then(() => {
+      // 确认
+    })
+  }
+})
+```
+
+2）回显数据
+
+给fileList加上类型，赋值需要
+```ts
+import type { ConsultIllness, Image } from '@/types/fast'
+const fileList = ref<Image[]>([])
+```
+从 store 拿出记录的数据
+```ts
+.then(() => {
+      // 确认
+      const { illnessDesc, illnessTime, consultFlag, pictures } = store.consult
+      form.value = { illnessDesc, illnessTime, consultFlag, pictures }
+      // 图片回显
+      fileList.value = pictures || []
+    })
+```
+
+3）回退需要也弹窗
+```ts
+closeOnPopstate: false
+```
+
+## 选择患者-家庭档案兼容{#fast-change-patient}
+> 实现：在家庭档案基础上实现选择患者功能
+
+步骤：
+- 界面兼容，根据地址栏是否有标识
+- 点击选中效果
+- 默认选中效果
+
+    
+代码：`User/PatientPage.vue`
+
+1）界面兼容选择患者
+```ts
+import { useRoute } from 'vue-router'
+```
+```ts
+// 是否是选择患者
+const route = useRoute()
+const isChange = computed(() => route.query.isChange === '1')
+```
+```html
+<cp-nav-bar :title="isChange ? '选择患者' : '家庭档案'" />
+```
+```html
+    <!-- 头部提示 -->
+    <div class="patient-change" v-if="isChange">
+      <h3>请选择患者信息</h3>
+      <p>以便医生给出更准确的治疗，信息仅医生可见</p>
+    </div>
+```
+```html
+    <!-- 底部按钮 -->
+    <div class="patient-next" v-if="isChange">
+      <van-button type="primary" @click="next" round block>下一步</van-button>
+    </div>
+```
+```scss
+.patient-change {
+  padding: 15px;
+  > h3 {
+    font-weight: normal;
+    margin-bottom: 5px;
+  }
+  > p {
+    color: var(--cp-text3);
+  }
+}
+.patient-next {
+  padding: 15px;
+  background-color: #fff;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  height: 80px;
+  box-sizing: border-box;
+}
+```
+
+2）点击选中效果
+
+```ts
+const patientId = ref<string>()
+const selectedPatient = (item: Patient) => {
+  if (isChange.value) {
+    patientId.value = item.id
+  }
+}
+```
+
+```html{5,6}
+      <div
+        class="patient-item"
+        v-for="item in list"
+        :key="item.id"
+        @click="selectedPatient(item)"
+        :class="{ selected: patientId === item.id }"
+      >
+```
+
+3) 默认选中效果
+
+```diff
+const loadList = async () => {
+  const res = await getPatientList()
+  list.value = res.data
++  // 设置默认选中的ID，当你是选择患者的时候，且有患者信息的时候
++  if (isChange.value && list.value.length) {
++    const defPatient = list.value.find((item) => item.defaultFlag === 1)
++    if (defPatient) patientId.value = defPatient.id
++    else patientId.value = list.value[0].id
++  }
+}
+```
+
+## 选择患者-提交问诊记录{#fast-change-submit}
+> 实现：点击下一步存储问诊记录到后台操作
+
+步骤：
+- 是否选择患者校验
+- 存储选择的患者ID
+- 定义一个API函数
+- 提交问诊记录信息，开启loading
+- 成功：
+  - 清空 pinia 记录
+  - 跳转问诊支付页面
+  - 结束loading
+- 失败
+  - 结束loading
+
+代码：
+
+`services/fast.ts`
+
+```diff
+import type {
+  DoctorPage,
+  FollowType,
+  Image,
+  KnowledgePage,
+  KnowledgeParams,
+  PageParams,
++  PartialConsult,
+  TopDep
+} from '@/types/fast'
+```
+```ts
+export const createConsultRecord = (data: PartialConsult) =>
+  request<{ id: string }>('/patient/consult/record', 'POST', data)
+```
+
+`User/PatientPage.vue`
+
+```ts
+import { useRoute, useRouter } from 'vue-router'
+import { useConsultStore } from '@/stores'
+import { createConsultRecord } from '@/services/fast'
+```
+
+```ts
+const router = useRouter()
+const store = useConsultStore()
+const loading = ref(false)
+const next = async () => {
+  if (!patientId.value) return Toast('请选就诊择患者')
+  store.setPatient(patientId.value)
+  // 提交问诊记录信息后台保存
+  loading.value = true
+  try {
+    const res = await createConsultRecord(store.consult)
+    loading.value = false
+    // 清空存储的问诊信息
+    store.clear()
+    router.push(`/fast/pay?consultId=${res.data.id}`)
+  } catch (e) {
+    loading.value = false
+  }
+}
+```
+
+小结：
+- 提交给后台之后，后台就生成了问诊记录，前端存储的使命结束了

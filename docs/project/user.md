@@ -784,10 +784,12 @@ const logout = async () => {
       &.name {
         font-size: 16px;
         color: var(--cp-text1);
+        width: 80px;
+        margin-right: 0;
       }
       &.id {
         color: var(--cp-text2);
-        width: 200px;
+        width: 180px;
       }
     }
   }
@@ -1086,6 +1088,7 @@ const onClickLeft = () => {
     color: var(--cp-text2);
     margin-bottom: 10px;
     border-radius: 4px;
+    transition: all 0.3s;
     &.active {
       border-color: var(--cp-primary);
       background-color: var(--cp-plain);
