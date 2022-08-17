@@ -1721,58 +1721,64 @@ const onLoad = async () => {
 
 ```html
 <div class="consult-item" v-for="item in list" :key="item.id">
-        <div class="head van-hairline--bottom">
-          <img class="img" src="@/assets/avatar-doctor.svg" />
-          <p>{{ item.docInfo.name }}</p>
-          <span
-            :class="{
-              orange: item.status === OrderType.ConsultPay,
-              green: item.status === OrderType.ConsultChat
-            }"
-            >{{ item.statusValue }}</span
-          >
-        </div>
-        <div class="body" @click="$router.push(`/user/consult/${item.id}`)">
-          <div class="body-row">
-            <div class="body-label">病情描述</div>
-            <div class="body-value">{{ item.illnessDesc }}</div>
-          </div>
-          <div class="body-row">
-            <div class="body-label">价格</div>
-            <div class="body-value">¥ {{ item.price.toFixed(2) }}</div>
-          </div>
-          <div class="body-row">
-            <div class="body-label">创建时间</div>
-            <div class="body-value tip">{{ item.createTime }}</div>
-          </div>
-        </div>
-        <div class="foot" v-if="item.status === OrderType.ConsultPay">
-          <van-button class="gray" plain size="small" round>取消问诊</van-button>
-          <van-button type="primary" plain size="small" round :to="`/user/consult/${item.id}`">
-            去支付
-          </van-button>
-        </div>
-        <div class="foot" v-if="item.status === OrderType.ConsultWait">
-          <van-button class="gray" plain size="small" round>取消问诊</van-button>
-          <van-button type="primary" plain size="small" round :to="`/room/${item.id}`"
-            >继续沟通</van-button
-          >
-        </div>
-        <div class="foot" v-if="item.status === OrderType.ConsultChat">
-          <van-button type="primary" plain size="small" round :to="`/room/${item.id}`"
-            >继续沟通</van-button
-          >
-        </div>
-        <div class="foot" v-if="item.status === OrderType.ConsultComplete">
-          <van-button class="gray" plain size="small" round>查看处方</van-button>
-          <van-button type="primary" plain size="small" round :to="`/room/${item.id}`">
-            继续沟通
-          </van-button>
-        </div>
-        <div class="foot" v-if="item.status === OrderType.ConsultCancel">
-          <van-button class="gray" plain size="small" round>删除订单</van-button>
-          <van-button type="primary" plain size="small" round to="/">咨询其他医生</van-button>
-        </div>
-      </div>
+  <div class="head van-hairline--bottom">
+    <img class="img" src="@/assets/avatar-doctor.svg" />
+    <p>{{ item.docInfo.name }}</p>
+    <span
+      :class="{
+        orange: item.status === OrderType.ConsultPay,
+        green: item.status === OrderType.ConsultChat
+      }"
+      >{{ item.statusValue }}</span
+    >
+  </div>
+  <div class="body">
+    <div class="body-row">
+      <div class="body-label">病情描述</div>
+      <div class="body-value">{{ item.illnessDesc }}</div>
+    </div>
+    <div class="body-row">
+      <div class="body-label">价格</div>
+      <div class="body-value">¥ {{ item.price.toFixed(2) }}</div>
+    </div>
+    <div class="body-row">
+      <div class="body-label">创建时间</div>
+      <div class="body-value tip">{{ item.createTime }}</div>
+    </div>
+  </div>
+  <div class="foot" v-if="item.status === OrderType.ConsultPay">
+    <van-button class="gray" plain size="small" round>取消问诊</van-button>
+    <van-button
+      type="primary"
+      plain
+      size="small"
+      round
+      :to="`/consult/pay?orderId=${item.id}`"
+    >
+      去支付
+    </van-button>
+  </div>
+  <div class="foot" v-if="item.status === OrderType.ConsultWait">
+    <van-button class="gray" plain size="small" round>取消问诊</van-button>
+    <van-button type="primary" plain size="small" round :to="`/room/${item.id}`"
+      >继续沟通</van-button
+    >
+  </div>
+  <div class="foot" v-if="item.status === OrderType.ConsultChat">
+    <van-button type="primary" plain size="small" round :to="`/room/${item.id}`"
+      >继续沟通</van-button
+    >
+  </div>
+  <div class="foot" v-if="item.status === OrderType.ConsultComplete">
+    <van-button class="gray" plain size="small" round>查看处方</van-button>
+    <van-button type="primary" plain size="small" round :to="`/room/${item.id}`">
+      继续沟通
+    </van-button>
+  </div>
+  <div class="foot" v-if="item.status === OrderType.ConsultCancel">
+    <van-button class="gray" plain size="small" round>删除订单</van-button>
+    <van-button type="primary" plain size="small" round to="/">咨询其他医生</van-button>
+  </div>
+</div>
 ```
 
