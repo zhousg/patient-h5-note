@@ -86,7 +86,7 @@
           </router-link>
         </van-col>
         <van-col span="8">
-          <router-link to="/fast" class="nav">
+          <router-link to="/consult/fast" class="nav">
             <cp-icon name="home-graphic"></cp-icon>
             <p class="title">极速问诊</p>
             <p class="desc">20s医生极速回复</p>
@@ -401,7 +401,7 @@ import KnowledgeList from './components/KnowledgeList.vue'
 2）默认激活 推荐tab , 结合查询列表接口的知识类型
 - recommend推荐，fatReduction减脂，food健康饮食，like关注医生页面文章
 
-`types/fast.d.ts`
+`types/consult.d.ts`
 ```ts
 // 文章类型
 export type KnowledgeType = 'like' | 'recommend' | 'fatReduction' | 'food'
@@ -411,7 +411,7 @@ export type KnowledgeType = 'like' | 'recommend' | 'fatReduction' | 'food'
 ```ts
 import { ref } from 'vue'
 import KnowledgeList from './components/KnowledgeList.vue'
-import type { KnowledgeType } from '@/types/fast'
+import type { KnowledgeType } from '@/types/consult'
 
 const active = ref<KnowledgeType>('recommend')
 ```
@@ -550,9 +550,9 @@ const props = defineProps<{
     </van-tabs>
 ```
 
-2）定义 api 函数 `services/fast.ts`
+2）定义 api 函数 `services/consult.ts`
 ```ts
-import type { KnowledgePage, KnowledgeParams } from '@/types/fast'
+import type { KnowledgePage, KnowledgeParams } from '@/types/consult'
 import { request } from '@/utils/request'
 
 export const getKnowledgePage = (params: KnowledgeParams) =>
@@ -565,8 +565,8 @@ export const getKnowledgePage = (params: KnowledgeParams) =>
 `Home/components/KnowledgeList.vue`
 ```vue
 <script setup lang="ts">
-import { getKnowledgePage } from '@/services/fast'
-import type { KnowledgeList, KnowledgeParams, KnowledgeType } from '@/types/fast'
+import { getKnowledgePage } from '@/services/consult'
+import type { KnowledgeList, KnowledgeParams, KnowledgeType } from '@/types/consult'
 import { ref } from 'vue'
 
 const props = defineProps<{
@@ -611,7 +611,7 @@ const onLoad = async () => {
 `Home/components/KnowledgeCard.vue`
 ```vue
 <script setup lang="ts">
-import type { Knowledge } from '@/types/fast'
+import type { Knowledge } from '@/types/consult'
 
 defineProps<{ item: Knowledge }>()
 </script>
@@ -842,7 +842,7 @@ const { width } = useWindowSize()
 - 如果遇见一些常见的需求可以先看看 @vueuse/core 是否提供，这样可以提高开发效率。
   - 如果：窗口尺寸，滚动距离，是否进入可视区，倒计时，...等等。
 
-作业：
+作业：consult
 - 使用 useIntervalFn 实现下发验证码倒计时业务
 
 
@@ -857,7 +857,7 @@ const { width } = useWindowSize()
 
 代码：
 
-1）定义 医生卡片数据 类型 `fast.d.ts`
+1）定义 医生卡片数据 类型 `consult.d.ts`
 ```ts
 // 通用的分页查询参数
 export type PageParams = {
@@ -896,9 +896,9 @@ export type DoctorPage = {
   rows: DoctorList
 }
 ```
-2）定义 获取推荐关注医生 接口函数 `fast.ts`
+2）定义 获取推荐关注医生 接口函数 `consult.ts`
 ```ts 
-import type { DoctorPage, KnowledgePage, KnowledgeParams, PageParams } from '@/types/fast'
+import type { DoctorPage, KnowledgePage, KnowledgeParams, PageParams } from '@/types/consult'
 import { request } from '@/utils/request'
 
 export const getDoctorPage = (params: PageParams) =>
@@ -910,8 +910,8 @@ export const getDoctorPage = (params: PageParams) =>
 `Home/components/FollowDoctor.vue`
 ```vue
 <script setup lang="ts">
-import { getDoctorPage } from '@/services/fast'
-import type { DoctorList } from '@/types/fast'
+import { getDoctorPage } from '@/services/consult'
+import type { DoctorList } from '@/types/consult'
 import { useWindowSize } from '@vueuse/core'
 import { onMounted, ref } from 'vue'
 
@@ -945,7 +945,7 @@ onMounted(() => loadData())
 `Home/components/DoctorCard.vue`
 ```vue
 <script lang="ts" setup>
-import type { Doctor } from '@/types/fast'
+import type { Doctor } from '@/types/consult'
 
 defineProps<{ item: Doctor }>()
 </script>
@@ -974,12 +974,12 @@ defineProps<{ item: Doctor }>()
 
 - 定义关注与取消关注API
 
-`types/fast.d.ts`
+`types/consult.d.ts`
 ```ts
 // 关注的类型
 export type FollowType = 'doc' | 'knowledge' | 'topic' | 'disease'
 ```
-`service/fast.ts`
+`service/consult.ts`
 ```ts
 
 export const followDoctor = (id: string, type: FollowType = 'doc') =>
@@ -995,8 +995,8 @@ export const followDoctor = (id: string, type: FollowType = 'doc') =>
             </van-button>
 ```
 ```ts
-import type { Doctor } from '@/types/fast'
-import { followDoctor } from '@/services/fast'
+import type { Doctor } from '@/types/consult'
+import { followDoctor } from '@/services/consult'
 import { ref } from 'vue'
 
 defineProps<{ item: Doctor }>()
@@ -1026,8 +1026,8 @@ const follow = async (doc: Doctor) => {
 `composable/index.ts`
 ```ts
 import { ref } from 'vue'
-import { followDoctor } from '@/services/fast'
-import type { FollowType } from '@/types/fast'
+import { followDoctor } from '@/services/consult'
+import type { FollowType } from '@/types/consult'
 
 // 封装逻辑，规范 useXxx，表示使用某功能
 export const useFollow = (type: FollowType = 'doc') => {
@@ -1052,7 +1052,7 @@ export const useFollow = (type: FollowType = 'doc') => {
 
 ```vue
 <script lang="ts" setup>
-import type { Doctor } from '@/types/fast'
+import type { Doctor } from '@/types/consult'
 import { useFollow } from '@/composable'
 
 defineProps<{ item: Doctor }>()

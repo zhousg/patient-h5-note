@@ -647,19 +647,19 @@ const login = async () => {
 
 |  路由路径    |   路由级别   |  组件功能    |
 | ---- | ---- | ---- |
-|   /register   |   1   |   注册   |
 |   /login   |   1  |   登录   |
 |   /   |   1    |  布局容器    |
 |   /user   |   ②    |   个人中心   |
 |   /user/patient   |   1   |   家庭档案   |
 |   /user/address   |   1   |   地址管理   |
 |   /home   |   ②   |   首页   |
-|   /fast   |   1   |   快速问诊   |
-|   /fast/dep   |   1   |   选择科室   |
-|   /fast/illness   |   1   |   病情描述   |
+|   /consult/fast   |   1   |   快速问诊   |
+|   /consult/dep   |   1   |   选择科室   |
+|   /consult/illness   |   1   |   病情描述   |
 |   /consult/pay   |   1   |   问诊支付   |
-|   /consult/room   |   1   |   问诊室   |
-|   /consult   |   1   |   我的问诊   |
+|   /room   |   1   |   问诊室   |
+|   /user/consult   |   1   |   我的问诊   |
+|   /user/consult/:id   |   1   |   问诊详情   |
 |   /order/pay   |   1   |   药品订单支付   |
 |   /order/pay/result   |   1   |   药品订单支付结果   |
 |   /order   |   1   |   药品订单列表   |

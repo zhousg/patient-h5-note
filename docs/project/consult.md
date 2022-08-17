@@ -1,6 +1,6 @@
 # 极速问诊模块
 
-## 极速问诊-需求分析{#fast-product}
+## 极速问诊-需求分析{#consult-product}
 > 理解：极速问诊阶段流程分析
 
 ![image-20220813195713860](./images/image-20220813195713860.png)
@@ -106,7 +106,7 @@ showOrderStatus(OrderStatus.Complete)
   - 不能，有值的需要写在 ts 文件中
 
 
-## 极速问诊-定义类型{#fast-type}
+## 极速问诊-定义类型{#consult-type}
 > 定义问诊记录数据相关类型
 
 步骤：
@@ -134,7 +134,7 @@ export enum ConsultTime {
 }
 ```
 
-`types/fast.d.ts`
+`types/consult.d.ts`
 ```ts
 import { ConsultType, IllnessTime } from '@/enums'
 
@@ -168,7 +168,7 @@ export type PartialConsult = Partial<Consult>
 注意：
 - 枚举类型需要在 ts 文件中，因为枚举会编译成 js 代码
 
-## 极速问诊-问诊记录仓库{#fast-consult-store}
+## 极速问诊-问诊记录仓库{#consult-consult-store}
 > 实现：病情描述仓库的定义，实现问诊记录分步修改
 
 步骤：
@@ -189,7 +189,7 @@ export type PartialConsult = Partial<Consult>
 
 ```ts
 import { ConsultType } from '@/enums'
-import type { PartialConsult } from '@/types/fast'
+import type { PartialConsult } from '@/types/consult'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
@@ -225,7 +225,8 @@ export const useConsultStore = defineStore(
 ```
 
 2) 导出仓库 `stores/index.ts`
-```
+
+```ts
 export * from './modules/consult'
 ```
 
@@ -239,10 +240,10 @@ const store = useConsultStore()
 ```
 
 ```html
-<router-link to="/fast" @click="store.setType(ConsultType.Fast)" class="nav">
+<router-link to="/consult" @click="store.setType(ConsultType.Fast)" class="nav">
 ```
 
-## 极速问诊-选择极速问诊类型{#fast-consult-type}
+## 极速问诊-选择极速问诊类型{#consult-consult-type}
 
 ![image-20220815133500165](./images/image-20220815133500165.png)
 
@@ -257,12 +258,12 @@ const store = useConsultStore()
 
 1）路由和组件 
 
-`Fast/index.vue`
+`Consult/ConsultFast.vue`
 ```vue
 <script setup lang="ts"></script>
 
 <template>
-  <div class="fast-page">fast</div>
+  <div class="consult-fast-page">consult</div>
 </template>
 
 <style lang="scss" scoped></style>
@@ -270,8 +271,8 @@ const store = useConsultStore()
 `router/index.ts`
 ```ts
     {
-      path: '/fast',
-      component: () => import('@/views/Fast/index.vue'),
+      path: '/consult/fast',
+      component: () => import('@/views/Consult/ConsultFast.vue'),
       meta: { title: '极速问诊' }
     }
 ```
@@ -282,23 +283,23 @@ const store = useConsultStore()
 <script setup lang="ts"></script>
 
 <template>
-  <div class="fast-page">
+  <div class="consult-fast-page">
     <cp-nav-bar title="极速问诊" right-text="问诊记录"></cp-nav-bar>
     <div class="fast-logo">
-      <img class="img" src="@/assets/fast-consult.png" alt="" />
+      <img class="img" src="@/assets/consult-fast.png" alt="" />
       <p class="text"><span>20s</span> 快速匹配专业医生</p>
     </div>
     <div class="fast-type">
-      <router-link to="/fast/dep" class="item">
-        <cp-icon class="pic" name="fast-doctor"></cp-icon>
+      <router-link to="/consult/dep" class="item">
+        <cp-icon class="pic" name="consult-doctor"></cp-icon>
         <div class="info">
           <p>三甲图文问诊</p>
           <p>三甲主治及以上级别医生</p>
         </div>
         <van-icon name="arrow"></van-icon>
       </router-link>
-      <router-link to="/fast/dep" class="item">
-        <cp-icon class="pic" name="fast-message"></cp-icon>
+      <router-link to="/consult/dep" class="item">
+        <cp-icon class="pic" name="consult-message"></cp-icon>
         <div class="info">
           <p>普通图文问诊</p>
           <p>二甲主治及以上级别医生</p>
@@ -310,7 +311,7 @@ const store = useConsultStore()
 </template>
 
 <style lang="scss" scoped>
-.fast-page {
+.consult-fast-page {
   padding-top: 46px;
   .fast-logo {
     padding: 30px 0;
@@ -373,15 +374,15 @@ const store = useConsultStore()
 ```
 
 ```html
-      <router-link to="/fast/dep" class="item" @click="store.setIllnessType(1)">
+      <router-link to="/consult/dep" class="item" @click="store.setIllnessType(1)">
 ```
 
 ```html
-      <router-link to="/fast/dep" class="item" @click="store.setIllnessType(0)">
+      <router-link to="/consult/dep" class="item" @click="store.setIllnessType(0)">
 ```
 
 
-## 极速问诊-选择科室-布局{#fast-consult-dep-html}
+## 极速问诊-选择科室-布局{#consult-consult-dep-html}
 > 实现：路由与组件，和基础结构
 
 步骤：
@@ -393,7 +394,7 @@ const store = useConsultStore()
 
 1）路由与组件
 
-`Fast/ConsultDep.vue`
+`Consult/ConsultDep.vue`
 ```vue
 <script setup lang="ts"></script>
 
@@ -406,8 +407,8 @@ const store = useConsultStore()
 `router/index.ts`
 ```ts
     {
-      path: '/fast/dep',
-      component: () => import('@/views/Fast/ConsultDep.vue'),
+      path: '/consult/dep',
+      component: () => import('@/views/Consult/ConsultDep.vue'),
       meta: { title: '选择科室' }
     }
 ```
@@ -459,9 +460,9 @@ const active = ref(0)
 3) 页面布局-二级科室
 ```html
       <div class="sub-dep">
-        <router-link to="/fast/illness">科室一</router-link>
-        <router-link to="/fast/illness">科室二</router-link>
-        <router-link to="/fast/illness">科室三</router-link>
+        <router-link to="/consult/illness">科室一</router-link>
+        <router-link to="/consult/illness">科室二</router-link>
+        <router-link to="/consult/illness">科室三</router-link>
       </div>
 ```
 ```scss
@@ -485,7 +486,7 @@ const active = ref(0)
 小结
 - 需要实现一级科室的切换要绑定数据
 
-## 极速问诊-选择科室-业务{#fast-consult-dep-logic}
+## 极速问诊-选择科室-业务{#consult-consult-dep-logic}
 > 实现：科室切换以及跳转到病情描述
 
 步骤：
@@ -499,7 +500,7 @@ const active = ref(0)
 
 代码：
 
-1）编写科室需要的类型 `types/fast.d.ts`
+1）编写科室需要的类型 `types/consult.d.ts`
 ```ts
 // 科室
 export type SubDep = {
@@ -512,7 +513,7 @@ export type TopDep = SubDep & {
 }
 ```
 
-2）准备API函数 `services/fast.ts`
+2）准备API函数 `services/consult.ts`
 ```diff
 import type {
   DoctorPage,
@@ -521,16 +522,16 @@ import type {
   KnowledgeParams,
   PageParams,
 +  TopDep
-} from '@/types/fast'
+} from '@/types/consult'
 
 +export const getAllDep = () => request<TopDep[]>('/dep/all')
 ```
 
-3）实现一级科室切换 `Fast/ConsultDep.vue`
+3）实现一级科室切换 `Consult/ConsultDep.vue`
 
 ```ts
-import { getAllDep } from '@/services/fast'
-import type { TopDep } from '@/types/fast'
+import { getAllDep } from '@/services/consult'
+import type { TopDep } from '@/types/consult'
 import { onMounted, ref } from 'vue'
 ```
 ```ts
@@ -557,7 +558,7 @@ const subDep = computed(() => allDep.value[active.value]?.child)
 ```
 ```html
       <div class="sub-dep">
-        <router-link to="/fast/illness" v-for="sub in subDep" :key="sub.id">
+        <router-link to="/consult/illness" v-for="sub in subDep" :key="sub.id">
           {{ sub.name }}
         </router-link>
       </div>
@@ -572,7 +573,7 @@ const store = useConsultStore()
 
 ```diff
         <router-link
-          to="/fast/illness"
+          to="/consult/illness"
           v-for="sub in subDep"
           :key="sub.id"
 +          @click="store.setDep(sub.id)"
@@ -605,19 +606,24 @@ const store = useConsultStore()
 </style>
 ```
 
+```ts
+    {
+      path: '/consult/illness',
+      component: () => import('@/views/Consult/ConsultIllness.vue'),
+      meta: { title: '病情描述' }
+    },
+```
+
 2) 病情描述头部提示
 
-```ts
-import avatar from '@/assets/avatar-doctor.svg'
-```
 ```html
     <!-- 医生提示 -->
     <div class="illness-tip van-hairline--bottom">
-      <van-image :src="avatar"></van-image>
+      <img class="img" src="@/assets/avatar-doctor.svg" />
       <div class="info">
         <p class="tit">在线医生</p>
         <p class="tip">请描述你的疾病或症状、是否用药、就诊经历，需要我听过什么样的帮助</p>
-        <p class="safe"><cp-icon name="fast-safe" /><span>内容仅医生可见</span></p>
+        <p class="safe"><cp-icon name="consult-safe" /><span>内容仅医生可见</span></p>
       </div>
     </div>
 ```
@@ -625,7 +631,7 @@ import avatar from '@/assets/avatar-doctor.svg'
 .illness-tip {
   display: flex;
   padding: 15px;
-  .van-image {
+  .img {
     width: 52px;
     height: 52px;
     border-radius: 4px;
@@ -662,7 +668,7 @@ import avatar from '@/assets/avatar-doctor.svg'
 
 2）准备表单数据
 
-`types/fast.d.ts`
+`types/consult.d.ts`
 ```ts
 // 问诊记录-病情描述全部必填
 export type ConsultIllness = Pick<
@@ -672,7 +678,7 @@ export type ConsultIllness = Pick<
 ```
 `stores/modules/consult.ts`
 ```ts
-import type { PartialConsult, ConsultIllness } from '@/types/fast'
+import type { PartialConsult, ConsultIllness } from '@/types/consult'
 ```
 ```diff
     // 设置病情描述
@@ -683,9 +689,9 @@ import type { PartialConsult, ConsultIllness } from '@/types/fast'
       consult.value.pictures = illnesss.pictures
     }
 ```
-`Fast/ConsultIllness.vue`
+`Consult/ConsultIllness.vue`
 ```ts
-import type { ConsultIllness } from '@/types/fast'
+import type { ConsultIllness } from '@/types/consult'
 import { ref } from 'vue'
 import { IllnessTime } from '@/enums'
 
@@ -866,7 +872,7 @@ const onDeleteImg = (item: UploaderFileListItem) => {
 
 代码：
 
-1）定义 api 函数 `services/fast.ts`
+1）定义 api 函数 `services/consult.ts`
 
 ```diff
 import type {
@@ -877,7 +883,7 @@ import type {
   KnowledgeParams,
   PageParams,
   TopDep
-} from '@/types/fast'
+} from '@/types/consult'
 ```
 ```ts
 export const uploadImage = (file: File) => {
@@ -887,10 +893,10 @@ export const uploadImage = (file: File) => {
 }
 ```
 
-2）实现上传 `Fast/ConsultIllness.vue`
+2）实现上传 `Consult/ConsultIllness.vue`
 
 ```ts
-import { uploadImage } from '@/services/fast'
+import { uploadImage } from '@/services/consult'
 ```
 
 ```ts
@@ -1005,7 +1011,7 @@ onMounted(() => {
 
 给fileList加上类型，赋值需要
 ```ts
-import type { ConsultIllness, Image } from '@/types/fast'
+import type { ConsultIllness, Image } from '@/types/consult'
 const fileList = ref<Image[]>([])
 ```
 从 store 拿出记录的数据
@@ -1024,7 +1030,7 @@ const fileList = ref<Image[]>([])
 closeOnPopstate: false
 ```
 
-## 选择患者-家庭档案兼容{#fast-change-patient}
+## 选择患者-家庭档案兼容{#consult-change-patient}
 > 实现：在家庭档案基础上实现选择患者功能
 
 步骤：
@@ -1120,7 +1126,7 @@ const loadList = async () => {
 }
 ```
 
-## 选择患者-提交问诊记录{#fast-change-submit}
+## 选择患者-提交问诊记录{#consult-change-submit}
 > 实现：点击下一步存储问诊记录到后台操作
 
 步骤：
@@ -1137,7 +1143,7 @@ const loadList = async () => {
 
 代码：
 
-`services/fast.ts`
+`services/consult.ts`
 
 ```diff
 import type {
@@ -1149,7 +1155,7 @@ import type {
   PageParams,
 +  PartialConsult,
   TopDep
-} from '@/types/fast'
+} from '@/types/consult'
 ```
 ```ts
 export const createConsultRecord = (data: PartialConsult) =>
@@ -1161,7 +1167,7 @@ export const createConsultRecord = (data: PartialConsult) =>
 ```ts
 import { useRoute, useRouter } from 'vue-router'
 import { useConsultStore } from '@/stores'
-import { createConsultRecord } from '@/services/fast'
+import { createConsultRecord } from '@/services/consult'
 ```
 
 ```ts
@@ -1178,7 +1184,7 @@ const next = async () => {
     loading.value = false
     // 清空存储的问诊信息
     store.clear()
-    router.push(`/fast/pay?consultId=${res.data.id}`)
+    router.push(`/consult/pay?consultId=${res.data.id}`)
   } catch (e) {
     loading.value = false
   }
@@ -1195,7 +1201,7 @@ const next = async () => {
 
 1）组件与路由
 
-组件 `Fast/ConsultPay.vue`
+组件 `Consult/ConsultPay.vue`
 ```vue
 <script setup lang="ts"></script>
 
@@ -1215,8 +1221,8 @@ const next = async () => {
 
 ```ts
     {
-      path: '/fast/pay',
-      component: () => import('@/views/Fast/ConsultPay.vue'),
+      path: '/consult/pay',
+      component: () => import('@/views/Consult/ConsultPay.vue'),
       meta: { title: '问诊支付' }
     }
 ```
@@ -1331,7 +1337,7 @@ const next = async () => {
 
 3）定义 API 函数，获取预支付信息
 
-`types/fast.d.ts`
+`types/consult.d.ts`
 ```ts
 // 问诊订单预支付信息
 export type ConsultOrderPre = Consult & {
@@ -1344,7 +1350,7 @@ export type ConsultOrderPre = Consult & {
   actualPayment: number
 }
 ```
-`services/fast.ts`
+`services/consult.ts`
 ```diff
 import type {
 +  ConsultOrderPre,
@@ -1356,18 +1362,18 @@ import type {
   PageParams,
   PartialConsult,
   TopDep
-} from '@/types/fast'
+} from '@/types/consult'
 ```
 ```ts
 export const getConsultOrderPre = (id: string) =>
   request<ConsultOrderPre>('/patient/consult/order/pre', 'POST', { id })
 ```
 
-4）获取数据渲染 `Fast/ConsultPay.vue`
+4）获取数据渲染 `Consult/ConsultPay.vue`
 ```vue
 <script setup lang="ts">
-import { getConsultOrderPre } from '@/services/fast'
-import type { ConsultOrderPre } from '@/types/fast'
+import { getConsultOrderPre } from '@/services/consult'
+import type { ConsultOrderPre } from '@/types/consult'
 import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -1427,11 +1433,15 @@ const agree = ref(false)
 
 
 支付流程：
-- 点击支付按钮，调用生成订单接口，得到订单ID，打开选择支付方式对话框
-- 选择支付方式，调用获取支付地址接口，得到支付地址，跳转到支付宝页面
+- 点击支付按钮，调用生成订单接口，得到 `订单ID`，打开选择支付方式对话框
+- 选择`支付方式`，（测试环境需要配置 `回跳地址`）调用获取支付地址接口，得到支付地址，跳转到支付宝页面
   - 使用支付宝APP支付（在手机上且安装沙箱支付宝）
   - 使用浏览器账号密码支付 （测试推荐）
 - 支付成功回跳到问诊室页面
+
+
+
+
 
 
 
