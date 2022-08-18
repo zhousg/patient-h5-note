@@ -8,7 +8,7 @@ export default defineConfig({
     lineNumbers: true
   },
   head: [['link', { rel: 'icon', type: 'image/svg+xml', href: './logo2.png' }]],
-  // base: '.',
+  base: '/patient-h5-note/',
   lastUpdated: true,
   themeConfig: {
     logo: '/logo2.png',

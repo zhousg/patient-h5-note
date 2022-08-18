@@ -1037,6 +1037,7 @@ closeOnPopstate: false
 - 界面兼容，根据地址栏是否有标识
 - 点击选中效果
 - 默认选中效果
+- 记录患者ID跳转到待支付页面
 
     
 
@@ -1126,73 +1127,15 @@ const loadList = async () => {
 }
 ```
 
-## 选择患者-提交问诊记录{#consult-change-submit}
-> 实现：点击下一步存储问诊记录到后台操作
-
-步骤：
-- 是否选择患者校验
-- 存储选择的患者ID
-- 定义一个API函数
-- 提交问诊记录信息，开启loading
-- 成功：
-  - 清空 pinia 记录
-  - 跳转问诊支付页面
-  - 结束loading
-- 失败
-  - 结束loading
-
-代码：
-
-`services/consult.ts`
-
-```diff
-import type {
-  DoctorPage,
-  FollowType,
-  Image,
-  KnowledgePage,
-  KnowledgeParams,
-  PageParams,
-+  PartialConsult,
-  TopDep
-} from '@/types/consult'
-```
-```ts
-export const createConsultOrder = (data: PartialConsult) =>
-  request<{ id: string }>('/patient/consult/order', 'POST', data)
-```
-
-`User/PatientPage.vue`
+4）记录患者ID跳转到待支付页面
 
 ```ts
-import { useRoute, useRouter } from 'vue-router'
-import { useConsultStore } from '@/stores'
-import { createConsultOrder } from '@/services/consult'
-```
-
-```ts
-const router = useRouter()
-const store = useConsultStore()
-const loading = ref(false)
 const next = async () => {
   if (!patientId.value) return Toast('请选就诊择患者')
   store.setPatient(patientId.value)
-  // 提交问诊记录信息后台保存
-  loading.value = true
-  try {
-    const res = await createConsultOrder(store.consult)
-    loading.value = false
-    // 清空存储的问诊信息
-    store.clear()
-    router.push(`/consult/pay?orderId=${res.data.id}`)
-  } catch (e) {
-    loading.value = false
-  }
+  router.push(`/consult/pay?orderId=${res.data.id}`)
 }
 ```
-
-小结：
-- 提交给后台之后，后台就生成了问诊记录，前端存储的使命结束了
 
 
 ## 问诊支付-页面渲染{#pay-html}
@@ -1339,10 +1282,11 @@ const next = async () => {
 
 `types/consult.d.ts`
 ```ts
+// 问诊订单预支付传参
+export type ConsultOrderPreParams = Pick<PartialConsult, 'type' | 'illnessType'>
+
 // 问诊订单预支付信息
-export type ConsultOrderPre = Consult & {
-  patientInfo: Patient
-  payment: number
+export type ConsultOrderPreData = {
   pointDeduction: number
   couponDeduction: number
   payment: number
@@ -1351,39 +1295,54 @@ export type ConsultOrderPre = Consult & {
 }
 ```
 `services/consult.ts`
-```diff
-import type {
-+  ConsultOrderPre,
-  DoctorPage,
-  FollowType,
-  Image,
-  KnowledgePage,
-  KnowledgeParams,
-  PageParams,
-  PartialConsult,
-  TopDep
-} from '@/types/consult'
+```ts
+import type { ConsultOrderPreData, ConsultOrderPreParams } from '@/types/consult'
 ```
 ```ts
-export const getConsultOrderPre = (id: string) =>
-  request<ConsultOrderPre>('/patient/consult/order/pre', 'POST', { id })
+// 拉取预支付订单信息
+export const getConsultOrderPre = (params: ConsultOrderPreParams) =>
+  request<ConsultOrderPreData>('/patient/consult/order/pre', 'GET', params)
 ```
+
+`services/user.ts`
+```ts
+// 查询患者详情
+export const getPatientDetail = (id: string) => request<Patient>(`/patient/info/${id}`)
+```
+
 
 4）获取数据渲染 `Consult/ConsultPay.vue`
 ```vue
 <script setup lang="ts">
 import { getConsultOrderPre } from '@/services/consult'
-import type { ConsultOrderPre } from '@/types/consult'
+import { getPatientDetail } from '@/services/user'
+import { useConsultStore } from '@/stores'
+import type { ConsultOrderPreData } from '@/types/consult'
+import type { Patient } from '@/types/user'
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
 
-const order = ref<ConsultOrderPre>()
-const route = useRoute()
+const store = useConsultStore()
+
+const order = ref<ConsultOrderPreData>()
 const loadData = async () => {
-  const res = await getConsultOrderPre(route.query.consultId as string)
+  const res = await getConsultOrderPre({
+    type: store.consult.type,
+    illnessType: store.consult.illnessType
+  })
   order.value = res.data
 }
-onMounted(() => loadData())
+
+const patient = ref<Patient>()
+const loadPatient = async () => {
+  if (!store.consult.patientId) return
+  const res = await getPatientDetail(store.consult.patientId)
+  patient.value = res.data
+}
+
+onMounted(() => {
+  loadData()
+  loadPatient()
+})
 
 const agree = ref(false)
 </script>
@@ -1408,9 +1367,9 @@ const agree = ref(false)
     <van-cell-group>
       <van-cell
         title="患者信息"
-        :value="`${order.patientInfo.name} | ${order.patientInfo.genderValue} | ${order.patientInfo.age}岁`"
+        :value="`${patient?.name} | ${patient?.genderValue} | ${patient?.age}岁`"
       ></van-cell>
-      <van-cell title="病情描述" :label="order.illnessDesc"></van-cell>
+      <van-cell title="病情描述" :label="store.consult.illnessDesc"></van-cell>
     </van-cell-group>
     <div class="pay-schema">
       <van-checkbox v-model="agree">我已同意 <span class="text">支付协议</span></van-checkbox>
@@ -1635,7 +1594,7 @@ export enum OrderType {
 
 ```ts
 // 问诊订单单项信息
-export type ConsultOrderItem = ConsultOrderPre & {
+export type ConsultOrderItem = Consult & {
   createTime: string
   docInfo: Doctor
   evaluateFlag: 0 | 1
