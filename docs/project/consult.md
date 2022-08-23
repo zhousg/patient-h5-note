@@ -154,6 +154,7 @@ export type Consult = {
   consultFlag: 0 | 1
   pictures: Image[]
   patientId: string
+  couponId: string
 }
 
 // 问诊记录-全部可选
@@ -214,9 +215,11 @@ export const useConsultStore = defineStore(
     }
     // 设置患者
     const setPatient = (id: string) => (consult.value.patientId = id)
+    // 设置优惠券
+    const setCunpon = (id?: string) => (consult.value.couponId = id)
     // 清空记录
     const clear = () => (consult.value = {})
-    return { consult, setType, setIllnessType, setDep, setIllness, setPatient, clear }
+    return { consult, setType, setIllnessType, setDep, setIllness, setPatient, setCunpon, clear }
   },
   {
     persist: true
@@ -1289,6 +1292,7 @@ export type ConsultOrderPreParams = Pick<PartialConsult, 'type' | 'illnessType'>
 export type ConsultOrderPreData = {
   pointDeduction: number
   couponDeduction: number
+  couponId: string
   payment: number
   couponId: number
   actualPayment: number
@@ -1323,13 +1327,16 @@ import { onMounted, ref } from 'vue'
 
 const store = useConsultStore()
 
-const order = ref<ConsultOrderPreData>()
+const payInfo = ref<ConsultOrderPreData>()
 const loadData = async () => {
   const res = await getConsultOrderPre({
     type: store.consult.type,
     illnessType: store.consult.illnessType
   })
-  order.value = res.data
+  payInfo.value = res.data
+  // 设置默认优惠券
+  store.setCunpon(payInfo.value.couponId)
+
 }
 
 const patient = ref<Patient>()
@@ -1348,10 +1355,10 @@ const agree = ref(false)
 </script>
 
 <template>
-  <div class="consult-pay-page" v-if="order">
+  <div class="consult-pay-page" v-if="payInfo">
     <cp-nav-bar title="支付" />
     <div class="pay-info">
-      <p class="tit">图文问诊 {{ order?.payment }} 元</p>
+      <p class="tit">图文问诊 {{ payInfo?.payment }} 元</p>
       <img class="img" src="@/assets/avatar-doctor.svg" />
       <p class="desc">
         <span>极速问诊</span>
@@ -1359,9 +1366,9 @@ const agree = ref(false)
       </p>
     </div>
     <van-cell-group>
-      <van-cell title="优惠券" :value="`-¥${order.couponDeduction}`" />
-      <van-cell title="积分抵扣" :value="`-¥${order.pointDeduction}`" />
-      <van-cell title="实付款" :value="`¥${order.actualPayment}`" class="pay-price" />
+      <van-cell title="优惠券" :value="`-¥${payInfo.couponDeduction}`" />
+      <van-cell title="积分抵扣" :value="`-¥${payInfo.pointDeduction}`" />
+      <van-cell title="实付款" :value="`¥${payInfo.actualPayment}`" class="pay-price" />
     </van-cell-group>
     <div class="pay-space"></div>
     <van-cell-group>
@@ -1376,7 +1383,7 @@ const agree = ref(false)
     </div>
     <van-submit-bar
       button-type="primary"
-      :price="order.actualPayment * 100"
+      :price="payInfo.actualPayment * 100"
       button-text="立即支付"
       text-align="left"
     />
@@ -1398,13 +1405,100 @@ const agree = ref(false)
   - 使用浏览器账号密码支付 （测试推荐）
 - 支付成功回跳到问诊室页面
 
+回跳地址：
+```
+http://localhost:8080/room
+```
+
+支付宝沙箱账号：
+```
+买家账号：jfjbwb4477@sandbox.com
+登录密码：111111
+支付密码：111111
+```
 
 
 
+
+## 问诊支付-生成订单{#pay-create-order}
+
+
+1）打开选项支付抽屉
+
+```ts
+const agree = ref(false)
+const show = ref(false)
+const paymentMethod = ref<0 | 1>()
+const submit = async () => {
+  if (!agree.value) return Toast('请勾选我已同意支付协议')
+  // 打开
+  show.value = true
+}
+```
+
+```html
+    <van-action-sheet v-model:show="show" title="选择支付方式">
+      <div class="pay-type">
+        <p class="amount">￥{{ payInfo.actualPayment.toFixed(2) }}</p>
+        <van-cell-group>
+          <van-cell title="微信支付" @click="paymentMethod = 0">
+            <template #icon><cp-icon name="consult-wechat" /></template>
+            <template #extra><van-checkbox :checked="paymentMethod === 0" /></template>
+          </van-cell>
+          <van-cell title="支付宝支付" @click="paymentMethod = 1">
+            <template #icon><cp-icon name="consult-alipay" /></template>
+            <template #extra><van-checkbox :checked="paymentMethod === 1" /></template>
+          </van-cell>
+        </van-cell-group>
+        <div class="btn">
+          <van-button type="primary" round block>立即支付</van-button>
+        </div>
+      </div>
+    </van-action-sheet>
+```
+
+2）打开的时候生成订单ID，成功后清空本地存储的问诊订单信息
+```ts
+import { createConsultOrder, getConsultOrderPayUrl, getConsultOrderPre } from '@/services/consult'
+```
+```diff
+const agree = ref(false)
+const show = ref(false)
++const loading = ref(false)
+const paymentMethod = ref<0 | 1>()
++const orderId = ref('')
+const submit = async () => {
+  if (!agree.value) return Toast('请勾选我已同意支付协议')
++  loading.value = true
++  const res = await createConsultOrder(store.consult)
++  orderId.value = res.data.id
++  loading.value = false
++  store.clear()
+  // 打开
+  show.value = true
+}
+```
 
 ## 问诊支付-进行支付{#pay-logic}
 
 
+1）生成订单后不可回退
+```ts
+import { onBeforeRouteLeave } from 'vue-router'
+```
+```ts
+onBeforeRouteLeave(() => {
+  if (orderId.value) return false
+})
+```
+```html
+<van-action-sheet v-model:show="show" title="选择支付方式" :close-on-popstate="false">
+```
+
+2）生成订单后不可关闭支付抽屉
+```ts
+
+```
 
 
 
@@ -1712,25 +1806,25 @@ const onLoad = async () => {
       plain
       size="small"
       round
-      :to="`/consult/pay?orderId=${item.id}`"
+      :to="`/user/consult/?orderId=${item.id}`"
     >
       去支付
     </van-button>
   </div>
   <div class="foot" v-if="item.status === OrderType.ConsultWait">
     <van-button class="gray" plain size="small" round>取消问诊</van-button>
-    <van-button type="primary" plain size="small" round :to="`/room/${item.id}`"
+    <van-button type="primary" plain size="small" round :to="`/room?id=${item.id}`"
       >继续沟通</van-button
     >
   </div>
   <div class="foot" v-if="item.status === OrderType.ConsultChat">
-    <van-button type="primary" plain size="small" round :to="`/room/${item.id}`"
+    <van-button type="primary" plain size="small" round :to="`/room?id=${item.id}`"
       >继续沟通</van-button
     >
   </div>
   <div class="foot" v-if="item.status === OrderType.ConsultComplete">
     <van-button class="gray" plain size="small" round>查看处方</van-button>
-    <van-button type="primary" plain size="small" round :to="`/room/${item.id}`">
+    <van-button type="primary" plain size="small" round :to="`/room?id=${item.id}`">
       继续沟通
     </van-button>
   </div>

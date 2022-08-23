@@ -177,6 +177,262 @@ import RoomAction from './components/RoomAction.vue'
 
 ## 问诊室-消息卡片
 
+组件 `Room/components/RoomMessage.vue` 
+
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  各类消息
+</template>
+
+<style lang="scss" scoped>
+@import '@/styles/room.scss';
+</style>
+
+```
+
+- 病情描述
+
+```html
+  <div class="msg msg-illness">
+    <div class="patient van-hairline--bottom">
+      <p>李富贵 男 31岁</p>
+      <p>一周内 | 未去医院就诊</p>
+    </div>
+    <van-row>
+      <van-col span="6">病情描述</van-col>
+      <van-col span="18">头痛、头晕、恶心</van-col>
+      <van-col span="6">图片</van-col>
+      <van-col span="18">点击查看</van-col>
+    </van-row>
+  </div>
+```
+
+- 温馨提示-通知
+
+```html
+  <div class="msg msg-tip">
+    <div class="content">
+      <span class="green">温馨提示：</span>
+      <span>在线咨询不能代替面诊，医护人员建议仅供参考</span>
+    </div>
+  </div>
+```
+
+- 通知
+
+```html
+  <div class="msg msg-tip">
+    <div class="content">
+      <span>医护人员正在赶来，请耐心等候</span>
+    </div>
+  </div>
+```
+
+- 发送文字
+
+```html
+  <div class="msg msg-to">
+    <div class="content">
+      <div class="time">20:12</div>
+      <div class="pao">大夫你好？</div>
+    </div>
+    <van-image src="https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg" />
+  </div>
+```
+
+- 发送图片
+
+```html
+  <div class="msg msg-to">
+    <div class="content">
+      <div class="time">20:12</div>
+      <van-image
+        fit="contain"
+        src="https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg"
+      />
+    </div>
+    <van-image src="https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg" />
+  </div>
+```
+
+- 接收文字
+
+```html
+  <div class="msg msg-from">
+    <van-image src="https://yjy-oss-files.oss-cn-zhangjiakou.aliyuncs.com/tuxian/popular_3.jpg" />
+    <div class="content">
+      <div class="time">20:12</div>
+      <div class="pao">哪里不舒服</div>
+    </div>
+  </div>
+```
+
+- 处方消息
+
+```html
+  <div class="msg msg-recipe">
+    <div class="content">
+      <div class="head van-hairline--bottom">
+        <div class="head-tit">
+          <h3>电子处方</h3>
+          <p>原始处方 <van-icon name="arrow"></van-icon></p>
+        </div>
+        <p>李富贵 男 31岁 血管性头痛</p>
+        <p>开方时间：2022-01-15 14:21:42</p>
+      </div>
+      <div class="body">
+        <div class="body-item" v-for="i in 2" :key="i">
+          <div class="durg">
+            <p>优赛明 维生素E乳</p>
+            <p>口服，每次1袋，每天3次，用药3天</p>
+          </div>
+          <div class="num">x1</div>
+        </div>
+      </div>
+      <div class="foot"><span>购买药品</span></div>
+    </div>
+  </div>
+```
+
+- 订单取消
+
+```html
+  <div class="msg msg-tip msg-tip-cancel">
+    <div class="content">
+      <span>订单取消</span>
+    </div>
+  </div>
+```
+
+- 评价卡片
+
+```vue
+<script setup lang="ts">
+import { Toast } from 'vant'
+import { computed, ref } from 'vue'
+
+const emit = defineEmits(['submit'])
+defineProps<{ complete?: boolean; showScore?: number }>()
+
+const score = ref(0)
+const anonymousFlag = ref(false)
+const content = ref('')
+const disabled = computed(() => !score.value || !content.value)
+const onSubmit = () => {
+  if (!score.value) return Toast('请选择评分')
+  if (!content.value) return Toast('请输入评价')
+  emit('submit', {
+    score: score.value,
+    content: content.value,
+    anonymousFlag: anonymousFlag.value ? 1 : 0
+  })
+}
+</script>
+
+<template>
+  <div class="evalutate-card" v-if="complete">
+    <p class="title">医生服务评价</p>
+    <p class="desc">我们会更加努力提升服务质量</p>
+    <van-rate
+      :model-value="showScore"
+      size="7vw"
+      gutter="3vw"
+      color="#FADB14"
+      void-icon="star"
+      void-color="rgba(0,0,0,0.04)"
+    />
+  </div>
+  <div class="evalutate-card" v-else>
+    <p class="title">感谢您的评价</p>
+    <p class="desc">本次在线问诊服务您还满意吗？</p>
+    <van-rate
+      v-model="score"
+      size="7vw"
+      gutter="3vw"
+      color="#FADB14"
+      void-icon="star"
+      void-color="rgba(0,0,0,0.04)"
+    />
+    <van-field
+      v-model="content"
+      type="textarea"
+      maxlength="150"
+      show-word-limit
+      rows="3"
+      placeholder="请描述您对医生的评价或是在医生看诊过程中遇到的问题"
+    ></van-field>
+    <div class="footer">
+      <van-checkbox v-model="anonymousFlag">匿名评价</van-checkbox>
+      <van-button @click="onSubmit" type="primary" size="small" :class="{ disabled }" round
+        >提交评价</van-button
+      >
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.evalutate-card {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: center;
+  padding: 15px;
+  .title {
+    font-size: 15px;
+    margin-bottom: 5px;
+  }
+  .desc {
+    font-size: 12px;
+    margin-bottom: 15px;
+    color: var(--cp-tip);
+  }
+  .van-field {
+    background-color: var(--cp-bg);
+    margin: 15px 0;
+    border-radius: 8px;
+  }
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    ::v-deep() {
+      .van-checkbox {
+        height: 16px;
+        .van-icon {
+          font-size: 11px;
+        }
+        &__label {
+          font-size: 12px;
+          color: var(--cp-tip);
+        }
+      }
+      .van-button {
+        padding: 0 16px;
+        &.disabled {
+          opacity: 1;
+          background: #fafafa;
+          color: #d9dbde;
+          border: #fafafa;
+        }
+      }
+    }
+  }
+}
+</style>
+```
+```ts
+import EvaluateCard from './EvaluateCard.vue'
+```
+```html
+  <div class="msg msg-comment">
+    <evaluate-card />
+  </div>
+```
+
 
 ## 问诊室-websocket介绍
 
@@ -185,6 +441,9 @@ import RoomAction from './components/RoomAction.vue'
 
 
 ## 问诊室-通讯规则
+
+
+## 问诊室-默认展示
 
 
 ## 问诊室-发送消息

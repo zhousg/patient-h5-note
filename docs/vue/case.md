@@ -6,7 +6,7 @@
 
 > 初始化代码安装element-plus组件库
 
-- 克隆代码 `git@gitee.com:zhoushugang/vue3-case.git`
+- 克隆代码 `git@gitee.com:zhoushugang/vue3-demo-template.git`
 - 模板代码分析
 
 ```diff
@@ -32,6 +32,26 @@ import App from './App.vue'
 ## 实现功能{#case-complete}
 
 ```vue
+<script setup>
+import { onMounted, ref } from "vue";
+import axios from 'axios'
+// 获取列表数据
+const list = ref([])
+const geList = async () => {
+  const res = await axios.get('/list')
+  list.value = res.data
+}
+
+onMounted(() => {
+  geList()
+})
+
+// 删除数据
+const delRow = async (id) => {
+  await axios.delete(`/del?id=${id}`)
+  geList()
+}
+</script>
 <template>
   <div class="app">
     <el-table :data="list">
@@ -40,32 +60,12 @@ import App from './App.vue'
       <el-table-column label="籍贯" prop="place"></el-table-column>
       <el-table-column label="操作" width="100">
         <template v-slot="{ row }">
-          <el-button type="text" @click="delRow(row.id)">删除</el-button>
+          <el-button type="primary" link @click="delRow(row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
   </div>
 </template>
-<script setup>
-  import { onMounted, ref } from "vue";
-  import axios from 'axios'
-  // 获取列表数据
-  const list = ref([])
-  const geList = async () => {
-    const res = await axios.get('/list')
-    list.value = res.data
-  }
-
-  onMounted(() => {
-    geList()
-  })
-
-  // 删除数据
-  const delRow = async (id) => {
-    await axios.delete(`/del?id=${id}`)
-    geList()
-  }
-</script>
 <style>
 .app {
   width: 980px;
