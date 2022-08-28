@@ -298,12 +298,6 @@ export default {
 案例：体验一下
 
 ```vue
-<template>
-  <button @click="toggle">显示隐藏图片</button>
-  <img v-show="show" alt="Vue logo" src="./assets/logo.png" />
-  <hr />
-  计数器：{{ count }} <button @click="increment">累加</button>
-</template>
 <script setup>
   // 显示隐藏
   const show = ref(true)
@@ -316,6 +310,13 @@ export default {
     count.value ++
   }
 </script>
+
+<template>
+  <button @click="toggle">显示隐藏图片</button>
+  <img v-show="show" alt="Vue logo" src="./assets/logo.png" />
+  <hr />
+  计数器：{{ count }} <button @click="increment">累加</button>
+</template>
 ```
 
 
@@ -343,13 +344,6 @@ export default {
 落地代码：
 
 ```vue
-<template>
-  <div>
-    <p>分数：{{ scoreList }}</p>
-    <p>优秀：{{ betterList }}</p>
-  </div>
-</template>
-
 <script setup>
   import { ref, computed } from "vue";
 
@@ -362,6 +356,13 @@ export default {
   }, 3000);
 
 </script>
+
+<template>
+  <div>
+    <p>分数：{{ scoreList }}</p>
+    <p>优秀：{{ betterList }}</p>
+  </div>
+</template>
 ```
 
 **总结：**
@@ -389,10 +390,6 @@ export default {
 - 使用 `watch` 监听一个响应式数据
 
 ```vue
-<template>
-  <p>计数器：{{ count }}</p>
-</template>
-
 <script setup>
   import { ref, watch } from "vue";
   const count = ref(0);
@@ -406,18 +403,15 @@ export default {
     count.value++;
   }, 2000);
 </script>
+
+<template>
+  <p>计数器：{{ count }}</p>
+</template>
 ```
 
 - 使用 `watch` 监听多个响应式数据
 
 ```vue
-<template>
-  <p>计数器：{{ count }}</p>
-  <p>
-    姓名：{{ user.name }} 性别：{{ user.info.gender }} 年龄：{{ user.info.age }}
-  </p>
-</template>
-
 <script setup>
   import { reactive, ref, watch } from "vue";
   const count = ref(0);
@@ -445,17 +439,18 @@ export default {
     user.info.age++;
   }, 4000);
 </script>
+
+<template>
+  <p>计数器：{{ count }}</p>
+  <p>
+    姓名：{{ user.name }} 性别：{{ user.info.gender }} 年龄：{{ user.info.age }}
+  </p>
+</template>
 ```
 
 - 使用 `watch` 监听响应式对象数据中的一个属性(简单)
 
 ```vue
-<template>
-  <p>
-    姓名：{{ user.name }} 性别：{{ user.info.gender }} 年龄：{{ user.info.age }}
-  </p>
-</template>
-
 <script setup>
   import { reactive, watch } from "vue";
   const user = reactive({
@@ -479,17 +474,17 @@ export default {
     user.info.age = 60;
   }, 4000);
 </script>
-```
 
-- 使用 `watch` 监听响应式对象数据中的一个属性(复杂)，配置深度监听
-
-```vue
 <template>
   <p>
     姓名：{{ user.name }} 性别：{{ user.info.gender }} 年龄：{{ user.info.age }}
   </p>
 </template>
+```
 
+- 使用 `watch` 监听响应式对象数据中的一个属性(复杂)，配置深度监听
+
+```vue
 <script setup>
   import { reactive, watch } from "vue";
   const user = reactive({
@@ -516,6 +511,12 @@ export default {
     user.info.age = 60;
   }, 2000);
 </script>
+
+<template>
+  <p>
+    姓名：{{ user.name }} 性别：{{ user.info.gender }} 年龄：{{ user.info.age }}
+  </p>
+</template>
 ```
 
 - 使用 `watch` 监听，配置默认执行
@@ -573,9 +574,6 @@ export default {
 - 参考代码
 
 ```vue
-<template>
-  <div>生命周期函数</div>
-</template>
 <script setup>
   import { onMounted } from "vue";
   // 生命周期函数：组件渲染完毕
@@ -587,6 +585,10 @@ export default {
     console.log('onMounted也触发了')
   })
 </script>
+
+<template>
+  <div>生命周期函数</div>
+</template>
 ```
 
 **总结：**
@@ -845,16 +847,6 @@ const changeMoney = (num) => {
 - 祖先组件：`App.vue`
 
 ```vue
-<template>
-  <div
-    class="app-page"
-    style="border: 10px solid #ccc; padding: 50px; width: 600px"
-  >
-    app 组件 {{ count }} updateCount
-    <ParentCom />
-  </div>
-</template>
-
 <script setup>
 import { provide, ref } from 'vue';
 import ParentCom from './ParentCom.vue';
@@ -869,11 +861,25 @@ const updateCount = (num) => {
 };
 provide('updateCount', updateCount);
 </script>
+
+<template>
+  <div
+    class="app-page"
+    style="border: 10px solid #ccc; padding: 50px; width: 600px"
+  >
+    app 组件 {{ count }} updateCount
+    <ParentCom />
+  </div>
+</template>
 ```
 
 - 父级组件：`ParentCom.vue`
 
 ```vue
+<script setup>
+import ChildCom from './ChildCom.vue';
+</script>
+
 <template>
   <div class="parent-page" style="padding: 50px">
     parent 组件
@@ -881,25 +887,21 @@ provide('updateCount', updateCount);
     <ChildCom />
   </div>
 </template>
-
-<script setup>
-import ChildCom from './ChildCom.vue';
-</script>
 ```
 
 - 子级组件：`ChildCom.vue`
 
 ```vue
+<script setup>
+const count = inject('count');
+const updateCount = inject('updateCount');
+</script>
+
 <template>
   <div class="child-page" style="padding: 50px; border: 10px solid #ccc">
     child 组件 {{ count }} <button @click="updateCount(100)">修改count</button>
   </div>
 </template>
-
-<script setup>
-const count = inject('count');
-const updateCount = inject('updateCount');
-</script>
 ```
 
 
@@ -930,22 +932,27 @@ const updateCount = inject('updateCount');
 - 基础案例
 
 ```vue
+<script setup>
+import { reactive } from "vue";
+const user = reactive({ name: "tom", age: 18 });
+</script>
+
 <template>
   <div>
     <p>姓名：{{ user.name }}</p>
     <p>年龄：{{ user.age }} <button @click="user.age++">一年又一年</button></p>
   </div>
 </template>
-
-<script setup>
-import { reactive } from "vue";
-const user = reactive({ name: "tom", age: 18 });
-</script>
 ```
 
 - 使用响应式数据，踩坑
 
 ```vue
+<script setup>
+import { reactive } from "vue";
+const { name, age } = reactive({ name: "tom", age: 18 });
+</script>
+
 <template>
   <div>
     <p>姓名：{{ name }}</p>
@@ -953,11 +960,6 @@ const user = reactive({ name: "tom", age: 18 });
     <p>年龄：{{ age }} <button @click="age++">一年又一年</button></p>
   </div>
 </template>
-
-<script setup>
-import { reactive } from "vue";
-const { name, age } = reactive({ name: "tom", age: 18 });
-</script>
 ```
 
 - 使用 `toRefs` 处理响应式数据，爬坑
