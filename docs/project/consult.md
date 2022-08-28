@@ -384,8 +384,10 @@ const store = useConsultStore()
       <router-link to="/consult/dep" class="item" @click="store.setIllnessType(0)">
 ```
 
-
 ## 极速问诊-选择科室-布局{#consult-dep-html}
+
+![image-20220824154050319](./images/image-20220824154050319.png)
+
 > 实现：路由与组件，和基础结构
 
 步骤：
@@ -588,6 +590,9 @@ const store = useConsultStore()
 
 
 ## 病情描述-基础布局{#illness-html}
+
+![image-20220824154141532](./images/image-20220824154141532.png)
+
 > 实现：路由和组件以及页面的基础布局（医生提示，描述，症状时间，是否已就诊）
 
 
@@ -1034,6 +1039,9 @@ closeOnPopstate: false
 ```
 
 ## 选择患者-家庭档案兼容{#consult-change-patient}
+
+![image-20220824154246436](./images/image-20220824154246436.png)
+
 > 实现：在家庭档案基础上实现选择患者功能
 
 步骤：
@@ -1140,8 +1148,10 @@ const next = async () => {
 }
 ```
 
-
 ## 问诊支付-页面渲染{#pay-html}
+
+![image-20220824154323546](./images/image-20220824154323546.png)
+
 > 实现：问诊页面的基础布局，和业务需求情况。
 
 
@@ -1481,6 +1491,8 @@ const submit = async () => {
 
 ## 问诊支付-进行支付{#pay-logic}
 
+![image-20220824154549604](./images/image-20220824154549604.png)
+
 
 1）生成订单后不可回退
 ```ts
@@ -1497,341 +1509,50 @@ onBeforeRouteLeave(() => {
 
 2）生成订单后不可关闭支付抽屉
 ```ts
-
-```
-
-
-
-## 问诊记录-页面搭建{#consult-order-page}
-
-步骤：
-- 新建问诊订单页面，实现tab切换
-- 新建问诊订单列表组件，通过传入问诊类型展示不同列表
-
-代码：
-
-1）新建问诊订单页面，实现tab切换
-
-`User/ConsultPage.vue`
-```vue
-<script setup lang="ts">
-import ConsultList from './components/ConsultList.vue'
-import { ConsultType } from '@/enums'
-</script>
-
-<template>
-  <div class="consult-page">
-    <cp-nav-bar title="问诊记录" />
-    <van-tabs sticky>
-      <van-tab title="找医生"><consult-list :type="ConsultType.Doctor" /></van-tab>
-      <van-tab title="极速问诊"><consult-list :type="ConsultType.Fast" /></van-tab>
-      <van-tab title="开药问诊"><consult-list :type="ConsultType.Medication" /></van-tab>
-    </van-tabs>
-  </div>
-</template>
-
-<style lang="scss" scoped>
-.consult-page {
-  padding-top: 46px;
-  background-color: var(--cp-bg);
-  min-height: calc(100vh - 46px);
-}
-</style>
-```
-
-2）新建问诊订单列表组件，通过传入问诊类型展示不同列表
-
-`User/components/ConsultList.vue`
-```vue
-<script setup lang="ts">
-import { ConsultType } from '@/enums'
-
-defineProps<{ type: ConsultType }>()
-</script>
-
-<template>
-  <div class="consult-list">
-    <div class="consult-item" v-for="i in 5" :key="i">
-      <div class="head van-hairline--bottom">
-        <img class="img" src="@/assets/avatar-doctor.svg" />
-        <p>极速问诊（自动分配医生）</p>
-        <span>待支付</span>
-      </div>
-      <div class="body">
-        <div class="body-row">
-          <div class="body-label">病情描述</div>
-          <div class="body-value">腹痛腹泻 胃部有些痉挛</div>
-        </div>
-        <div class="body-row">
-          <div class="body-label">价格</div>
-          <div class="body-value">¥ 39.00</div>
-        </div>
-        <div class="body-row">
-          <div class="body-label">创建时间</div>
-          <div class="body-value tip">2019-07-08 09:55:54</div>
-        </div>
-      </div>
-      <div class="foot">
-        <van-button class="gray" plain size="small" round>取消问诊</van-button>
-        <van-button type="primary" plain size="small" round to="/room/1000">继续沟通</van-button>
-      </div>
-    </div>
-  </div>
-</template>
-
-<style lang="scss" scoped>
-.consult-list {
-  padding: 10px 15px;
-}
-.consult-item {
-  border-radius: 4px;
-  box-shadow: 0px 0px 22px 0px rgba(245, 245, 245, 0.1);
-  background-color: #fff;
-  margin-bottom: 10px;
-  .head {
-    display: flex;
-    align-items: center;
-    height: 50px;
-    padding: 0 15px;
-    .img {
-      width: 20px;
-      height: 20px;
-    }
-    > p {
-      flex: 1;
-      font-size: 15px;
-      padding-left: 10px;
-    }
-    > span {
-      color: var(--cp-tag);
-      &.orange {
-        color: #f2994a;
-      }
-      &.green {
-        color: var(--cp-primary);
-      }
-    }
-  }
-  .body {
-    padding: 15px 15px 8px 15px;
-    .body-row {
-      display: flex;
-      margin-bottom: 7px;
-    }
-    .body-label {
-      width: 62px;
-      font-size: 13px;
-      color: var(--cp-tip);
-    }
-    .body-value {
-      width: 250px;
-      &.tip {
-        color: var(--cp-tip);
-      }
-    }
-  }
-  .foot {
-    padding: 0 15px 15px 15px;
-    display: flex;
-    justify-content: flex-end;
-    .van-button {
-      margin-left: 10px;
-      padding: 0 16px;
-      &.gray {
-        color: var(--cp-dark);
-        background-color: var(--cp-bg);
-      }
-    }
-  }
-}
-</style>
-```
-
-## 问诊记录-类型定义与API函数{#consult-order-type}
-
-步骤：
-- 定义接口参数类型
-- 订单状态枚举
-- 单个问诊订单类型
-- 带分页问诊订单类型
-- 定义查询API函数
-
-代码：
-
-1）定义接口参数类型 `types/consult.d.ts`
-```ts 
-export type ConsultOrderListParams = PageParams & {
-  type: ConsultType
+const router = useRouter()
+const onClose = () => {
+  return Dialog.confirm({
+    title: '关闭支付',
+    message: '取消支付将无法获得医生回复，医生接诊名额有限，是否确认关闭？',
+    cancelButtonText: '仍要关闭',
+    confirmButtonText: '继续支付',
+    confirmButtonColor: 'var(--cp-primary)'
+  })
+    .then(() => {
+      return false
+    })
+    .catch(() => {
+      orderId.value = ''
+      router.push('/user/consult')
+      return true
+    })
 }
 ```
 
-2）订单状态枚举 `enums/index.ts`
-```ts
-// 订单类型
-// 1待支付2待接诊3咨询中4已完成5已取消   问诊订单
-// 10待支付11待发货12待收货13已完成14已取消   药品订单
-export enum OrderType {
-  ConsultPay = 1,
-  ConsultWait = 2,
-  ConsultChat = 3,
-  ConsultComplete = 4,
-  ConsultCancel = 5,
-  MedicinePay = 10,
-  MedicineSend = 11,
-  MedicineTake = 12,
-  MedicineComplete = 13,
-  MedicineCancel = 14
-}
-```
-
-3）单个问诊订单类型 `types/consult.d.ts`
+3）生成支付地址的 API 函数
 
 ```ts
-// 问诊订单单项信息
-export type ConsultOrderItem = Consult & {
-  createTime: string
-  docInfo: Doctor
-  evaluateFlag: 0 | 1
-  orderNo: string
-  price: number
-  statusValue: string
-  typeValue: string
-  status: OrderType
-}
+// 获取支付地址  0 是微信  1 支付宝
+export const getConsultOrderPayUrl = (params: {
+  paymentMethod: 0 | 1
+  orderId: string
+  payCallback: string
+}) => request<{ payUrl: string }>('/patient/consult/pay', 'POST', params)
 ```
 
-4）带分页问诊订单类型 `types/consult.d.ts`
-```ts
-export type ConsultOrderPage = {
-  pageTotal: number
-  total: number
-  rows: ConsultOrderItem[]
-}
-```
-
-5）定义查询API函数 `services/consult.ts`
+4）跳转到支付宝页面
 
 ```ts
-import type { ConsultOrderListParams, ConsultOrderPage } from '@/types/consult'
-```
-```ts
-export const getConsultOrderList = (params: ConsultOrderListParams) =>
-  request<ConsultOrderPage>('/patient/consult/order/list', 'GET', params)
-```
-
-
-## 问诊记录-加载信息{#consult-order-render}
-
-
-
-1）加载数据逻辑
-
-```vue
-<script setup lang="ts">
-import { ConsultType } from '@/enums'
-import { getConsultOrderList } from '@/services/consult'
-import type { ConsultOrderItem, ConsultOrderListParams } from '@/types/consult'
-import { ref } from 'vue'
-
-const props = defineProps<{ type: ConsultType }>()
-const params = ref<ConsultOrderListParams>({
-  type: props.type,
-  current: 1,
-  pageSize: 5
-})
-const loading = ref(false)
-const finished = ref(false)
-const list = ref<ConsultOrderItem[]>([])
-const onLoad = async () => {
-  const res = await getConsultOrderList(params.value)
-  list.value.push(...res.data.rows)
-  if (params.value.current < res.data.pageTotal) {
-    params.value.current++
-  } else {
-    finished.value = true
-  }
-  loading.value = false
+// 跳转支付
+const pay = async () => {
+  if (paymentMethod.value === undefined) return Toast('请选择支付方式')
+  Toast.loading('跳转支付')
+  const res = await getConsultOrderPayUrl({
+    orderId: orderId.value,
+    paymentMethod: paymentMethod.value,
+    payCallback: 'http://localhost:8080/room'
+  })
+  window.location.href = res.data.payUrl
 }
-</script>
-
-<template>
-  <div class="consult-list">
-    <van-list
-      v-model:loading="loading"
-      :finished="finished"
-      finished-text="没有更多了"
-      @load="onLoad"
-    >
-      <div class="consult-item" v-for="item in list" :key="item.id">
-        ... 省略 ...
-      </div>
-    </van-list> 
-  </div>
-</template>     
-```
-
-2）渲染
-
-```html
-<div class="consult-item" v-for="item in list" :key="item.id">
-  <div class="head van-hairline--bottom">
-    <img class="img" src="@/assets/avatar-doctor.svg" />
-    <p>{{ item.docInfo.name }}</p>
-    <span
-      :class="{
-        orange: item.status === OrderType.ConsultPay,
-        green: item.status === OrderType.ConsultChat
-      }"
-      >{{ item.statusValue }}</span
-    >
-  </div>
-  <div class="body">
-    <div class="body-row">
-      <div class="body-label">病情描述</div>
-      <div class="body-value">{{ item.illnessDesc }}</div>
-    </div>
-    <div class="body-row">
-      <div class="body-label">价格</div>
-      <div class="body-value">¥ {{ item.price.toFixed(2) }}</div>
-    </div>
-    <div class="body-row">
-      <div class="body-label">创建时间</div>
-      <div class="body-value tip">{{ item.createTime }}</div>
-    </div>
-  </div>
-  <div class="foot" v-if="item.status === OrderType.ConsultPay">
-    <van-button class="gray" plain size="small" round>取消问诊</van-button>
-    <van-button
-      type="primary"
-      plain
-      size="small"
-      round
-      :to="`/user/consult/?orderId=${item.id}`"
-    >
-      去支付
-    </van-button>
-  </div>
-  <div class="foot" v-if="item.status === OrderType.ConsultWait">
-    <van-button class="gray" plain size="small" round>取消问诊</van-button>
-    <van-button type="primary" plain size="small" round :to="`/room?id=${item.id}`"
-      >继续沟通</van-button
-    >
-  </div>
-  <div class="foot" v-if="item.status === OrderType.ConsultChat">
-    <van-button type="primary" plain size="small" round :to="`/room?id=${item.id}`"
-      >继续沟通</van-button
-    >
-  </div>
-  <div class="foot" v-if="item.status === OrderType.ConsultComplete">
-    <van-button class="gray" plain size="small" round>查看处方</van-button>
-    <van-button type="primary" plain size="small" round :to="`/room?id=${item.id}`">
-      继续沟通
-    </van-button>
-  </div>
-  <div class="foot" v-if="item.status === OrderType.ConsultCancel">
-    <van-button class="gray" plain size="small" round>删除订单</van-button>
-    <van-button type="primary" plain size="small" round to="/">咨询其他医生</van-button>
-  </div>
-</div>
 ```
 
