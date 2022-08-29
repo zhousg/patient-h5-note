@@ -411,12 +411,227 @@ const onSelect = () => {
 
 
 ## 问诊记录-取消订单
+> 实现取消问诊订单功能
+
+步骤：
+- API接口
+- 取消订单逻辑函数
+- 使用逻辑
+
+代码：
+
+1）API接口 `services/consult.ts`
+```ts
+// 取消订单
+export const cancelOrder = (id: string) => request(`/patient/order/cancel/${id}`, 'PUT')
+```
+
+2）取消订单逻辑函数 `ConsultItem.vue`
+```ts
+import { cancelOrder } from '@/services/consult'
+import { Toast } from 'vant'
+```
+```ts
+// 取消订单
+const loading = ref(false)
+const cancelConsultOrder = (item: ConsultOrderItem) => {
+  loading.value = true
+  cancelOrder(item.id)
+    .then(() => {
+      item.status = OrderType.ConsultCancel
+      item.statusValue = '已取消'
+      Toast.success('取消成功')
+    })
+    .catch(() => {
+      Toast.fail('取消失败')
+    })
+    .finally(() => {
+      loading.value = false
+    })
+}
+```
+
+
+3）使用逻辑
+
+```diff
+    <div class="foot" v-if="item.status === OrderType.ConsultPay">
+      <van-button
+        class="gray"
+        plain
+        size="small"
++        :loading="loading"
+        round
++        @click="cancelConsultOrder(item)"
+      >
+        取消问诊
+      </van-button>
+      <van-button type="primary" plain size="small" round :to="`/user/consult/${item.id}`">
+        去支付
+      </van-button>
+    </div>
+```
+
+```diff
+    <div class="foot" v-if="item.status === OrderType.ConsultWait">
+      <van-button
+        class="gray"
+        plain
+        size="small"
++        :loading="loading"
+        round
++        @click="cancelConsultOrder(item)"
+      >
+        取消问诊
+      </van-button>
+      <van-button type="primary" plain size="small" round :to="`/room?orderId=${item.id}`">
+        继续沟通
+      </van-button>
+    </div>
+```
 
 
 ## 问诊记录-删除订单
 
+> 删除订单功能实现
+
+步骤：
+- API接口
+- 删除订单逻辑函数
+- 使用逻辑
+
+代码：
+
+1）API接口 `services/consult.ts`
+```ts
+// 删除订单
+export const deleteOrder = (id: string) => request(`/patient/order/${id}`, 'DELETE')
+```
+
+2）删除订单逻辑函数 `ConsultItem.vue`
+```ts
+import { deleteOrder } from '@/services/consult'
+```
+```ts
+// 删除订单
+const deleteLoading = ref(false)
+const deleteConsultOrder = (item: ConsultOrderItem) => {
+  deleteLoading.value = true
+  deleteOrder(item.id)
+    .then(() => {
+      emit('on-delete', item.id)
+      Toast.success('删除成功')
+    })
+    .catch(() => {
+      Toast.fail('删除失败')
+    })
+    .finally(() => {
+      deleteLoading.value = false
+    })
+}
+```
+
+3）使用逻辑
+
+更多操作的删除
+```ts
+const onSelect = (action: { text: string }, i: number) => {
+  if (i === 1) {
+    // 删除
+    deleteConsultOrder(item)
+  }
+}
+```
+按钮的删除
+```diff
+    <div class="foot" v-if="item.status === OrderType.ConsultCancel">
+      <van-button
+        class="gray"
+        plain
+        size="small"
+        round
++        :loading="deleteLoading"
++        @click="deleteConsultOrder(item)"
+      >
+        删除订单
+      </van-button>
+      <van-button type="primary" plain size="small" round to="/">咨询其他医生</van-button>
+    </div>
+```
+
+4）父组件进行删除数据 `ConsultList.vue`
+```html
+<consult-item v-for="item in list" :key="item.id" :item="item" @on-delete="onDelete" />
+```
+```ts
+const onDelete = (id: string) => {
+  list.value = list.value.filter((item) => item.id !== id)
+}
+```
 
 ## 问诊记录-查看处方Hook
+
+> 实现，查看处方逻辑复用，提取一个hook函数
+
+步骤：
+- 提取一个hook提供，查看处方函数
+- 问诊室使用，订单列表中使用
+
+代码：
+
+1）提取hook函数  `composable/index.ts`
+```ts
+import { getPrescriptionPic } from '@/services/consult'
+import { ImagePreview } from 'vant'
+```
+```ts
+// 封装查看处方逻辑
+export const useShowPrescription = () => {
+  const showPrescription = async (id?: string) => {
+    if (id) {
+      const res = await getPrescriptionPic(id)
+      ImagePreview([res.data.url])
+    }
+  }
+  return { showPrescription }
+}
+```
+
+2）使用hook函数
+
+问诊室使用 `Room/components/RoomMessage.vue`
+```ts
+import { useShowPrescription } from '@/composable'
+
+const { showPrescription } = useShowPrescription()
+```
+```diff
+          <div class="head-tit">
+            <h3>电子处方</h3>
++            <p @click="showPrescription(msg.prescription?.id)">
+              原始处方 <van-icon name="arrow"></van-icon>
+            </p>
+          </div>
+```
+订单列表使用 `User/components/ConsultItem.vue`
+```ts
+import { useShowPrescription } from '@/composable'
+```
+```ts
+const onSelect = (action: { text: string }, i: number) => {
+  if (i === 0) {
+    showPrescription(item.prescriptionId)
+  }
+  if (i === 1) {
+    // 删除
+    deleteConsultOrder(item)
+  }
+}
+const { showPrescription } = useShowPrescription()
+```
+
+小结：
+- 现在是只有一个函数复用，其实也可以复用状态数据之类的，或者多个函数。
 
 
 ## 问诊记录-问诊详情
@@ -787,7 +1002,7 @@ const onSelect = () => {
           <template #reference> 更多 </template>
         </van-popover>
       </div>
-      <van-button type="default" round>问诊记录</van-button>
+      <van-button type="default" round :to="`/room?orderId=${item.id}`">问诊记录</van-button>
       <van-button type="primary" round v-if="item.evaluateId">写评价</van-button>
       <van-button type="default" round v-else>查看评价</van-button>
     </div>
@@ -818,10 +1033,301 @@ const onSelect = () => {
 
 ## 问诊记录-取消订单Hook
 
+> 实现，取消订单逻辑复用，提取hook函数
+
+
+`composable/index.ts`
+```ts
+import { cancelOrder, followDoctor, getPrescriptionPic } from '@/services/consult'
+import type { ConsultOrderItem, FollowType } from '@/types/consult'
+import { ImagePreview, Toast } from 'vant'
+import { OrderType } from '@/enums'
+```
+```ts
+// 封装取消订单逻辑
+export const useCancelOrder = () => {
+  const loading = ref(false)
+  const cancelConsultOrder = (item: ConsultOrderItem) => {
+    loading.value = true
+    cancelOrder(item.id)
+      .then(() => {
+        item.status = OrderType.ConsultCancel
+        item.statusValue = '已取消'
+        Toast.success('取消成功')
+      })
+      .catch(() => {
+        Toast.fail('取消失败')
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  }
+  return { loading, cancelConsultOrder }
+}
+```
+
+`ConsultItem.vue`
+```ts
+import { useCancelOrder } from '@/composable'
+const { loading, cancelConsultOrder } = useCancelOrder()
+```
+
+`ConsultDetail.vue`
+```ts
+import { useCancelOrder } from '@/composable'
+const { loading, cancelConsultOrder } = useCancelOrder()
+```
+
+```diff
+<div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultPay">
+      <div class="price">
+        <span>需付款</span>
+        <span>￥{{ item.actualPayment }}</span>
+      </div>
++      <van-button type="default" round :loading="loading" @click="cancelConsultOrder(item!)">
+        取消问诊
+      </van-button>
+      <van-button type="primary" round>继续支付</van-button>
+    </div>
+    <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultWait">
++      <van-button type="default" round :loading="loading" @click="cancelConsultOrder(item!)">
+        取消问诊
+      </van-button>
+      <van-button type="primary" round :to="`/room?orderId=${item.id}`">继续沟通</van-button>
+    </div>
+```
 
 
 ## 问诊记录-删除订单Hook
 
+> 实现，取消删除逻辑复用，提取hook函数
+
+```ts
+import { cancelOrder, deleteOrder, followDoctor, getPrescriptionPic } from '@/services/consult'
+
+
+export const useDeleteOrder = (emit: (e: 'on-delete', id: string) => void) => {
+  // 删除订单
+  const loading = ref(false)
+  const deleteConsultOrder = (item: ConsultOrderItem) => {
+    loading.value = true
+    deleteOrder(item.id)
+      .then(() => {
+        emit('on-delete', item.id)
+        Toast.success('删除成功')
+      })
+      .catch(() => {
+        Toast.fail('删除失败')
+      })
+      .finally(() => {
+        loading.value = false
+      })
+  }
+  return { loading, deleteConsultOrder }
+}
+```
+
+`ConsultItem.vue`
+
+```ts
+import { useCancelOrder, useDeleteOrder, useShowPrescription } from '@/composable'
+
+const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder(()=>{
+  emit('on-delete', item.id)
+})
+```
+
+`ConsultDetail.vue`
+```ts
+import { useCancelOrder, useDeleteOrder, useShowPrescription } from '@/composable'
+
+const { showPrescription } = useShowPrescription()
+const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder(() => {
+  router.push('/user/consult')
+})
+```
+
+查看处方和删除订单
+```ts
+const onSelect = (action: { text: string }, i: number) => {
+  if (i === 0) {
+    showPrescription(item.value?.prescriptionId)
+  }
+  if (i === 1) {
+    // 删除
+    item.value && deleteConsultOrder(item.value)
+  }
+}
+```
+
+删除订单 `(item!)` 是ts语法非空断言
+```html
+      <van-button type="default" round :loading="deleteLoading" @click="deleteConsultOrder(item!)">
+        删除订单
+      </van-button>
+```
+
+查看处方
+```diff
+      <van-button
+        type="default"
+        round
+        v-if="item.prescriptionId"
++        @click="showPrescription(item?.prescriptionId)"
+      >
+        查看处方
+      </van-button>
+      <van-button type="primary" round :to="`/room?orderId=${item.id}`">继续沟通</van-button>
+    </div>
+```
+
+小结：
+- 删除订单和查看处方一起实现
 
 
 ## 问诊记录-支付抽屉组件封装
+
+
+思路：
+- 组件需要实现哪些功能？
+  - 展示微信支付和支付宝支付，可以选择
+  - 展示支付金额，传入订单ID用于生成订单支付链接
+  - 打开关闭抽屉
+  - 关闭后的业务可自定义
+- 需要暴露哪些 props 参数？
+  - orderId  actualPayment  onClose show
+- 需要提供哪些 emits 事件？
+  - update:show
+
+
+代码：
+
+1）封装组件 `components/CpPaySheet.vue`
+```vue
+<script setup lang="ts">
+import { Toast } from 'vant'
+import { ref } from 'vue'
+import { getConsultOrderPayUrl } from '@/services/consult'
+
+const { orderId, show } = defineProps<{
+  orderId: string
+  actualPayment: number
+  onClose?: () => void
+  show: boolean
+}>()
+const emit = defineEmits<{
+  (e: 'update:show', val: boolean): void
+}>()
+
+const paymentMethod = ref<0 | 1>()
+
+// 跳转支付
+const pay = async () => {
+  if (paymentMethod.value === undefined) return Toast('请选择支付方式')
+  Toast.loading('跳转支付')
+  const res = await getConsultOrderPayUrl({
+    orderId: orderId,
+    paymentMethod: paymentMethod.value,
+    payCallback: 'http://localhost:8080/room'
+  })
+  window.location.href = res.data.payUrl
+}
+</script>
+
+<template>
+  <!-- 支付方式弹窗 -->
+  <van-action-sheet
+    :show="show"
+    @update:show="emit('update:show', $event)"
+    title="选择支付方式"
+    :close-on-popstate="false"
+    :before-close="onClose"
+    :closeable="false"
+  >
+    <div class="pay-type">
+      <p class="amount">￥{{ actualPayment.toFixed(2) }}</p>
+      <van-cell-group>
+        <van-cell title="微信支付" @click="paymentMethod = 0">
+          <template #icon><cp-icon name="consult-wechat" /></template>
+          <template #extra><van-checkbox :checked="paymentMethod === 0" /></template>
+        </van-cell>
+        <van-cell title="支付宝支付" @click="paymentMethod = 1">
+          <template #icon><cp-icon name="consult-alipay" /></template>
+          <template #extra><van-checkbox :checked="paymentMethod === 1" /></template>
+        </van-cell>
+      </van-cell-group>
+      <div class="btn">
+        <van-button @click="pay" type="primary" round block>立即支付</van-button>
+      </div>
+    </div>
+  </van-action-sheet>
+</template>
+
+<style lang="scss" scoped>
+.pay-type {
+  .amount {
+    padding: 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .btn {
+    padding: 15px;
+  }
+  .van-cell {
+    align-items: center;
+    .cp-icon {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+    .van-checkbox :deep(.van-checkbox__icon) {
+      font-size: 16px;
+    }
+  }
+}
+</style>
+```
+
+```diff
+import CpNavBar from '@/components/CpNavBar.vue'
+import CpIcon from '@/components/CpIcon.vue'
+import CpRadioBtn from '@/components/CpRadioBtn.vue'
++import CpPaySheet from '@/components/CpPaySheet.vue'
+import { RouterLink, RouterView } from 'vue-router'
+
+declare module 'vue' {
+  interface GlobalComponents {
+    CpNavBar: typeof CpNavBar
+    CpIcon: typeof CpIcon
+    CpRadioBtn: typeof CpRadioBtn
++    CpPaySheet: typeof CpPaySheet
+    RouterLink: typeof RouterLink
+    RouterView: typeof RouterView
+  }
+}
+```
+
+2）使用组件
+
+```html
+      <cp-pay-sheet
+        v-model:show="show"
+        :order-id="orderId"
+        :actualPayment="payInfo.actualPayment"
+        :onClose="onClose"
+      />
+```
+
+```ts
+const show = ref(false)
+```
+```diff
+    <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultCancel">
+      <van-button type="default" round :loading="deleteLoading" @click="deleteConsultOrder(item!)">
+        删除订单
+      </van-button>
+      <van-button type="primary" round to="/">咨询其他医生</van-button>
+    </div>
++   <cp-pay-sheet v-model:show="show" :order-id="item.id" :actualPayment="item.actualPayment" />
+  </div>
+```
