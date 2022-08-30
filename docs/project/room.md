@@ -312,132 +312,8 @@ import RoomAction from './components/RoomAction.vue'
   </div>
 ```
 
-- 评价卡片
-
-```vue
-<script setup lang="ts">
-import { Toast } from 'vant'
-import { computed, ref } from 'vue'
-
-const emit = defineEmits(['submit'])
-defineProps<{ complete?: boolean; showScore?: number }>()
-
-const score = ref(0)
-const anonymousFlag = ref(false)
-const content = ref('')
-const disabled = computed(() => !score.value || !content.value)
-const onSubmit = () => {
-  if (!score.value) return Toast('请选择评分')
-  if (!content.value) return Toast('请输入评价')
-  emit('submit', {
-    score: score.value,
-    content: content.value,
-    anonymousFlag: anonymousFlag.value ? 1 : 0
-  })
-}
-</script>
-
-<template>
-  <div class="evalutate-card" v-if="complete">
-    <p class="title">医生服务评价</p>
-    <p class="desc">我们会更加努力提升服务质量</p>
-    <van-rate
-      :model-value="showScore"
-      size="7vw"
-      gutter="3vw"
-      color="#FADB14"
-      void-icon="star"
-      void-color="rgba(0,0,0,0.04)"
-    />
-  </div>
-  <div class="evalutate-card" v-else>
-    <p class="title">感谢您的评价</p>
-    <p class="desc">本次在线问诊服务您还满意吗？</p>
-    <van-rate
-      v-model="score"
-      size="7vw"
-      gutter="3vw"
-      color="#FADB14"
-      void-icon="star"
-      void-color="rgba(0,0,0,0.04)"
-    />
-    <van-field
-      v-model="content"
-      type="textarea"
-      maxlength="150"
-      show-word-limit
-      rows="3"
-      placeholder="请描述您对医生的评价或是在医生看诊过程中遇到的问题"
-    ></van-field>
-    <div class="footer">
-      <van-checkbox v-model="anonymousFlag">匿名评价</van-checkbox>
-      <van-button @click="onSubmit" type="primary" size="small" :class="{ disabled }" round
-        >提交评价</van-button
-      >
-    </div>
-  </div>
-</template>
-
-<style lang="scss" scoped>
-.evalutate-card {
-  width: 100%;
-  background-color: #fff;
-  border-radius: 8px;
-  overflow: hidden;
-  text-align: center;
-  padding: 15px;
-  .title {
-    font-size: 15px;
-    margin-bottom: 5px;
-  }
-  .desc {
-    font-size: 12px;
-    margin-bottom: 15px;
-    color: var(--cp-tip);
-  }
-  .van-field {
-    background-color: var(--cp-bg);
-    margin: 15px 0;
-    border-radius: 8px;
-  }
-  .footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    box-sizing: border-box;
-    ::v-deep() {
-      .van-checkbox {
-        height: 16px;
-        .van-icon {
-          font-size: 11px;
-        }
-        &__label {
-          font-size: 12px;
-          color: var(--cp-tip);
-        }
-      }
-      .van-button {
-        padding: 0 16px;
-        &.disabled {
-          opacity: 1;
-          background: #fafafa;
-          color: #d9dbde;
-          border: #fafafa;
-        }
-      }
-    }
-  }
-}
-</style>
-```
-```ts
-import EvaluateCard from './EvaluateCard.vue'
-```
-```html
-  <div class="msg msg-comment">
-    <evaluate-card />
-  </div>
-```
+小结：
+- 知道问诊室大概有哪些消息卡片（类型）
 
 
 ## 问诊室-websocket介绍
@@ -552,23 +428,1027 @@ socket.close()
 
 ## 问诊室-通讯规则
 
+> 知道前后以及定义数据的类型
 
-## 问诊室-默认展示
+- 通讯的一些事件
+
+![image-20220829154759024](./images/image-20220829154759024.png)
+
+`chatMsgList` **接收**聊天记录
+
+`sendChatMsg` 发送消息
+
+`receiveChatMsg` **接收**消息
+
+`updateMsgStatus` 消息已读
+
+`getChatMsgList` 获取聊天记录
+
+`statusChange` **接收**订单状态改变
 
 
-## 问诊室-发送消息
+
+- 消息数据的类型
+
+```ts
+import { MsgType, PrescriptionStatus } from '@/enums'
+import type { Consult, Image } from './consult'
+import type { Patient } from './user'
+
+export type Medical = {
+  id: string
+  name: string
+  amount: string
+  avatar: string
+  specs: string
+  usageDosag: string
+  quantity: string
+  prescriptionFlag: 0 | 1
+}
+
+export type Prescription = {
+  id: string
+  orderId: string
+  createTime: string
+  name: string
+  recordId: string
+  gender: 0 | 1
+  genderValue: ''
+  age: number
+  diagnosis: string
+  status: PrescriptionStatus
+  medicals: Medical[]
+}
+
+export type EvaluateDoc = {
+  id?: string
+  score?: number
+  content?: string
+  createTime?: string
+  creator?: string
+}
+
+export type Message = {
+  id: string
+  msgType: MsgType
+  from?: string
+  fromAvatar?: string
+  to?: string
+  toAvatar?: string
+  createTime: string
+  msg: {
+    content?: string
+    picture?: Image
+    consultRecord?: Consult & {
+      patientInfo: Patient
+    }
+    prescription?: Prescription
+    evaluateDoc?: EvaluateDoc
+  }
+}
+
+export type TimeMessages = {
+  createTime: string
+  items: RoomMessage[]
+  orderId: string
+  sid: string
+}
+```
 
 
-## 问诊室-接收消息
+## 问诊室-建立连接
 
+
+步骤：
+- 安装 sokect.io-client 包
+- 在组件挂载完毕，进行socket连接
+- 监听连接成功，监听错误消息，监听关闭连接
+- 组件卸载关闭连接
+
+代码：
+
+- 安装 sokect.io-client 包
+```bash
+pnpm add sokect.io-client
+```
+
+```ts
+import { useUserStore } from '@/stores'
+import { useRoute } from 'vue-router'
+import { io, type Socket } from 'socket.io-client'
+
+const store = useUserStore()
+const route = useRoute()
+
+let socket: Socket
+onUnmounted(() => {
+  socket.close()
+})
+onMounted(async () => {
+  // 建立链接，创建 socket.io 实例
+  socket = io(baseURL, {
+    auth: {
+      token: `Bearer ${store.user?.token}`
+    },
+    query: {
+      orderId: route.query.orderId
+    }
+  })
+
+  socket.on('connect', () => {
+    // 建立连接成功
+    console.log('connect')
+  })
+
+  socket.on('error', (event) => {
+    // 错误异常消息
+    console.log('error')
+  })
+
+  socket.on('disconnect', ()=> {
+    // 已经断开连接
+    console.log('disconnect')
+  })
+})
+```
+
+
+
+## 问诊室-默认消息
+
+步骤：
+- 监听默认聊天记录，并且处理处理成消息列表
+- 提取常量数据
+- 进行渲染
+- 预览病情图片
+
+代码：
+
+1）监听默认聊天记录，并且处理处理成消息列表 `Room/index.vue`
+```ts
+import { MsgType } from '@/enums'
+import type { Message, TimeMessages } from '@/types/room'
+
+const list = ref<Message[]>([])
+```
+
+```ts
+  // 聊天记录
+  socket.on('chatMsgList', ({ data }: { data: TimeMessages[] }) => {
+    // 准备转换常规消息列表
+    const arr: Message[] = []
+    data.forEach((item, i) => {
+      arr.push({
+        msgType: MsgType.Notify,
+        msg: { content: item.createTime },
+        createTime: item.createTime,
+        id: item.createTime
+      })
+      arr.push(...item.items)
+    })
+    // 追加到聊天消息列表
+    list.value.unshift(...arr)
+  })
+```
+
+2) 抽取常量数据 `services/constants.ts`
+
+```ts
+import { IllnessTime } from '@/enums'
+
+export const timeOptions = [
+  { label: '一周内', value: IllnessTime.Week },
+  { label: '一月内', value: IllnessTime.Month },
+  { label: '半年内', value: IllnessTime.HalfYear },
+  { label: '大于半年', value: IllnessTime.More }
+]
+export const flagOptions = [
+  { label: '就诊过', value: 0 },
+  { label: '没就诊过', value: 1 }
+]
+```
+
+
+3）进行渲染 `Room/components/RoomMessage.vue`
+
+```html
+<room-message :list="list" />
+```
+
+```ts
+import { IllnessTime } from '@/enums'
+import { flagOptions, timeOptions } from '@/services/constants'
+
+
+defineProps<{ list: Message[] }>()
+
+const getIllnessTimeText = (time: IllnessTime) =>
+  timeOptions.find((item) => item.value === time)?.label
+
+const getConsultFlagText = (flag: 0 | 1) =>
+  flagOptions.find((item) => item.value === flag)?.label
+
+```
+
+```html
+  <template v-for="{ msgType, msg, createTime, from } in list" :key="msg.id">
+    <!-- 病情描述 -->
+    <div class="msg msg-illness" v-if="msgType === MsgType.CardPat">
+      <div class="patient van-hairline--bottom" v-if="msg.consultRecord">
+        <p>
+          {{ msg.consultRecord.patientInfo.name }}
+          {{ msg.consultRecord.patientInfo.genderValue }}
+          {{ msg.consultRecord.patientInfo.age }}岁
+        </p>
+        <p>
+          {{ getIllnessTimeText(msg.consultRecord.illnessTime) }} |
+          {{ getConsultFlagText(msg.consultRecord.consultFlag) }}
+        </p>
+      </div>
+      <van-row>
+        <van-col span="6">病情描述</van-col>
+        <van-col span="18">{{ msg.consultRecord?.illnessDesc }}</van-col>
+        <van-col span="6">图片</van-col>
+        <van-col span="18" @click="previewImg(msg.consultRecord?.pictures)"> 点击查看 </van-col>
+      </van-row>
+    </div>
+    <!-- 温馨提示 -->
+    <div class="msg msg-tip" v-if="msgType === MsgType.NotifyTip">
+      <div class="content">
+        <span class="green">温馨提示：</span>
+        <span>{{ msg.content }}</span>
+      </div>
+    </div>
+    <!-- 通用通知 -->
+    <div class="msg msg-tip" v-if="msgType === 31">
+      <div class="content">
+        <span>{{ msg.content }}</span>
+      </div>
+    </div>
+  </template>    
+```
+
+4）预览病情图片 `Room/components/RoomMessage.vue`
+```ts
+import { ImagePreview } from 'vant'
+
+const previewImg = (pictures?: Image[]) => {
+  if (pictures && pictures.length) ImagePreview(pictures.map((item) => item.url))
+}
+```
+
+## 问诊室-文字聊天
+> 可以发送文字消息，可以接收文字消息
+
+步骤：
+- 底部操作组件，可以输入文字，触发 `send-text` 事件传出文字
+- 问诊室组件，监听 `send-text` 事件接收文字
+- 获取订单详情，需要使用医生ID，作为收信息人的标识
+- 通过 `socket.emit` 的 `sendChatMsg` 发送文字给服务器
+- 通过 `socket.on` 的 `receiveChatMsg` 接收发送成功或者医生发来的消息
+- 展示消息
+
+代码：
+
+1）底部操作组件，可以输入文字，触发 `send-text` 事件传出文字
+`Room/components/RoomAction.vue`
+```ts
+import { ref } from 'vue'
+
+const emit = defineEmits<{
+  (e: 'send-text', text: string): void
+}>()
+
+const text = ref('')
+
+const sendText = () => {
+  emit('send-text', text.value)
+  text.value = ''
+}
+```
+```html
+    <van-field
+      v-model="text"
+      type="text"
+      class="input"
+      :border="false"
+      placeholder="问医生"
+      autocomplete="off"
+      @keyup.enter="sendText"
+    ></van-field>
+```
+
+2）问诊室组件，监听 `send-text` 事件接收文字 
+`Room/index.vue`
+```html
+<room-action @send-text="sendText" />
+```
+```ts
+const sendText = (text: string) => {
+  // 发送消息
+}
+```
+
+3）获取订单详情，需要使用医生ID，作为收信息人的标识
+`types/consult.d.ts`
+```ts
+// 问诊订单单项信息
+export type ConsultOrderItem = Consult & {
+  createTime: string
+  docInfo?: Doctor
+  patientInfo: Patient
+  orderNo: string
+  statusValue: string
+  typeValue: string
+  status: OrderType
+  countdown: number
+  prescriptionId?: string
+  evaluateId: number
+  payment: number
+  couponDeduction: number
+  pointDeduction: number
+  actualPayment: number
+}
+```
+`services/consult.ts`
+```ts
+export const getConsultOrderDetail = (orderId: string) =>
+  request<ConsultOrderItem>('/patient/consult/order/detail', 'GET', { orderId })
+```
+
+4）通过 `socket.emit` 的 `sendChatMsg` 发送文字给服务器
+
+```ts
+import type { ConsultOrderItem } from '@/types/consult'
+import { getConsultOrderDetail } from '@/services/consult'
+
+const consult = ref<ConsultOrderItem>()
+
+onMounted(async () => {
+  const res = await getConsultOrderDetail(route.query.orderId as string)
+  consult.value = res.data
+})  
+
+const sendText = (text: string) => {
+  // 发送信息需要  发送人  收消息人  消息类型  消息内容
+  socket.emit('sendChatMsg', {
+    from: store.user?.id,
+    to: consult.value?.docInfo?.id,
+    msgType: MsgType.MsgText,
+    msg: { content: text }
+  })
+}
+```
+
+5）通过 `socket.on` 的 `receiveChatMsg` 接收发送成功或者医生发来的消息
+```ts
+ // 接收消息
+  socket.on('receiveChatMsg', async (event) => {
+    list.value.push(event)
+    await nextTick()
+    window.scrollTo(0, document.body.scrollHeight)
+  })
+```
+
+6) 展示消息  `Room/components/RoomMessage.vue`
+
+```ts
+import dayjs from 'dayjs'
+
+const formatTime = (time: string) => dayjs(time).format('HH:mm')
+```
+```html
+    <!-- 我发的消息 -->
+    <div class="msg msg-to" v-if="msgType === MsgType.MsgText && store.user?.id === from">
+      <div class="content">
+        <div class="time">{{ formatTime(createTime) }}</div>
+        <div class="pao">{{ msg.content }}</div>
+      </div>
+      <van-image :src="store.user?.avatar" />
+    </div>
+
+    <!-- 医生发的消息 -->
+    <div class="msg msg-from" v-if="msgType === MsgType.MsgText && store.user?.id !== from">
+      <van-image :src="avatar" />
+      <div class="content">
+        <div class="time">{{ formatTime(createTime) }}</div>
+        <div class="pao">{{ msg.content }}</div>
+      </div>
+    </div>
+```
+
+
+
+## 问诊室-图片聊天
+
+步骤：
+- 底部操作组件，可以上传图片，触发 `send-image` 事件传出图片对象
+- 问诊室组件，监听 `send-image` 事件接收图片对象
+- 通过 `socket.emit` 的 `sendChatMsg` 发送图片给服务器
+- 展示消息
+
+
+代码：
+
+1）底部操作组件，可以上传图片，触发 `send-image` 事件传出图片对象
+```ts
+import { uploadImage } from '@/services/consult'
+import type { Image } from '@/types/consult'
+import { Toast } from 'vant'
+import type { UploaderAfterRead } from 'vant/lib/uploader/types'
+```
+```diff
+const emit = defineEmits<{
+  (e: 'send-text', text: string): void
++  (e: 'send-image', img: Image): void
+}>()
+```
+```ts
+const sendImage: UploaderAfterRead = async (data) => {
+  if (Array.isArray(data)) return
+  if (!data.file) return
+  const t = Toast.loading('正在上传')
+  const res = await uploadImage(data.file)
+  t.clear()
+  emit('send-image', res.data)
+}
+```
+```html
+ <van-uploader :preview-image="false" :after-read="sendImage">
+      <cp-icon name="consult-img" />
+    </van-uploader>
+```
+
+2）问诊室组件，监听 `send-image` 事件接收图片对象，通过 `socket.emit` 的 `sendChatMsg` 发送图片给服务器
+```html
+<room-action @send-text="sendText" @send-image="sendImage" />
+```
+```ts
+import type { Image } from '@/types/consult'
+
+const sendImage = (img: Image) => {
+  socket.emit('sendChatMsg', {
+    from: store.user?.id,
+    to: consult.value?.docInfo?.id,
+    msgType: MsgType.MsgImage,
+    msg: { picture: img }
+  })
+}
+```
+
+3）展示消息
+
+```html
+    <div class="msg msg-to" v-if="msgType === MsgType.MsgImage && store.user?.id === from">
+      <div class="content">
+        <div class="time">{{ formatTime(createTime) }}</div>
+        <van-image fit="contain" :src="msg.picture?.url" />
+      </div>
+      <van-image :src="store.user?.avatar" />
+    </div>
+    <div class="msg msg-from" v-if="msgType === MsgType.MsgImage && store.user?.id !== from">
+      <van-image :src="avatar" />
+      <div class="content">
+        <div class="time">{{ formatTime(createTime) }}</div>
+        <van-image fit="contain" :src="msg.picture?.url" />
+      </div>
+    </div>
+```
 
 ## 问诊室-聊天记录
+
+步骤：
+- 实现下拉刷新效果
+- 记录每段消息的开始时间，作为下一次请求的开始时间
+- 触发刷新，发送获取聊天记录消息
+- 在接收聊天记录事件中
+  - 关闭刷新中效果
+  - 判断是否有数据？没有提示 `没有聊天记录了`
+  - 如果是初始化获取的聊天，需要滚动到最底部
+  - 如果是第二，三...次获取消息,不需要滚动到底部
+- 如果断开连接后再次连接，需要清空聊天记录
+
+代码：
+- 实现下拉刷新效果
+
+```html
+    <van-pull-refresh v-model="loading" @refresh="onRefresh">
+      <room-message :list="list" />
+    </van-pull-refresh>
+```
+```ts
+const loading = ref(false)
+const onRefresh = () => {
+  // 触发下拉
+}
+```
+
+- 记录每段消息的开始时间，作为下一次请求的开始时间
+
+```ts
+const time = ref(dayjs().format('YYYY-MM-DD HH:mm:ss'))
+```
+```diff
+    const arr: Message[] = []
+    data.forEach((item, i) => {
++      if (i === 0) time.value = item.createTime
+      arr.push({
+        msgType: MsgType.Notify,
+        msg: { content: item.createTime },
+        createTime: item.createTime,
+        id: item.createTime
+      })
+      arr.push(...item.items)
+    })
+```
+
+- 触发刷新，发送获取聊天记录消息
+
+```ts
+  socket.emit('getChatMsgList', 20, time.value, route.query.orderId)
+```
+
+- 在接收聊天记录事件中
+  - 关闭刷新中效果
+  - 判断是否有数据？没有提示 `没有聊天记录了`
+  - 如果是初始化获取的聊天，需要滚动到最底部
+```ts
+const initialMsg = ref(true)
+```
+```diff
+socket.on('chatMsgList', ({ data }: { data: TimeMessages[] }) => {
+    const arr: Message[] = []
+    data.forEach((item, i) => {
+      if (i === 0) time.value = item.createTime
+      arr.push({
+        msgType: MsgType.Notify,
+        msg: { content: item.createTime },
+        createTime: item.createTime,
+        id: item.createTime
+      })
+      arr.push(...item.items)
+    })
+    list.value.unshift(...arr)
++    loading.value = false
++    if (!data.length) {
++      return Toast('没有聊天记录了')
++    }
++    nextTick(() => {
++      if (initialMsg.value) {
++        window.scrollTo(0, document.body.scrollHeight)
++        initialMsg.value = false
++      }
++    })
+  })
+```
+
+- 如果断开连接后再次连接，需要清空聊天记录
+```ts
+  // 建立连接成功
+  socket.on('connect', () => {
+    list.value = []
+  })
+```
+
+
+## 问诊室-消息已读
+
+步骤：
+- 接收到消息的时候，需要把消息设置为已读
+- 默认加载的消息，需要用最后一条消息设置已读，之前所有消息即是已读
+
+代码：
+
+```diff
+  socket.on('receiveChatMsg', async (event) => {
+    list.value.push(event)
+    await nextTick()
++    socket.emit('updateMsgStatus', event.id)
+    window.scrollTo(0, document.body.scrollHeight)
+  })
+```
+
+```diff
+    nextTick(() => {
+      if (initialMsg.value) {
++        socket.emit('updateMsgStatus', arr[arr.length - 1].id)
+        window.scrollTo(0, document.body.scrollHeight)
+        initialMsg.value = false
+      }
+    })
+```
+
+小结：
+- 这个功能是给 消息通知  默认准备的，那里有未读消息的条数。
+
+
+## 问诊室-接诊状态
+
+
+步骤：
+- 传入 订单状态 倒计时时间  给状态组件
+- 根据状态展示对应信息
+  - 待接诊，绿色文字提示
+  - 问诊中，倒计时显示
+  - 已结束or已取消，显示问诊结束
+- 订单状态发送变化，需要更新组件
+
+代码：
+
+1）传入 订单状态 倒计时时间  给状态组件
+`Room/index.vue`
+```html
+<room-status :status="consult?.status" :countdown="consult?.countdown" />
+```
+`Room/components/RoomStatus.vue`
+```ts
+import { OrderType } from '@/enums'
+
+const { status, countdown = 0 } = defineProps<{
+  status?: OrderType
+  countdown?: number
+}>()
+```
+:::warning 开启解构Props响应式转换功能，vite.config.ts
+    vue({
+      reactivityTransform: true
+    }),
+:::
+
+2）根据状态展示对应信息 `Room/components/RoomStatus.vue`
+```html
+  <div class="room-status">
+    <div class="wait" v-if="status === OrderType.ConsultWait">
+      已通知医生尽快接诊，24小时内医生未回复将自动退款
+    </div>
+    <div class="chat" v-if="status === OrderType.ConsultChat">
+      <span>咨询中</span>
+      <span class="time">剩余时间：<van-count-down :time="countdown * 1000" /></span>
+    </div>
+    <div
+      class="end"
+      v-if="status === OrderType.ConsultComplete || status === OrderType.ConsultCancel"
+    >
+      <van-icon name="passed" /> 已结束
+    </div>
+  </div>
+```
+
+3) 订单状态发送变化，需要更新组件  `Room/index.vue`
+
+```ts
+  // 订单状态
+  socket.on('statusChange', async () => {
+    const res = await getConsultOrderDetail(route.query.orderId as string)
+    consult.value = res.data
+  })
+```
 
 
 ## 问诊室-评价医生
 
+步骤：
+- 准备评价组件
+- 展示评价组件
+  - 传入 评价信息对象 条件展示
+- 评价表单数据绑定和校验
+- 提交评价
+- 修改消息
+
+
+
+代码：
+
+1）准备评价组件 `Room/components/evaluateCard.vue`
+
+显示卡片
+```html
+  <div class="evalutate-card">
+    <p class="title">医生服务评价</p>
+    <p class="desc">我们会更加努力提升服务质量</p>
+    <van-rate
+      :modelValue="3"
+      size="7vw"
+      gutter="3vw"
+      color="#FADB14"
+      void-icon="star"
+      void-color="rgba(0,0,0,0.04)"
+    />
+  </div>
+```
+评价表单
+```html
+  <div class="evalutate-card">
+    <p class="title">感谢您的评价</p>
+    <p class="desc">本次在线问诊服务您还满意吗？</p>
+    <van-rate
+      size="7vw"
+      gutter="3vw"
+      color="#FADB14"
+      void-icon="star"
+      void-color="rgba(0,0,0,0.04)"
+    />
+    <van-field
+      type="textarea"
+      maxlength="150"
+      show-word-limit
+      rows="3"
+      placeholder="请描述您对医生的评价或是在医生看诊过程中遇到的问题"
+    ></van-field>
+    <div class="footer">
+      <van-checkbox>匿名评价</van-checkbox>
+      <van-button type="primary" size="small" round>
+        提交评价
+      </van-button>
+    </div>
+  </div>
+```
+样式
+```scss
+.evalutate-card {
+  width: 100%;
+  background-color: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  text-align: center;
+  padding: 15px;
+  .title {
+    font-size: 15px;
+    margin-bottom: 5px;
+  }
+  .desc {
+    font-size: 12px;
+    margin-bottom: 15px;
+    color: var(--cp-tip);
+  }
+  .van-field {
+    background-color: var(--cp-bg);
+    margin: 15px 0;
+    border-radius: 8px;
+  }
+  .footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    ::v-deep() {
+      .van-checkbox {
+        .van-icon {
+          font-size: 12px;
+        }
+        &__label {
+          font-size: 12px;
+          color: var(--cp-tip);
+        }
+        height: 16px;
+      }
+      .van-button {
+        padding: 0 16px;
+        &.disabled {
+          opacity: 1;
+          background: #fafafa;
+          color: #d9dbde;
+          border: #fafafa;
+        }
+      }
+    }
+  }
+}
+```
+
+2）展示评价组件
+
+`Room/components/RoomMessage.vue`
+```ts
+import EvaluateCard from './EvaluateCard.vue'
+```
+```html
+    <div
+      class="msg msg-comment"
+      v-if="msgType === MsgType.CardEva || msgType === MsgType.CardEvaForm"
+    >
+      <evaluate-card :evaluateDoc="msg.evaluateDoc" />
+    </div>
+```
+
+`Room/components/evaluateCard.vue`
+```ts
+import type { EvaluateDoc } from '@/types/room'
+
+defineProps<{
+  evaluateDoc?: EvaluateDoc
+}>()
+```
+```diff
++  <div class="evalutate-card" v-if="evaluateDoc">
+    <p class="title">医生服务评价</p>
+    <p class="desc">我们会更加努力提升服务质量</p>
+    <van-rate
++      :modelValue="evaluateDoc.score"
+      size="7vw"
+      gutter="3vw"
+      color="#FADB14"
+      void-icon="star"
+      void-color="rgba(0,0,0,0.04)"
+    />
+  </div>
++  <div class="evalutate-card" v-else>
+```
+
+3）评价表单数据绑定和校验
+
+```ts
+import { Toast } from 'vant'
+import { computed, inject, ref } from 'vue'
+
+const score = ref(0)
+const anonymousFlag = ref(false)
+const content = ref('')
+const disabled = computed(() => !score.value || !content.value)
+
+const onSubmit = async () => {
+  if (!score.value) return Toast('请选择评分')
+  if (!content.value) return Toast('请输入评价')
+  
+}
+```
+```html
+    <van-rate
+      v-model="score"
+      size="7vw"
+      gutter="3vw"
+      color="#FADB14"
+      void-icon="star"
+      void-color="rgba(0,0,0,0.04)"
+    />
+    <van-field
+      v-model="content"
+      type="textarea"
+      maxlength="150"
+      show-word-limit
+      rows="3"
+      placeholder="请描述您对医生的评价或是在医生看诊过程中遇到的问题"
+    ></van-field>
+    <div class="footer">
+      <van-checkbox v-model="anonymousFlag">匿名评价</van-checkbox>
+      <van-button @click="onSubmit" type="primary" size="small" :class="{ disabled }" round>
+        提交评价
+      </van-button>
+    </div>
+```
+
+4）提交评价
+
+api函数
+```ts
+// 评价问诊
+export const evaluateConsultOrder = (data: {
+  docId: string
+  orderId: string
+  score: number
+  content: string
+  anonymousFlag: 0 | 1
+}) => request<{ id: string }>('/patient/order/evaluate', 'POST', data)
+```
+
+注入订单信息：提供医生ID和订单ID
+`Room/index.vue`
+```ts
+import { provide } from 'vue'
+// ...
+provide('consult', consult)
+```
+`Room/components/EvaluateCard.vue`
+```ts
+import { inject, type Ref } from 'vue'
+import type { ConsultOrderItem } from '@/types/consult'
+
+const consult = inject<Ref<ConsultOrderItem>>('consult')
+```
+
+提交评价
+```diff
+const onSubmit = async () => {
+  if (!score.value) return Toast('请选择评分')
+  if (!content.value) return Toast('请输入评价')
++  if (!consult?.value) return Toast('未找到订单')
++  if (consult.value.docInfo?.id) {
++    await evaluateConsultOrder({
++      docId: consult.value?.docInfo?.id,
++      orderId: consult.value?.id,
++      score: score.value,
++      content: content.value,
++      anonymousFlag: anonymousFlag.value ? 1 : 0
++    })
++  }
+  // 修改消息
+}
+```
+
+5）成功后修改消息
+`Room/index.vue`
+```ts
+const completeEva = (score: number) => {
+  const item = list.value.find((item) => item.msgType === MsgType.CardEvaForm)
+  if (item) {
+    item.msg.evaluateDoc = { score }
+    item.msgType = MsgType.CardEva
+  }
+}
+provide('completeEva', completeEva)
+```
+`Room/components/EvaluateCard.vue`
+```diff
++const completeEva = inject<(score: number) => void>('completeEva')
+
+
+const onSubmit = async () => {
+  if (!score.value) return Toast('请选择评分')
+  if (!content.value) return Toast('请输入评价')
+  if (!consult?.value) return Toast('未找到订单')
+  if (consult.value.docInfo?.id) {
+    await evaluateConsultOrder({
+      docId: consult.value.docInfo?.id,
+      orderId: consult.value?.id,
+      score: score.value,
+      content: content.value,
+      anonymousFlag: anonymousFlag.value ? 1 : 0
+    })
+  }
++  completeEva && completeEva(score.value)
+}
+```
+
+
 
 ## 问诊室-查看处方
 
+步骤：
+- 定义参考处方API
+- 点击查看处方预览处方图片
+
+:::tip
+  需要去辅助-超级医生开处方
+:::
+
+代码：
+
+1）定义参考处方API
+
+```ts
+// 查看处方
+export const getPrescriptionPic = (id: string) =>
+  request<{ url: string }>(`/patient/consult/prescription/${id}`)
+```
+
+2）点击查看处方预览处方图片
+
+```diff
+      <van-row>
+        <van-col span="6">病情描述</van-col>
+        <van-col span="18">{{ msg.consultRecord?.illnessDesc }}</van-col>
+        <van-col span="6">图片</van-col>
++        <van-col span="18" @click="previewImg(msg.consultRecord?.pictures)"> 点击查看 </van-col>
+      </van-row>
+```
+
+```ts
+  import { getPrescriptionPic } from '@/services/consult'
+  import { ImagePreview } from 'vant'
+
+  const showPrescription = async (id?: string) => {
+    if (id) {
+      const res = await getPrescriptionPic(id)
+      ImagePreview([res.data.url])
+    }
+  }
+```
+
+
 
 ## 问诊室-购买药品
+
+
+步骤：
+- 处方状态不同此按钮操作不同：
+  - 如果处方失效：提示即可
+  - 如果没付款且有订单ID，代表已经生成订单没付款：去订单详情付款
+  - 如果没付款且没订单ID：去预支付页面
+
+代码：
+```ts
+import { useRouter } from 'vue-router'
+import { PrescriptionStatus } from '@/enums'
+import { Toast } from 'vant'
+
+// 点击处方的跳转
+const router = useRouter()
+const buy = (pre?: Prescription) => {
+  if (pre) {
+    if (pre.status === PrescriptionStatus.Invalid) return Toast('处方已失效')
+    if (pre.status === PrescriptionStatus.NotPayment && !pre.orderId)
+      return router.push(`/order/pay?id=${pre.id}`)
+    router.push(`/order/${pre.orderId}`)
+  }
+}
+```
