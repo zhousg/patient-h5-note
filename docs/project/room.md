@@ -477,7 +477,7 @@ export type Prescription = {
   age: number
   diagnosis: string
   status: PrescriptionStatus
-  medicals: Medical[]
+  medicines: Medical[]
 }
 
 export type EvaluateDoc = {

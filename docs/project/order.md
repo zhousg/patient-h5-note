@@ -6,8 +6,7 @@
 
 ![image-20220830174600932](./images/image-20220830174600932.png)
 
-
-
+1）路由与组件
 ```ts
     {
       path: '/order/pay',
@@ -226,12 +225,225 @@
 </style>
 ```
 
+2）API函数和渲染
+`types/order.d.ts`
+```ts
+import type { Medical } from './room'
 
-## 药品订单-支付链接
+export type OrderPre = {
+  id: string
+  couponId: string
+  pointDeduction: number
+  couponDeduction: number
+  payment: number
+  expressFee: number
+  actualPayment: number
+  medicines: Medical[]
+}
+export type Address = {
+  id: string
+  mobile: string
+  receiver: string
+  province: string
+  city: string
+  county: string
+  addressDetail: string
+}
+
+// 订单列表
+export type AddressItem = Address & {
+  isDefault: 0 | 1
+  postalCode: string
+}
+```
+`services/order.ts`
+```ts
+import type { OrderPre,AddressItem } from '@/types/order'
+import { request } from '@/utils/request'
+
+// 查询药品订单预支付信息
+export const getMedicalOrderPre = (params: { prescriptionId: string }) =>
+  request<OrderPre>('/patient/medicine/order/pre', 'GET', params)
+
+  // 获取收货地址列表
+export const getAddressList = () => request<AddressItem[]>('/patient/order/address')
+```
+
+```vue
+<script setup lang="ts">
+import { getAddressList, getMedicalOrderPre } from '@/services/order'
+import type { AddressItem, OrderPre } from '@/types/order'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const orderPre = ref<OrderPre>()
+const address = ref<AddressItem>()
+onMounted(async () => {
+  const res = await getMedicalOrderPre({ prescriptionId: route.query.id as string })
+  const addRes = await getAddressList()
+  orderPre.value = res.data
+  // 设置收货地址
+  if (addRes.data.length) {
+    const defAddress = addRes.data.find((item) => item.isDefault === 0)
+    if (defAddress) address.value = defAddress
+    else address.value = addRes.data[0]
+  }
+})
+</script>
+
+<template>
+  <div class="order-pay-page" v-if="orderPre && address">
+    <cp-nav-bar title="药品支付" />
+    <div class="order-address">
+      <p class="area">
+        <van-icon name="location" />
+        <span>{{ address.province + address.city + address.county }}</span>
+      </p>
+      <p class="detail">{{ address.addressDetail }}</p>
+      <p>
+        {{ address.receiver }}
+        {{ address.mobile.replace(/^(\d{3})(?:\d{4})(\d{4})$/, '\$1****\$2') }}
+      </p>
+    </div>
+    <div class="order-medical">
+      <div class="head">
+        <h3>优医药房</h3>
+        <small>优医质保 假一赔十</small>
+      </div>
+      <div class="item van-hairline--top" v-for="med in orderPre.medicines" :key="med.id">
+        <img class="img" :src="med.avatar" alt="" />
+        <div class="info">
+          <p class="name">
+            <span>{{ med.name }}</span>
+            <span>x{{ med.quantity }}</span>
+          </p>
+          <p class="size">
+            <van-tag v-if="med.prescriptionFlag === 1">处方药</van-tag>
+            <span>{{ med.specs }}</span>
+          </p>
+          <p class="price">￥{{ med.amount }}</p>
+        </div>
+        <div class="desc">{{ med.usageDosag }}</div>
+      </div>
+    </div>
+    <div class="order-detail">
+      <van-cell-group>
+        <van-cell title="药品金额" :value="`￥${orderPre.payment}`" />
+        <van-cell title="运费" :value="`￥${orderPre.expressFee}`" />
+        <van-cell title="优惠券" :value="`-￥${orderPre.couponDeduction}`" />
+        <van-cell title="实付款" :value="`￥${orderPre.actualPayment}`" class="price" />
+      </van-cell-group>
+    </div>
+    <div class="order-tip">
+      <p class="tip">
+        由于药品的特殊性，如非错发、漏发药品的情况，药品一经发出
+        不得退换，请核对药品信息无误后下单。
+      </p>
+      <van-checkbox>我已同意<a href="javascript:;">支付协议</a></van-checkbox>
+    </div>
+    <van-submit-bar
+      :price="orderPre.actualPayment * 100"
+      button-text="立即支付"
+      button-type="primary"
+      text-align="left"
+    ></van-submit-bar>
+  </div>
+  <div class="order-pay-page" v-else>
+    <cp-nav-bar title="药品支付" />
+    <van-skeleton title :row="4" style="margin-top: 30px" />
+    <van-skeleton title :row="4" style="margin-top: 30px" />
+  </div>
+</template>
+```
+
+## 药品订单-进行支付
+
+
+1）生成支付链接API函数
+```ts
+// 创建药品订单
+export const createMedicalOrder = (data: { id: string; addressId: string; couponId?: string }) =>
+  request<{ id: string }>('/patient/medicine/order', 'POST', data)
+```
+
+2）支付抽屉支持，设置回跳地址
+```diff
+const { orderId, show, payCallback } = defineProps<{
+  orderId: string
+  actualPayment: number
+  onClose?: () => void
+  show: boolean
++  payCallback: string
+}>()
+```
+```diff
+// 跳转支付
+const pay = async () => {
+  if (paymentMethod.value === undefined) return Toast('请选择支付方式')
+  Toast.loading('跳转支付')
+  const res = await getConsultOrderPayUrl({
+    orderId: orderId,
+    paymentMethod: paymentMethod.value,
++    payCallback
+  })
+  window.location.href = res.data.payUrl
+}
+```
+
+3) 生成订单，使用支付抽屉组件
+
+```ts
+import { createMedicalOrder } from '@/services/order'
+```
+```ts
+// 生成订单
+const agree = ref(false)
+const loading = ref(false)
+const orderId = ref('')
+const submit = async () => {
+  if (!agree.value) return Toast('请同意支付协议')
+  if (!address.value?.id) return Toast('请选择收货地址')
+  if (!orderPre.value?.id) return Toast('未找到处方')
+  // 没有生成订单ID
+  if (!orderId.value) {
+    loading.value = true
+    try {
+      const res = await createMedicalOrder({
+        id: orderPre.value?.id,
+        addressId: address.value?.id,
+        couponId: orderPre.value.couponId
+      })
+      orderId.value = res.data.id
+      loading.value = false
+      // 打开支付抽屉
+      show.value = true
+    } catch (e) {
+      loading.value = false
+    }
+  } else {
+    show.value = true
+  }
+}
+// 控制抽屉和弹窗
+const show = ref(false)
+```
+```html
+    <cp-pay-sheet
+      :orderId="orderId"
+      :actualPayment="orderPre.actualPayment"
+      payCallback="http://localhost:8080/order/pay/result"
+      v-model:show="show"
+    />
+```
+
 
 ## 药品订单-支付结果
 
 ![image-20220830174508558](./images/image-20220830174508558.png)
+
+
+1）路由与组件
 
 ```ts
     {
@@ -300,10 +512,80 @@
 </style>
 ```
 
+2）展示信息
+
+```ts
+export type OrderDetail = {
+  id: string
+  orderNo: string
+  type: 4
+  createTime: string
+  prescriptionId: string
+  status: OrderType
+  statusValue: string
+  medicines: Medical[]
+  countDown: number
+  addressInfo: Address
+  expressInfo: {
+    content: string
+    time: string
+  }
+  payTime: string
+  paymentMethod?: 0 | 1
+  payment: number
+  pointDeduction: number
+  couponDeduction: number
+  payment: number
+  expressFee: number
+  actualPayment: number
+  roomId: string
+}
+```
+```ts
+// 获取药品订单详情
+export const getMedicalOrderDetail = (id: string) =>
+  request<OrderDetail>(`/patient/medicine/order/detail/${id}`)
+```
+```vue
+<script setup lang="ts">
+import { getMedicalOrderDetail } from '@/services/order'
+import type { OrderDetail } from '@/types/order'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const order = ref<OrderDetail>()
+onMounted(async () => {
+  const res = await getMedicalOrderDetail(route.query.orderId as string)
+  order.value = res.data
+})
+</script>
+
+<template>
+  <div class="order-pay-result-page">
+    <cp-nav-bar title="药品支付结果" />
+    <div class="result">
+      <van-icon name="checked" />
+      <p class="price">￥ {{ order?.actualPayment }}</p>
+      <p class="status">支付成功</p>
+      <p class="tip">订单支付成功，已通知药房尽快发出， 请耐心等待~</p>
+      <div class="btn">
+        <van-button type="primary" :to="`/order/${order?.id}`">查看订单</van-button>
+        <van-button :to="`/room?orderId=${order?.roomId}`">返回诊室</van-button>
+      </div>
+    </div>
+  </div>
+</template>
+```
+
+
 ## 药品订单-订单详情
 
 ![image-20220830185418506](./images/image-20220830185418506.png)
 
+
+
+1）路由与组件
 
 ```ts
     {
@@ -530,9 +812,183 @@
 </style>
 ```
 
+2）抽取药品组件
+```vue
+<script setup lang="ts">
+import type { Medical } from '@/types/room'
+
+const { medicines = [] } = defineProps<{ medicines?: Medical[] }>()
+</script>
+
+<template>
+  <div class="order-medical">
+    <div class="head">
+      <h3>优医药房</h3>
+      <small>优医质保 假一赔十</small>
+    </div>
+    <div class="item van-hairline--top" v-for="med in medicines" :key="med.id">
+      <img class="img" :src="med.avatar" alt="" />
+      <div class="info">
+        <p class="name">
+          <span>{{ med.name }}</span>
+          <span>x{{ med.quantity }}</span>
+        </p>
+        <p class="size">
+          <van-tag v-if="med.prescriptionFlag === 1">处方药</van-tag>
+          <span>{{ med.specs }}</span>
+        </p>
+        <p class="price">￥{{ med.amount }}</p>
+      </div>
+      <div class="desc">{{ med.usageDosag }}</div>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.order-medical {
+  background-color: #fff;
+  padding: 0 15px;
+  .head {
+    display: flex;
+    height: 54px;
+    align-items: center;
+    > h3 {
+      font-size: 16px;
+      font-weight: normal;
+    }
+    > small {
+      font-size: 13px;
+      color: var(--cp-tag);
+      margin-left: 10px;
+    }
+  }
+  .item {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 15px 0;
+    .img {
+      width: 80px;
+      height: 70px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .info {
+      padding-left: 15px;
+      width: 250px;
+      .name {
+        display: flex;
+        font-size: 15px;
+        margin-bottom: 5px;
+        > span:first-child {
+          width: 200px;
+        }
+        > span:last-child {
+          width: 50px;
+          text-align: right;
+        }
+      }
+      .size {
+        margin-bottom: 5px;
+        .van-tag {
+          background-color: var(--cp-primary);
+          vertical-align: middle;
+        }
+        span:not(.van-tag) {
+          margin-left: 10px;
+          color: var(--cp-tag);
+          vertical-align: middle;
+        }
+      }
+      .price {
+        font-size: 16px;
+        color: #eb5757;
+      }
+    }
+    .desc {
+      width: 100%;
+      background-color: var(--cp-bg);
+      border-radius: 4px;
+      margin-top: 10px;
+      padding: 4px 10px;
+      color: var(--cp-tip);
+    }
+  }
+}
+</style>
+```
+
+3）获取订单详情数据hook封装
+```ts
+import { getMedicalOrderDetail } from '@/services/order'
+import type { OrderDetail } from '@/types/order'
+import { onMounted, ref } from 'vue'
+
+export const useOrderDetail = (id: string) => {
+  const loading = ref(false)
+  const order = ref<OrderDetail>()
+  onMounted(async () => {
+    loading.value = true
+    try {
+      const res = await getMedicalOrderDetail(id)
+      order.value = res.data
+    } finally {
+      loading.value = false
+    }
+  })
+  return { order, loading }
+}
+```
+
+4）获取信息且渲染
+
+```vue
+<script setup lang="ts">
+import { useRoute } from 'vue-router'
+import { useOrderDetail } from './hooks'
+import OrderMedical from './components/OrderMedical.vue'
+
+const route = useRoute()
+const { order } = useOrderDetail(route.params.id as string)
+</script>
+
+<template>
+  <div class="order-detail-page" v-if="order">
+    <cp-nav-bar title="药品订单详情" />
+    <div class="order-head">
+      <div class="card" @click="$router.push(`/order/logistics/${order?.id}`)">
+        <div class="logistics">
+          <p>{{ order.expressInfo?.content }}</p>
+          <p>{{ order.expressInfo?.time }}</p>
+        </div>
+        <van-icon name="arrow" />
+      </div>
+    </div>
+    <order-medical :medicines="order?.medicines" />
+    <div class="order-detail">
+      <van-cell-group>
+        <van-cell title="药品金额" :value="`￥${order.payment}`" />
+        <van-cell title="运费" :value="`￥${order.expressFee}`" />
+        <van-cell title="优惠券" :value="`-￥${order.couponDeduction}`" />
+        <van-cell title="实付款" :value="`￥${order.actualPayment}`" class="price" />
+        <van-cell title="订单编号" :value="order.orderNo" />
+        <van-cell title="创建时间" :value="order.createTime" />
+        <van-cell title="支付时间" :value="order.payTime" />
+        <van-cell title="支付方式" :value="order.paymentMethod === 0 ? '微信' : '支付宝'" />
+      </van-cell-group>
+    </div>
+    <!-- 待收货 -->
+    <van-action-bar>
+      <van-action-bar-button type="primary" text="确认收货" />
+    </van-action-bar>
+  </div>
+</template>
+```
+
+
 ## 药品订单-物流详情
 
-![image-20220830221308117](./images/image-20220830221308117.png)
+![image-20220831105232116](./images/image-20220831105232116.png)
+
 
 ```ts
     {
@@ -553,10 +1009,10 @@
         <van-icon name="service" />
       </div>
       <div class="current">
-        <p class="status">订单派送中</p>
+        <p class="status">订单派送中 预计明天送达</p>
         <p class="predict">
-          <span>预计明天送达</span>
-          <span>申通快递 7511266366963366</span>
+          <span>申通快递</span>
+          <span>7511266366963366</span>
         </p>
       </div>
     </div>
@@ -680,3 +1136,7 @@
 
 
 ## 药品订单-高德地图
+
+开放平台 https://lbs.amap.com/
+
+[Vue例子](https://lbs.amap.com/api/jsapi-v2/guide/webcli/map-vue1)
