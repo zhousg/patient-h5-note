@@ -989,7 +989,7 @@ const { order } = useOrderDetail(route.params.id as string)
 
 ![image-20220831105232116](./images/image-20220831105232116.png)
 
-
+1）路由与组件
 ```ts
     {
       path: '/order/logistics/:id',
@@ -1135,8 +1135,249 @@ const { order } = useOrderDetail(route.params.id as string)
 ```
 
 
-## 药品订单-高德地图
 
-开放平台 https://lbs.amap.com/
+2）相关类型声明
+`types/order.d.ts`
+```ts
+export type Express = {
+  id: string
+  content: string
+  createTime: string
+  status: ExpressStatus
+  statusValue: string
+}
 
-[Vue例子](https://lbs.amap.com/api/jsapi-v2/guide/webcli/map-vue1)
+export type Location = {
+  longitude: string
+  latitude: string
+}
+
+export type Logistics = {
+  estimatedTime: string
+  name: string
+  awbNo: string
+  status: ExpressStatus
+  statusValue: string
+  list: Express[]
+  logisticsInfo: Location[]
+  currentLocationInfo: Location
+}
+```
+
+3）获取物流详情API函数
+`services/order.ts`
+```ts
+// 获取药品订单物流信息
+export const getMedicalOrderLogistics = (id: string) =>
+  request<Logistics>(`/patient/order/${id}/logistics`)
+```
+
+4）获取数据且渲染
+```vue
+<script setup lang="ts">
+import { getMedicalOrderLogistics } from '@/services/order'
+import type { Logistics } from '@/types/order'
+import { onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
+
+// 获取物流信息
+const logistics = ref<Logistics>()
+const route = useRoute()
+onMounted(async () => {
+  const res = await getMedicalOrderLogistics(route.params.id as string)
+  logistics.value = res.data
+})
+</script>
+
+<template>
+  <div class="order-logistics-page">
+    <div id="map">
+      <div class="title">
+        <van-icon name="arrow-left" @click="$router.back()" />
+        <span>{{ logistics?.statusValue }}</span>
+        <van-icon name="service" />
+      </div>
+      <div class="current">
+        <p class="status">{{ logistics?.statusValue }}——预计{{ logistics?.estimatedTime }}</p>
+        <p class="predict">
+          <span>{{ logistics?.name }}</span>
+          <span>{{ logistics?.awbNo }}</span>
+        </p>
+      </div>
+    </div>
+    <div class="logistics">
+      <p class="title">物流详情</p>
+      <van-steps direction="vertical" :active="0">
+        <van-step v-for="item in logistics?.list" :key="item.id">
+          <p class="status" v-if="item.statusValue">{{ item.statusValue }}</p>
+          <p class="content">{{ item.content }}</p>
+          <p class="time">{{ item.createTime }}</p>
+        </van-step>
+      </van-steps>
+    </div>
+  </div>
+</template>
+```
+
+## 药品订单-高德地图-初始化
+
+参考文档
+- [高德地图开放平台](https://lbs.amap.com/)
+- [Web开发-JSAPI文档](https://lbs.amap.com/api/jsapi-v2/summary/)
+- [参考手册](https://lbs.amap.com/api/jsapi-v2/documentation)
+
+
+步骤：
+- 准备工作 https://lbs.amap.com/api/jsapi-v2/guide/abc/prepare
+- Vue中使用 https://lbs.amap.com/api/jsapi-v2/guide/webcli/map-vue1
+
+
+代码：
+- 注册&认证完毕===>创建web应用====>得到 `key` 和 `jscode`
+  - `key` 4eed3d61125c8b9c168fc22414aaef7e
+  - `jscode` 415e917da833efcf2d5b69f4d821784b
+
+- 在vue3中使用
+
+a. 安装
+```bash
+pnpm add @amap/amap-jsapi-loader
+```
+
+b. 配置 securityJsCode
+```ts
+window._AMapSecurityConfig = {
+  securityJsCode: '415e917da833efcf2d5b69f4d821784b'
+}
+```
+
+c. 扩展 Window 的类型
+```ts
+interface Window {
+  _AMapSecurityConfig: {
+    securityJsCode: string
+  }
+}  
+```
+
+d. 加载高德地图需要的资源，组件初始化的时候
+```ts
+import AMapLoader from '@amap/amap-jsapi-loader'
+```
+```ts
+onMounted(async () => {
+  // ... 省略 ...
+  AMapLoader.load({
+    key: '4eed3d61125c8b9c168fc22414aaef7e',
+    version: '2.0'
+  }).then((AMap) => {
+    // 使用 Amap 初始化地图
+  })
+})
+```
+
+e. 初始化地图   
+[mapStyle](https://lbs.amap.com/api/jsapi-v2/guide/map/map-style)  
+[zoom](https://lbs.amap.com/api/jsapi-v2/documentation#mapsetzoom)
+```ts
+const map = new AMap.Map('map', {
+  mapStyle: 'amap://styles/whitesmoke',
+  zoom: 12
+})
+```
+
+
+## 药品订单-高德地图-物流轨迹
+
+步骤：
+- 绘制轨迹
+- 关闭默认覆盖物
+- 绘制位置
+
+代码：
+
+1）绘制路径  `map` 绘制到哪个地图上，`showTraffic` 是否先道路情况  [参考示例](https://lbs.amap.com/api/jsapi-v2/guide/services/navigation)
+```ts
+AMap.plugin('AMap.Driving', function () {
+  const driving = new AMap.Driving({
+    map: map,
+    showTraffic: false,
+  })
+
+  // 起点
+  const end = res.data.logisticsInfo.pop()
+  // 起点
+  const start = res.data.logisticsInfo.shift()
+
+  driving.search(
+    [start?.longitude, start?.latitude],
+    [end?.longitude, end?.latitude],
+    { waypoints: res.data.logisticsInfo.map((item) => [item.longitude, item.latitude]) },
+    (status: string, result: object) => {
+      // 未出错时，result即是对应的路线规划方案
+      console.log(status, result)
+    }
+  )
+})
+```
+
+2）关闭 `marker` 标记，自定义 `marker` 标记 [参考文档](https://lbs.amap.com/api/jsapi-v2/guide/map/map-layer)
+
+```diff
+  const driving = new AMap.Driving({
+    map: map,
+    showTraffic: false,
++    hideMarkers: true
+  })
+```
+```ts
+import carImg from '@/assets/car.png'
+import startImg from '@/assets/start.png'
+```
+```ts
+  // 起点
+  const end = res.data.logisticsInfo.pop()
+  const startMarker = new AMap.Marker({
+    position: [end?.longitude, end?.latitude],
+    icon: startImg
+  })
+  map.add(startMarker)
+  // 起点
+  const start = res.data.logisticsInfo.shift()
+  const marker2 = new AMap.Marker({
+    position: [start?.longitude, start?.latitude],
+    icon: endImg
+  })
+  map.add(marker2)
+```
+
+3）标记当前货运位置
+
+```ts
+import endImg from '@/assets/end.png'
+```
+
+```diff
+driving.search(
+  [start?.longitude, start?.latitude],
+  [end?.longitude, end?.latitude],
+  { waypoints: res.data.logisticsInfo.map((item) => [item.longitude, item.latitude]) },
+  (status: string, result: object) => {
+    // 未出错时，result即是对应的路线规划方案
+    console.log(status, result)
++    const marker = new AMap.Marker({
++      icon: carImg,
++      position: [
++        res.data.currentLocationInfo.longitude,
++        res.data.currentLocationInfo.latitude
++      ],
++      anchor: 'center'
++    })
++    map.add(marker)
++    setTimeout(() => {
++      map.setFitView([marker])
++      map.setZoom(9)
++    }, 3000)
++  }
+)   
+```

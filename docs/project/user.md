@@ -622,7 +622,7 @@ onMounted(async () => {
 
 ```ts
 const tools = [
-  { label: '我的问诊', path: '/consult' },
+  { label: '我的问诊', path: '/user/consult' },
   { label: '我的处方', path: '/' },
   { label: '家庭档案', path: '/user/patient' },
   { label: '地址管理', path: '/user/address' },
