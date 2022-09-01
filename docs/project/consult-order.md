@@ -1185,6 +1185,43 @@ const onSelect = (action: { text: string }, i: number) => {
 - 删除订单和查看处方一起实现
 
 
+## 问诊记录-复制订单号
+
+步骤：
+- 知道 useClipboard 基本用法
+- 使用 useClipboard 复制订单号
+
+代码：
+- [参考代码](https://github.com/vueuse/vueuse/blob/main/packages/core/useClipboard/demo.vue)
+```
+1. copy(需要拷贝的内容)
+2. copied 是否拷贝成功，默认1.5s恢复状态 
+```
+
+- 实现逻辑
+
+```ts
+import { useClipboard } from '@vueuse/core'
+import { Toast } from 'vant'
+```
+
+```ts
+const { copy, copied } = useClipboard()
+watch(copied, () => {
+  if (copied.value) Toast('已复制')
+})
+```
+
+```html
+        <van-cell title="订单编号">
+          <template #value>
+            <span class="copy" @click="copy(item?.orderNo || '')">复制</span>
+            {{ item.orderNo }}
+          </template>
+        </van-cell>
+```
+
+
 ## 问诊记录-支付抽屉组件封装
 
 

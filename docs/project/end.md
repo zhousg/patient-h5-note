@@ -1,11 +1,9 @@
 # 其他扩展
-[TOC]
 
-## 第三方登录
 
-### QQ登录流程
+## 第三方登录-QQ登录流程
 
-### 跳转QQ登录
+## 第三方登录-跳转QQ登录
 
 步骤：
 - 本地host配置
@@ -90,7 +88,7 @@ http://consult-patients.itheima.net:8080/login/callback#access_token=B417C0C3EBF
 ```
 
 
-### QQ登录-进行登录
+## 第三方登录-进行登录
 
 步骤：
 - 路由规则，加入登录白名单，基础结构
@@ -183,7 +181,7 @@ onMounted(() => {
 - `isBind` 是 `false` 需要显示绑定手机界面
 
 
-### QQ登录-绑定手机
+## 第三方登录-绑定手机
 
 步骤：
 - 准备基础页面
@@ -352,7 +350,7 @@ const loginSuccess = (res: { data: User }) => {
 ```
 
 
-### 验证码hook封装
+## 第三方登录-验证码hook封装
 
 步骤：
 - 分析 hook 需要传入参数，返回哪些数据
@@ -360,35 +358,68 @@ const loginSuccess = (res: { data: User }) => {
 - 使用 hook 函数
 
 代码：
+
 1）分析 hook 需要传入参数，返回哪些数据
 ```
 参数：
-1. 
+1. 手机号
+2. 发短信类型
 
 返回：
+1. form 表单响应式数据
+2. time 倒计时数据
+3. send 发送函数
 ```
 
+2）提取函数
+```ts
+import { Toast, type FormInstance } from 'vant'
+import { sendMobileCode } from '@/services/user'
+import type { CodeType } from '@/types/user'
+```
+```ts
+// 发送短信验证码吗逻辑
+export const useSendMobileCode = (mobile: Ref<string>, type: CodeType = 'login') => {
+  const form = ref<FormInstance>()
+  const time = ref(0)
+  let timeId: number
+  const send = async () => {
+    if (time.value > 0) return
+    await form.value?.validate('mobile')
+    await sendMobileCode(mobile.value, type)
+    Toast.success('发送成功')
+    time.value = 60
+    // 倒计时
+    clearInterval(timeId)
+    timeId = window.setInterval(() => {
+      time.value--
+      if (time.value <= 0) window.clearInterval(timeId)
+    }, 1000)
+  }
+  onUnmounted(() => {
+    window.clearInterval(timeId)
+  })
+  return { form, time, send }
+}
+```
 
-### 区分环境
+3）使用函数
+```ts
+const { form, time, send } = useSendMobileCode(mobile, 'bindMobile')
+```
+
+## 第三方登录-开发生产环境
+
+## 扩展-真机调试
+
+## 扩展-mock接口数据
+
+## 扩展-tailwindcss
+
+## 项目部署-pm2部署
 
 
-## 真机调试
-
-## mock接口数据
-
-## tailwindcss
+## 项目部署-腾讯云部署
 
 
-## 项目上线
-
-
-### 项目打包
-
-
-### pm2部署
-
-
-### 云自动部署
-
-
-### gitlab部署
+## 项目部署-gitlab部署(演示)
