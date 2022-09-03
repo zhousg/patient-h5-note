@@ -9,7 +9,7 @@
 - [演示项目](https://cp.itheima.net/)
 
 手机端演示：
-<video width="400" controls src="./images/cp-preview.mp4"></video>
+<video width="400" controls src="http://yjy-teach-oss.oss-cn-beijing.aliyuncs.com/app/test/20220903/202209032213177645201.mp4"></video>
 
 ## 能学到什么{#what}
 > 了解：在项目中会使用到哪些技术方案和特色业务
