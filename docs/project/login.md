@@ -483,7 +483,7 @@ const agree = ref(false)
 ```
 ```html
     <van-form autocomplete="off">
-      <van-field placeholder="请输入手机号"></van-field>
+      <van-field placeholder="请输入手机号" type="tel"></van-field>
       <van-field placeholder="请输入密码" type="password"></van-field>
       <div class="cp-cell">
         <van-checkbox v-model="agree">
@@ -647,7 +647,7 @@ const password = ref('')
 const show = ref(false)
 ```
 ```html
-<van-field v-model="mobile" placeholder="请输入手机号"></van-field>
+<van-field v-model="mobile" placeholder="请输入手机号" type="tel"></van-field>
 <van-field v-model="password" placeholder="请输入密码" :type="show ? 'text' : 'password'">
   <template #button>
     <cp-icon @click="show = !show" :name="`login-eye-${show ? 'on' : 'off'}`"></cp-icon>
@@ -684,7 +684,7 @@ export { mobileRules, passwordRules }
 import { mobileRules, passwordRules } from '@/utils/rules'
 ```
 ```diff
-+      <van-field v-model="mobile" :rules="mobileRules" placeholder="请输入手机号"></van-field>
++      <van-field v-model="mobile" :rules="mobileRules" placeholder="请输入手机号" type="tel"></van-field>
       <van-field
         v-model="password"
 +        :rules="passwordRules"
@@ -888,6 +888,7 @@ const send = async () => {
 +        name="mobile"
         :rules="mobileRules"
         placeholder="请输入手机号"
+        type="tel"
       ></van-field>
 ```
 ```ts
