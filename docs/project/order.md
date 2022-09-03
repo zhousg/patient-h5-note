@@ -432,7 +432,7 @@ const show = ref(false)
     <cp-pay-sheet
       :orderId="orderId"
       :actualPayment="orderPre.actualPayment"
-      payCallback="http://localhost:8080/order/pay/result"
+      payCallback="http://localhost/order/pay/result"
       v-model:show="show"
     />
 ```

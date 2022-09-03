@@ -343,7 +343,7 @@ defineProps<{ item: ConsultOrderItem }>()
 - 待支付：支付金额+取消问诊+去支付
 - 待接诊：取消问诊+继续沟通
 - 咨询中：查看处方（如果开了）+继续沟通
-- 已完成：更多（查看处方<如果开了>，删除订单）+问诊记录+（未评价?写评价:查看评价）
+- 已完成：更多（查看处方，如果开了，删除订单）+问诊记录+（未评价?写评价:查看评价）
 - 已取消：删除订单+咨询其他医生
 
 代码实现：
@@ -954,7 +954,7 @@ onMounted(async () => {
 - 待支付：支付金额+取消问诊+去支付
 - 待接诊：取消问诊+继续沟通
 - 咨询中：查看处方（如果开了）+继续沟通
-- 已完成：更多（查看处方<如果开了>，删除订单）+问诊记录+（未评价?写评价:查看评价）
+- 已完成：更多（查看处方，如果开了，删除订单）+问诊记录+（未评价?写评价:查看评价）
 - 已取消：删除订单+咨询其他医生
 
 代码实现：
@@ -1196,6 +1196,7 @@ const onSelect = (action: { text: string }, i: number) => {
 ```
 1. copy(需要拷贝的内容)
 2. copied 是否拷贝成功，默认1.5s恢复状态 
+3. isSupported 浏览器是否支持，需要授权读取粘贴板和写入粘贴板权限
 ```
 
 - 实现逻辑
@@ -1206,7 +1207,11 @@ import { Toast } from 'vant'
 ```
 
 ```ts
-const { copy, copied } = useClipboard()
+const { copy, copied, isSupported } = useClipboard()
+const onCopy = () => {
+  if (!isSupported.value) Toast('未授权，不支持')
+  copy(item.value?.orderNo || '')
+}
 watch(copied, () => {
   if (copied.value) Toast('已复制')
 })
@@ -1215,7 +1220,7 @@ watch(copied, () => {
 ```html
         <van-cell title="订单编号">
           <template #value>
-            <span class="copy" @click="copy(item?.orderNo || '')">复制</span>
+            <span class="copy" @click="onCopy()">复制</span>
             {{ item.orderNo }}
           </template>
         </van-cell>
@@ -1265,7 +1270,7 @@ const pay = async () => {
   const res = await getConsultOrderPayUrl({
     orderId: orderId,
     paymentMethod: paymentMethod.value,
-    payCallback: 'http://localhost:8080/room'
+    payCallback: 'http://localhost/room'
   })
   window.location.href = res.data.payUrl
 }

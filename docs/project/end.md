@@ -1,52 +1,52 @@
 # 其他扩展
 
-
 ## 第三方登录-QQ登录流程
+
+![image-20220902131335118](./images/image-20220902131335118.png)
+
+
+首先：
+- 需要在 [QQ互联](https://connect.qq.com/index.html) 平台注册。
+- 需要实名身份认证，审核通过。
+- 然后创建我的web应用，需要有网站域名，需要域名备案号，设置登录成功回跳地址，审核通过。
+- 得到 appid 和 回跳地址。
+
+```bash
+# 测试用 appid 
+# 100556005
+# 测试用 redirect_uri
+# http://consult-patients.itheima.net/login/callback
+```
+
+然后：
+
+- 
+
+
+
 
 ## 第三方登录-跳转QQ登录
 
 步骤：
-- 本地host配置
 - 引入QQ登录SDK
 - 生成QQ登录跳转链接
 - 登录后回跳成功
+- 本地host配置
 
 代码：
-1） 本地host配置
-`windows`
-```
-1. 找到 C:\Windows\System32\drivers\etc 下hosts文件
-2. 在文件中加入  127.0.0.1       consult-patients.itheima.net
-3. 保存即可。
-# 如果提示没有权限
-1. 将hosts文件移到桌面，然后进行修改，确认保存。
-2. 将桌面hosts文件替换c盘文件
-```
 
-
-`mac OS`
-```
-1. 打开命令行窗口
-2. 输入：sudo vim /etc/hosts
-3. 按下：i 键
-4. 输入：127.0.0.1       consult-patients.itheima.net
-5. 按下：esc
-6. 按下：shift + :
-7. 输入：wq 回车即可
-```
-
-2） 引入QQ登录SDK
+1） 引入QQ登录SDK
 
 `inde.html`
 ```vue
 <script
-  src="http://connect.qq.com/qc_jssdk.js"
+  src="https://connect.qq.com/qc_jssdk.js"
   data-appid="102015968"
-  data-redirecturi="http://consult-patients.itheima.net:8080/login/callback"
+  data-redirecturi="http://consult-patients.itheima.net/login/callback"
 ></script>
 ```
 
-3）生成QQ登录跳转链接，改成直接跳转
+2）生成QQ登录跳转链接，改成直接跳转
 
 ```ts
   onMounted(() => {
@@ -62,7 +62,7 @@
 以上可以审查元素看到登录链接，复制后改成 A 标签改成 href 跳转即可
 ```html
   <a
-    href="https://graph.qq.com/oauth2.0/authorize?client_id=102015968&response_type=token&scope=all&redirect_uri=http%3A%2F%2Fconsult-patients.itheima.net%3A8080%2Flogin%2Fcallback"
+    href="https://graph.qq.com/oauth2.0/authorize?client_id=102015968&response_type=token&scope=all&redirect_uri=http%3A%2F%2Fconsult-patients.itheima.net%2Flogin%2Fcallback"
   >
     <img src="@/assets/qq.svg" alt="" />
   </a>
@@ -80,12 +80,38 @@
 
 ![image-20220901163349489](./images/image-20220901163349489.png)
 
-4）登录后回跳成功
+3）登录后回跳成功
 
 链接如下，路由为 `/login/callback`
 ```
-http://consult-patients.itheima.net:8080/login/callback#access_token=B417C0C3EBF93A380A22A188A9C491A4&expires_in=7776000
+http://consult-patients.itheima.net/login/callback#access_token=B417C0C3EBF93A380A22A188A9C491A4&expires_in=7776000
 ```
+
+4） 本地host配置
+`windows`
+
+```
+1. 找到 C:\Windows\System32\drivers\etc 下hosts文件
+2. 在文件中加入  127.0.0.1       consult-patients.itheima.net
+3. 保存即可。
+# 如果提示没有权限
+1. 将hosts文件移到桌面，然后进行修改，确认保存。
+2. 将桌面hosts文件替换c盘文件
+```
+
+
+`mac OS`
+
+```
+1. 打开命令行窗口
+2. 输入：sudo vim /etc/hosts
+3. 按下：i 键
+4. 输入：127.0.0.1       consult-patients.itheima.net
+5. 按下：esc
+6. 按下：shift + :
+7. 输入：wq 回车即可
+```
+
 
 
 ## 第三方登录-进行登录
@@ -332,7 +358,7 @@ const bind = async () => {
 ```diff
         <a
 +          @click="store.setReturnUrl($route.query.returnUrl as string)"
-          href="https://graph.qq.com/oauth2.0/authorize?client_id=102015968&response_type=token&scope=all&redirect_uri=http%3A%2F%2Fconsult-patients.itheima.net%3A8080%2Flogin%2Fcallback"
+          href="https://graph.qq.com/oauth2.0/authorize?client_id=102015968&response_type=token&scope=all&redirect_uri=http%3A%2F%2Fconsult-patients.itheima.net%2Flogin%2Fcallback"
         >
           <img src="@/assets/qq.svg" alt="" />
         </a>
@@ -410,11 +436,94 @@ const { form, time, send } = useSendMobileCode(mobile, 'bindMobile')
 
 ## 第三方登录-开发生产环境
 
+
+
+步骤：
+
+- 知道使用 什么是开发环境和生成环境？
+  - run dev 是本地开发环境，run build 是线上生产环境
+- QQ回调地址：
+  - 线上：https://cp.itheima.net/login/callback
+  - 本地：http://consult-patients.itheima.net/login/callback
+- 支付回调
+  - 问诊支付
+    - 线上：https://cp.itheima.net/room
+    - 本地：http://consult-patients.itheima.net/room
+  - 药品支付
+    - 线上：https://cp.itheima.net/order/pay/result
+    - 本地：http://consult-patients.itheima.net/order/pay/result
+- 标题：生产环境（优医问诊），本地环境（本地-优医问诊）
+
+代码：
+
+`.env.development`
+```
+VITE_APP_CALLBACK=http://consult-patients.itheima.net
+VITE_APP_TITLE=本地-优医问诊
+```
+`.env.production`
+```
+VITE_APP_CALLBACK=https://cp.itheima.net
+VITE_APP_TITLE=优医问诊
+```
+
+1) 跳转QQ登录 `Login/index.vue`
+```ts
+const qqUrl = `https://graph.qq.com/oauth2.0/authorize?client_id=102015968&response_type=token&scope=all&redirect_uri=${encodeURIComponent(
+  import.meta.env.VITE_APP_CALLBACK + '/login/callback'
+)}`
+```
+```html 
+  <a @click="store.setReturnUrl($route.query.returnUrl as string)" :href="qqUrl">
+    <img src="@/assets/qq.svg" alt="" />
+  </a>
+```
+
+2）CpPaySheet 加入动态域名
+
+```diff
+  const res = await getConsultOrderPayUrl({
+    orderId: orderId,
+    paymentMethod: paymentMethod.value,
++    payCallback: import.meta.env.VITE_APP_CALLBACK + payCallback
+  })
+```
+
+3）配置问诊支付回调
+`Consult/ConsultPay.vue` `User/ConsultDetail.vue`
+```diff
+      <cp-pay-sheet
+        v-model:show="show"
+        :order-id="orderId"
+        :actualPayment="payInfo.actualPayment"
+        :onClose="onClose"
++        pay-callback="/room"
+      />
+```
+
+4）配置药品订单支付回调
+`Order/OrderPay.vue`
+```diff
+    <cp-pay-sheet
+      :orderId="orderId"
+      :actualPayment="orderPre.actualPayment"
+      v-model:show="show"
++      payCallback="/order/pay/result"
+    />
+```
+
+
+
+
+
 ## 扩展-真机调试
+
 
 ## 扩展-mock接口数据
 
+
 ## 扩展-tailwindcss
+
 
 ## 项目部署-pm2部署
 

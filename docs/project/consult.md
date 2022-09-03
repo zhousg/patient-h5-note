@@ -1417,7 +1417,7 @@ const agree = ref(false)
 
 回跳地址：
 ```
-http://localhost:8080/room
+http://localhost/room
 ```
 
 支付宝沙箱账号：
@@ -1550,7 +1550,7 @@ const pay = async () => {
   const res = await getConsultOrderPayUrl({
     orderId: orderId.value,
     paymentMethod: paymentMethod.value,
-    payCallback: 'http://localhost:8080/room'
+    payCallback: 'http://localhost/room'
   })
   window.location.href = res.data.payUrl
 }

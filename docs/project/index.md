@@ -5,6 +5,8 @@
 
 - [产品原型](https://app.mockplus.cn/s/Y-U4_XHGRx)
 - [产品设计](https://app.mockplus.cn/s/S77krW4rKh)
+- [接口文档](https://www.apifox.cn/apidoc/shared-16a58bff-e4db-465c-9c8b-859c839318ac)
+- [演示项目](https://cp.itheima.net/)
 
 ## 能学到什么{#what}
 > 了解：在项目中会使用到哪些技术方案
@@ -109,7 +111,6 @@ Done. Now run:
 
 
 可选：
-- `Tailwind CSS IntelliSense` 现代css框架的提示
 - `gitLens` 代码git提交记录提示
 - `json2ts` json自动转ts类型
 
