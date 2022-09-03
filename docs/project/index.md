@@ -9,7 +9,7 @@
 - [演示项目](https://cp.itheima.net/)
 
 手机端演示：
-<video width="400" controls src="/patient-h5-note/cp-preview.mp4"></video>
+<video width="400" controls src="./images/cp-preview.mp4"></video>
 
 ## 能学到什么{#what}
 > 了解：在项目中会使用到哪些技术方案和特色业务
