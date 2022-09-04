@@ -467,6 +467,8 @@ VITE_APP_CALLBACK=https://cp.itheima.net
 VITE_APP_TITLE=优医问诊
 ```
 
+**JS文件中**
+
 1) 跳转QQ登录 `Login/index.vue`
 ```ts
 const qqUrl = `https://graph.qq.com/oauth2.0/authorize?client_id=102015968&response_type=token&scope=all&redirect_uri=${encodeURIComponent(
@@ -512,17 +514,182 @@ const qqUrl = `https://graph.qq.com/oauth2.0/authorize?client_id=102015968&respo
     />
 ```
 
+**index.html中**
 
+安装 html 模板插件
+```bash
+pnpm add vite-plugin-html
+```
 
+`vite.config.ts`
+```ts
+import { createHtmlPlugin } from 'vite-plugin-html'
+```
+```ts
+plugins: [
+  createHtmlPlugin()
+]
+```
+`index.html`  `<%=环境变量名%>` 取出值
+```html
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%=VITE_APP_TITLE%></title>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+    <script
+      src="https://connect.qq.com/qc_jssdk.js"
+      data-appid="102015968"
+      data-redirecturi="<%=VITE_APP_CALLBACK%>/login/callback"
+    ></script>
+```
 
 
 ## 扩展-真机调试
 
+- 在 Chrome 浏览器中使用什么进行调试？
+  - 控制面板，开发者工具，F12
+- 在 手机端 浏览器使用什么进行调试呢？
+- Eruda 手机调试面板工具
+
+使用方式：https://github.com/liriliri/eruda
+
+`index.html`
+
+```html
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/eruda/2.4.1/eruda.min.js"></script>
+    <script>eruda.init()</script>
+```
+
+只在开发环境使用：
+```html
+    <% if(DEV){ %>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/eruda/2.4.1/eruda.min.js"></script>
+    <script>eruda.init()</script>
+    <% } %>
+```
+
+小结：
+- 使用 vite-plugin-html 解析模板，默认支持 ejs 模板引擎语法
+
+
 
 ## 扩展-mock接口数据
 
+https://www.npmjs.com/package/vite-plugin-mock
 
-## 扩展-tailwindcss
+1）安装 vite-plugin-mock mockjs
+```bash
+pnpm i vite-plugin-mock mockjs -D
+```
+
+2）使用插件扫描 `src/mock` 下文件
+```ts
+import { viteMockServe } from 'vite-plugin-mock'
+```
+```ts
+plugins: [
+  createHtmlPlugin()
+]
+```
+
+3）mock文件 `src/mock/index.ts`
+```ts
+import type { KnowledgeList } from '@/types/consult'
+import type { MockMethod } from 'vite-plugin-mock'
+import Mock from 'mockjs'
+
+const rules: MockMethod[] = [
+  {
+    url: '/patient/home/knowledge',
+    method: 'get',
+    timeout: 1000,
+    response: () => {
+      const rows: KnowledgeList = []
+      for (let i = 0; i < 5; i++) {
+        const item = Mock.mock({
+          id: '@id',
+          title: '@ctitle(10,20)',
+          coverUrl:
+            i % 2
+              ? ['https://yanxuan-item.nosdn.127.net/27afb774345de98c87dddf89042ab33a.jpg']
+              : [
+                  'https://yanxuan-item.nosdn.127.net/27afb774345de98c87dddf89042ab33a.jpg',
+                  'https://yanxuan-item.nosdn.127.net/b6e1cfa68ee53719b7ab2c8e0dc20916.jpg',
+                  'https://yanxuan-item.nosdn.127.net/17d32665d53e351aa499fb1e56796e58.jpg'
+                ],
+          topics: ['@ctitle(2,4)', '@ctitle(2,4)'],
+          collectionNumber: '@integer(10,100)',
+          commentNumber: '@integer(10,100)',
+          creatorName: '@cname',
+          creatorAvatar: 'https://yanxuan-item.nosdn.127.net/ca17e384dc1c005c24c06e1abfde6ab4.jpg',
+          creatorHospatalName: '积水潭医院',
+          likeFlag: '@integer(10,100)',
+          content: '@ctitle(30,60)',
+          creatorDep: '内科',
+          creatorTitles: '主任医师'
+        })
+        rows.push(item)
+      }
+      return {
+        code: 10000,
+        message: '获取数据成功',
+        data: {
+          pageTotal: 5,
+          total: 25,
+          rows
+        }
+      }
+    }
+  },
+  {
+    url: '/patient/message/list',
+    method: 'get',
+    timeout: 1000,
+    response: () => {
+      const data: {
+        id: string
+        avatar: string
+        title: string
+        lastContent: string
+        sendTime: string
+      }[] = []
+      for (let i = 0; i < 10; i++) {
+        data.push(
+          Mock.mock({
+            id: '@id',
+            avatar: '@image("100x100")',
+            title: '@ctitle(3,10)',
+            lastContent: '@ctitle(10,40)',
+            sendTime: '@datetime()'
+          })
+        )
+      }
+      return {
+        code: 10000,
+        message: '获取数据成功',
+        data
+      }
+    }
+  }
+]
+
+export default rules
+```
+ 
+
+使用注意：
+- 这些mock接口是  vite 本地服务器提供的，请求的时候不能带上其他服务器的域名
+  - `https://consult-api.itheima.net/xxx` × 其他服务
+  - `/xxx` √  本地服务
+  - `http://localhost/xxx` √  本地服务
+  - `http://consult-patients.itheima.net/xxx` √   hosts映射其实就是本地服务
+
+因为我们配置了 baseURL 使用 `/xxx` 都是走其他服务，需要走 mock 的时候可以写全域名。
 
 
 ## 项目部署-pm2部署
