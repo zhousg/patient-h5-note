@@ -102,7 +102,7 @@ pnpm create vite
 
 
 
-## 代码解析{#code-analysis}
+## 代码分析{#code-analysis}
 > 对vite初始化的代码进行分析
 
 1. 需要切换插件

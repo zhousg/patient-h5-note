@@ -18,9 +18,17 @@
 # http://consult-patients.itheima.net/login/callback
 ```
 
-然后：
 
-- 
+
+步骤：
+
+- 准备QQ登录按钮
+- 准备回跳页面
+  - 使用 openID 进行登录
+  - 登录成功，跳转到来源页面
+  - 登录失败，显示绑定手机界面
+    - 绑定成功，跳转到来源页面
+
 
 
 
@@ -680,7 +688,7 @@ const rules: MockMethod[] = [
 
 export default rules
 ```
- 
+
 
 使用注意：
 - 这些mock接口是  vite 本地服务器提供的，请求的时候不能带上其他服务器的域名
@@ -689,13 +697,158 @@ export default rules
   - `http://localhost/xxx` √  本地服务
   - `http://consult-patients.itheima.net/xxx` √   hosts映射其实就是本地服务
 
-因为我们配置了 baseURL 使用 `/xxx` 都是走其他服务，需要走 mock 的时候可以写全域名。
-
+因为我们配置了 baseURL 使用 `/xxx` 都是走其他服务，需要走 mock 的时候可以写全域名。待接口开发完毕后，去掉本地服务的域名即可。
 
 ## 项目部署-pm2部署
 
+1）本地打包
 
-## 项目部署-腾讯云部署
+```sh
+pnpm build
+```
+
+得到 dist 资源包
 
 
-## 项目部署-gitlab部署(演示)
+
+2）上传服务器
+
+服务器一般是 linux系统，使用 XFTP 进行文件的上传和下载（这个就不赘述了）
+
+
+
+3）服务器使用pm2进行部署（本地演示） [托管静态资源](https://pm2.keymetrics.io/docs/usage/expose/)
+
+全局安装：
+
+```sh
+npm i pm2 -g
+```
+
+进入dist：
+
+```sh
+# pm2 serve 目录 端口  --name 服务名称
+pm2 serve ./ 8080 --name my-cp-server
+```
+
+
+
+4）history路由模式问题，如果有子路径，刷新页面 404 
+
+原因：hostory 改变路由是前端切换，不会请求服务器，一旦刷新浏览器 `/consult/dep`按照这个地址请求服务器，是没有对应的资源的。
+
+解决：遇见子路径且没有后缀名，服务器定位到 ‘index.html’ 页面返回给前端即可。
+
+命令：
+
+```sh
+pm2 serve --spa ./ 8080 --name my-cp-server
+```
+
+
+
+pm2其他命令：
+
+```sh
+# 查看服务列表
+pm2 list
+# 删除服务
+pm2 delete my-cp-server
+```
+
+
+
+
+
+## 自动部署-腾讯云部署
+
+
+
+[腾讯云-Web应用托管](https://console.cloud.tencent.com/webify/index)
+
+- 注册，实名认证，才可以使用 webify 服务
+
+使用步骤演示：
+
+1）创建应用
+
+![image-20220905110845886](./images/image-20220905110845886.png)
+
+2）关联码云，需要码云授权
+
+![image-20220905111106986](./images/image-20220905111106986.png)
+
+3）选择需要使用的仓库
+
+![image-20220905111526726](./images/image-20220905111526726.png)
+
+4）构建配置
+
+![image-20220905111847289](./images/image-20220905111847289.png)
+
+![image-20220905111952307](./images/image-20220905111952307.png)
+
+
+
+5）进行构建
+
+![image-20220905112105818](./images/image-20220905112105818.png)
+
+![image-20220905112731150](./images/image-20220905112731150.png)
+
+6）尝试访问
+
+![image-20220905112907762](./images/image-20220905112907762.png)
+
+
+
+自动部署流程：
+
+![image-20220905113553768](./images/image-20220905113553768.png)
+
+
+
+## 自动部署-gitlab部署(演示)
+
+![image-20220905124702905](./images/image-20220905124702905.png)
+
+
+
+1. 本地Vscode编写代码
+2. gitlab是企业版，内部部署
+3. Linux服务器
+   1. 安装 gitlab-runner 用于拉取仓库代码
+   2. 安装 Nodejs 用于打包项目
+   3. 安装 pm2 用于启动静态资源托管，守护进程
+4. 运维使用 Nginx 进行域名代理
+5. 用户通过浏览器访问服务
+
+依赖于gitlab-ci.yml配置文件
+
+```text
+stages:
+  - build
+cache:
+  key: ${CI_BUILD_REF_NAME}
+  paths:
+    - node_modules/
+
+build-140:
+  stage: build
+  only:
+    - master
+  script:
+    - rm -rf node_modules/
+    - pnpm i
+    - pnpm build
+    - rm -rf /home/patient-h5-preview
+    - mkdir /home/patient-h5-preview
+    - cp -r dist/* /home/patient-h5-preview
+    - cd /home/patient-h5-preview
+    - pm2 delete patient-h5-preview || echo no
+    - pm2 serve --spa ./ 8083 --name patient-h5-preview
+  tags: 
+    - patient-h5-preview
+```
+
