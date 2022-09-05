@@ -13,11 +13,12 @@
 
 | 库名称  | 简介 |
 | :----| :----|
-| [ant-design-vue](https://antdv.com/docs/vue/introduce-cn/) | ant-design-vue 是 Ant Design 的 Vue 实现，组件的风格与 Ant Design 保持同步    |
-| [element-plus](https://antdv.com/docs/vue/introduce-cn/)   | Element Plus，一套为开发者、设计师和产品经理准备的基于 Vue 3.0 的桌面端组件库 |
-| [vant](https://vant-contrib.gitee.io/vant/v3/#/zh-CN)      | 有赞前端团队开源的移动端组件库，于 2016 年开源，已持续维护 4 年时间           |
-| [Naive UI](https://vant-contrib.gitee.io/vant/v3/#/zh-CN)  | 一个 Vue 3 组件库比较完整，主题可调，使用 TypeScript，不算太慢，有点意思      |
-| [VueUse](https://vueuse.org/)                              | 基于 composition 组合 api 的常用函数集合                                      |
+| [ant-design-vue](https://antdv.com/docs/vue/introduce-cn/) | PC端组件库：Ant Design 的 Vue 实现，开发和服务于企业级后台产品 |
+| [arco-design-vue](https://arco.design/vue)                 | PC端组件库：字节跳动出品的企业级设计系统                     |
+| [element-plus](https://element-plus.gitee.io/zh-CN/)       | PC端组件库：基于 Vue 3，面向设计师和开发者的组件库           |
+| [Naive UI](https://www.naiveui.com/zh-CN/)                 | PC端组件库：一个 Vue 3 组件库，比较完整，主题可调，使用 TypeScript，快，有点意思 |
+| [vant](https://vant-contrib.gitee.io/vant/v3/#/zh-CN)      | 移动端组件库：一个**轻量、可靠的移动端组件库**，于 2017 年开源 |
+| [VueUse](https://vueuse.org/)                              | 基于 composition 组合式 api 的常用函数集合                   |
 
 2. 相关文档
 
