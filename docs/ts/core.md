@@ -38,10 +38,10 @@ age = '19';
 TS 常用类型：
 
 - JS 已有类型
-  - 原始类型，简单类型，`number` `string` `boolean` `null` `undefined`
+  - 简单类型，`number` `string` `boolean` `null` `undefined`
   - 复杂类型，对象 数组 函数
 - TS 新增类型
-  - 联合类型、自定义类型(类型别名)、接口、元组、字面量类型、枚举、void、any 等
+  - 联合类型、自定义类型(类型别名)、接口、元组、字面量类型、枚举、void、any、泛型 等
 
 原始类型：
 
