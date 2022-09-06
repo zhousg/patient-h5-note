@@ -726,7 +726,7 @@ let id2 = getId({name:'jack'})
 - 刷新页面后，展示访问历史记录，记录包含：次数和时间。
 
 步骤：
-- 封装格式化时间函数，支持 Date 和 string 格式的时间，转换成功 `10:10:10` 时分秒
+- 封装格式化时间函数，支持 Date 和 string 格式的时间，可选参数，转换成功 `10:10:10` 时分秒
 - 定义访问记录单项 对象 类型，定义访问记录 列表 类型，需要存储在本地的 key 字面量类型
 - 封装获取访问历史记录函数，返回类型是  记录列表
 - 封装修改访问历史记录函数
@@ -739,7 +739,8 @@ export {};
 
 
 // 1. 封装格式化时间函数，支持 Date 和 string 格式的时间，转换成功 `10:10:10` 时分秒
-const formatTime = (date: Date | string): string => {
+const formatTime = (date?: Date | string): string => {
+  if (!date) date = new Date()
   if (typeof date === 'string') date = new Date(date)
   const h = date.getHours();
   const m = date.getMinutes();
@@ -770,7 +771,7 @@ const updateData = () => {
   const lastItem = list[list.length - 1];
   list.push({
     count: lastItem ? lastItem.count + 1 : 1,
-    time: formatTime(new Date()),
+    time: formatTime(),
   });
   localStorage.setItem(KEY, JSON.stringify(list));
 };
