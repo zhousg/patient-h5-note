@@ -319,7 +319,7 @@ const axios = (config: Config) => {};
 - 对象的可选参数怎么设置？`{name?: string}`
 - 对象类型会使用 `{}` 如何提供可阅读性？`类型别名`
 
-:::warning 作业
+:::warning 练习
 创建一个学生对象，该对象中具有以下属性和方法：
 
 - 属性：必选属性：姓名、性别、成绩，可选属性：身高
@@ -430,7 +430,7 @@ let o: Point3D = {
 
 > 了解：interface 和 type 的相同点和区别
 
-- 类型别名和接口非常相似，在许多情况下，您可以在它们之间`自由选择`。
+- 类型别名和接口非常相似，在许多情况下，可以在它们之间`自由选择`。
 - 接口的几乎所有特性都以类型的形式可用，关键的区别在于不能重新打开类型以添加新属性，而接口总是`可扩展`的。
 
 | interface      | type                     |
@@ -461,7 +461,7 @@ interface Person {
 interface Person {
   age: number;
 }
-// 类型会合并，注意：属性和方法不同重复定义
+// 类型会合并，注意：属性类型和方法类型不能重复定义
 const p: Person = {
   name: 'jack',
   age: 18,
@@ -717,58 +717,75 @@ let id2 = getId({name:'jack'})
 ```
 
 
-### 泛型约束{#generic-constraint}
-> 
-> 了解：使用泛型约束，实现对泛型类型进行收缩
+## 综合案例
+
+> 使用 TS 实现访问历史记录功能
+
+
+需求：
+- 刷新页面后，展示访问历史记录，记录包含：次数和时间。
+
+步骤：
+- 封装格式化时间函数，支持 Date 和 string 格式的时间，转换成功 `10:10:10` 时分秒
+- 定义访问记录单项 对象 类型，定义访问记录 列表 类型，需要存储在本地的 key 字面量类型
+- 封装获取访问历史记录函数，返回类型是  记录列表
+- 封装修改访问历史记录函数
+- 封装一个展示访问历史记录函数，且调用
+
+代码：
 
 ```ts
-// 代码报错
-function getId<T>(id: T): T {
-  console.log(id.length)
-  return id
-}
-getId([1, 2])
+export {};
+
+
+// 1. 封装格式化时间函数，支持 Date 和 string 格式的时间，转换成功 `10:10:10` 时分秒
+const formatTime = (date: Date | string): string => {
+  if (typeof date === 'string') date = new Date(date)
+  const h = date.getHours();
+  const m = date.getMinutes();
+  const s = date.getSeconds();
+  return `${h}:${m}:${s}`;
+};
+
+// 2. 定义访问记录单项 对象 类型，定义访问记录 列表 类型，需要存储在本地的 key 字面量类型
+type Data = {
+  count: number;
+  time: string;
+};
+
+type List = Array<Data>
+
+const KEY = "ts-demo-data";
+
+
+// 3. 封装获取访问历史记录函数，返回类型是  记录列表
+const getData = () => {
+  const str = localStorage.getItem(KEY);
+  return JSON.parse(str || "[]") as List;
+};
+
+// 4. 封装修改访问历史记录函数
+const updateData = () => {
+  const list = getData()
+  const lastItem = list[list.length - 1];
+  list.push({
+    count: lastItem ? lastItem.count + 1 : 1,
+    time: formatTime(new Date()),
+  });
+  localStorage.setItem(KEY, JSON.stringify(list));
+};
+
+// 5. 封装一个展示访问历史记录函数，且调用
+const render = () => {
+  updateData();
+  
+  const data = getData()
+  const app = document.querySelector("#app") as HTMLDivElement;
+  app.innerHTML = data
+    .map((item) => `次数：${item.count}，时间：${item.time}`)
+    .join("<br/>");
+};
+
+render();
 ```
-- 解释
-  - Type 可以代表任意类型，无法保证一定存在 length 属性，比如 number 类型就没有 length
-  - 需要为泛型添加约束来 `收缩类型` (缩窄类型取值范围)
-  - 实现泛型约束两种方式：1 指定更加具体的类型  2 添加约束
 
-
-1. 指定更加具体的类型
-
-```ts
-// 约束传入的参数有length属性，约定为数组
-function getId<T>(id: T[]): T[] {
-  console.log(id.length);
-  return id;
-}
-getId([1, 2]);
-```
-但是：除了数组，字符串也有length属性
-
-2. 添加约束
-
-```ts
-// 通过 `extends` 关键字使用该接口，为泛型(类型变量)添加约束
-// 注意：传入的实参(比如，数组)只要有 length 属性即可（类型兼容性)
-interface Len {
-  length: number;
-}
-function getId<T extends Len>(id: T): T {
-  console.log(id.length);
-  return id;
-}
-getId('1');
-getId(['2']);
-```
-
-解释:
-1. 创建描述约束的接口 Len，该接口要求提供 length 属性
-2. 通过 `extends` 关键字使用该接口，为泛型(类型变量)添加约束
-3. 该约束表示：**传入的类型必须具有 length 属性**
-
-:::tip
-- 泛型约束语法比较高级，一般用于框架封装，或者高级函数封装。
-- 还有class泛型，一般在node后台开发使用较多，今天也就不提及
-:::
