@@ -7,7 +7,23 @@
 > 初始化代码安装element-plus组件库
 
 - 克隆代码 `git@gitee.com:zhoushugang/vue3-demo-template.git`
+
+```bash
+git clone git@gitee.com:zhoushugang/vue3-demo-template.git
+```
+
+成功之后：
+```bash
+cd vue3-demo-template
+yarn 
+yarn dev
+```
+
 - 模板代码分析
+
+```bash
+yarn add element-plus
+```
 
 ```diff
 import { createApp } from 'vue'
