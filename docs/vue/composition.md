@@ -773,7 +773,7 @@ console.log(props.money)
 
 步骤：
 
-1. 子组件通过 `defineEmit `获取 `emit` 函数（因为没有this)
+1. 子组件通过 `defineEmits`获取 `emit` 函数（因为没有this)
 2. 子组件通过 `emit` 触发事件，并且传递数据
 3. 父组件提供方法
 4. 父组件通过自定义事件的方式给子组件注册事件

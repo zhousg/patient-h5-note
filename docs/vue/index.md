@@ -103,7 +103,7 @@ pnpm create vite
 
 vue3 组件代码和 vue2 有些不一样，使用的语法提示和高亮插件也不一样。
 
-- `vuter` 插件需要禁用，安装 `volar`插件。
+- `vetur` 插件需要禁用，安装 `volar`插件。
 
 ![image-20220713115203696](./images/image-20220713115203696.png)
 
