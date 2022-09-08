@@ -21,10 +21,11 @@ yarn dev
 
 - 模板代码分析
 
+安装 element-plus
 ```bash
 yarn add element-plus
 ```
-
+使用 element-plus
 ```diff
 import { createApp } from 'vue'
 import App from './App.vue'
