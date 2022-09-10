@@ -127,7 +127,7 @@ Done. Now run:
 - `Vue Language Features (Volar)` vue3语法支持 
 - `Eslint` 代码风格校验
 
-:::tip 提示
+:::warning 注意
 - vscode 安装了 `Prettier` 插件的可以先 `禁用`，或者关闭保存自动格式化功能，避免和项目的 `Eslint` 风格冲突。
 :::
 
