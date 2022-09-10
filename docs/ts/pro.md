@@ -48,25 +48,6 @@ const { money, car = '小黄车' } = defineProps<{
 </script>
 ```
 
-
-
-如果提供的默认值需要在模板中渲染，需要额外添加配置
-
-https://vuejs.org/guide/extras/reactivity-transform.html#explicit-opt-in
-
-```ts
-// vite.config.ts
-export default {
-  plugins: [
-    vue({
-      reactivityTransform: true
-    })
-  ]
-}
-```
-
-
-
 ## defineEmits与Typescript{#ts-define-emits}
 
 > 掌握：defineEmits的使用
