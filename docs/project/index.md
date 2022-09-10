@@ -125,7 +125,6 @@ Done. Now run:
 
 必装：
 - `Vue Language Features (Volar)` vue3语法支持
-- `TypeScript Vue Plugin (Volar)` vue3项目ts支持
 - `Eslint` 代码风格校验
 
 :::tip 提示
@@ -139,7 +138,7 @@ Done. Now run:
 
 
 提示：
-- 如果在大型ts项目中建议开启 [TS托管模式](https://staging-cn.vuejs.org/guide/typescript/overview.html#takeover-mode) , 现在我们的项目不开启也不影响。
+- 建议开启 [TS托管模式](https://staging-cn.vuejs.org/guide/typescript/overview.html#takeover-mode) , 更好更快的类型提示，
 
 
 
