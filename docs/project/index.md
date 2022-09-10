@@ -124,7 +124,7 @@ Done. Now run:
 > 安装：项目开发需要的一些插件
 
 必装：
-- `Vue Language Features (Volar)` vue3语法支持
+- `Vue Language Features (Volar)` vue3语法支持 
 - `Eslint` 代码风格校验
 
 :::tip 提示
