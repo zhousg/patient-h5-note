@@ -172,10 +172,12 @@ function handleChange(event) {
 
 处理类型：
 ```ts
-// 1. handleChange($event) 查看$event类型
+// `event` 隐式地标注为 `any` 类型，如何指定：event 类型?
+// 1. @change="handleChange($event)"" 查看$event类型
+// 2. 鼠标摸一下事件 @change 查看类型
 function handleChange(event: Event) {
-  // `event` 隐式地标注为 `any` 类型
-  // 2. document.querySelector('input') 查看返回值类型
+  // `event.target` 是 `EventTarget | null` 类型，如何指定具体类型？
+  // document.querySelector('input') 查看返回值类型
   console.log((event.target as HTMLInputElement).value)
 }
 ```
@@ -189,7 +191,7 @@ function handleChange(event: Event) {
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 
-const el = ref<HTMLInputElement>()
+const el = ref<HTMLInputElement| null>(null)
 
 onMounted(() => {
   el.value?.focus()
