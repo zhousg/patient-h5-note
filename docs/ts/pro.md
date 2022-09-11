@@ -7,7 +7,7 @@ typescript 配合 Vue3 composition-api 使用
 https://staging-cn.vuejs.org/guide/typescript/composition-api.html
 :::
 
-## defineProps与Typescript{#ts-define-props}
+## defineProps的TS写法{#ts-define-props}
 > 掌握：ts中defineProps的使用
 
 1. defineProps 的基本使用：
@@ -48,22 +48,29 @@ const props = withDefaults(defineProps<{
 })
 ```
 
-4. 上面写法太笨拙，可以使用 [响应式语法糖](https://cn.vuejs.org/guide/extras/reactivity-transform.html#reactive-props-destructure) 使用结构 + defineProps<类型> 就行：
+4. 上面写法太笨拙，可以使用 [响应式语法糖](https://cn.vuejs.org/guide/extras/reactivity-transform.html#reactive-props-destructure) 解构 + defineProps 就行：
 
 ```ts
-<script lang="ts" setup>
-// 使用ts的泛型指令props类型
 const { money, car = '宝马车' } = defineProps<{
   money: number
   car?: string
 }>()
-</script>
 ```
 注意：目前需要 [显式地选择开启](https://cn.vuejs.org/guide/extras/reactivity-transform.html#explicit-opt-in) ，因为它还是一个实验性特性。
 
+```ts
+// vite.config.ts
+export default defineConfig({
+  plugins: [
+    vue({
+      reactivityTransform: true,
+    }),
+  ],
+});
+```
 
 
-## defineEmits与Typescript{#ts-define-emits}
+## defineEmits的TS写法{#ts-define-emits}
 
 > 掌握：defineEmits的使用
 
@@ -84,7 +91,7 @@ const emit = defineEmits<{
 - 基于类型的声明使我们可以对所触发事件的类型进行更细粒度的控制。
 
 
-## ref与Typescript{#ts-ref}
+## ref的TS写法{#ts-ref}
 
 > 掌握：ts中ref函数如何使用
 
@@ -114,7 +121,7 @@ setTimeout(() => {
 })
 ```
 
-## reactive与TypeScript{#ts-reactive}
+## reactive的TS写法{#ts-reactive}
 > 掌握：ts中reactive函数的使用
 
 `reactive()` 也会隐式地从它的参数中推导类型：
@@ -126,7 +133,7 @@ import { reactive } from 'vue'
 const book = reactive({ title: 'Vue 3 指引' })
 ```
 
-要显式地标注一个 reactive property 的类型，我们可以使用接口：
+要显式地标注一个 reactive property 的类型，我们可以使用接口或类型别名：
 
 ```ts
 import { reactive } from 'vue'
