@@ -166,13 +166,13 @@ import ArticleList from './components/ArticleList.vue'
 </script>
 
 <template>
-  <ChannelNav />
-  <ArticleList />
+  <ChannelNav></ChannelNav>
+  <ArticleList></ArticleList>
 </template>
 ```
 
 ## axios 与 TypeScript{#axios-and-ts}
->掌握：掌握axios配合泛型设置响应数据类型
+>掌握：掌握axios配合泛型，设置响应数据类型
 
 ```vue
 <script setup lang="ts">
