@@ -8,7 +8,6 @@ https://staging-cn.vuejs.org/guide/typescript/composition-api.html
 :::
 
 ## defineProps的TS写法{#ts-define-props}
-> 掌握：ts中defineProps的使用
 
 1. defineProps 的基本使用：
 
@@ -51,10 +50,10 @@ const props = withDefaults(defineProps<{
 4. 上面写法太笨拙，可以使用 [响应式语法糖](https://cn.vuejs.org/guide/extras/reactivity-transform.html#reactive-props-destructure) 解构 + defineProps 就行：
 
 ```ts
-const { money, car = '宝马车' } = defineProps<{
+const { money, car = "宝马车" } = defineProps<{
   money: number
   car?: string
-}>()
+}>();
 ```
 注意：目前需要 [显式地选择开启](https://cn.vuejs.org/guide/extras/reactivity-transform.html#explicit-opt-in) ，因为它还是一个实验性特性。
 
@@ -69,18 +68,15 @@ export default defineConfig({
 });
 ```
 
-
 ## defineEmits的TS写法{#ts-define-emits}
 
-> 掌握：defineEmits的使用
-
-1. defineEmits配合运行时声明
+1. defineEmits 的基本用法：
 
 ```ts
-const emit = defineEmits(['change', 'update'])
+const emit = defineEmits(['changeMoney', 'changeCar'])
 ```
 
-2. defineEmits配合ts 类型声明，可以实现更细粒度的校验
+2. defineEmits 通过泛型参数来定义，可以实现更细粒度的校验：
 
 ```ts
 const emit = defineEmits<{
@@ -88,22 +84,23 @@ const emit = defineEmits<{
   (e: 'changeCar', car: string): void
 }>()
 ```
-- 基于类型的声明使我们可以对所触发事件的类型进行更细粒度的控制。
+
+了解：扩展TS语法 [调用签名](https://www.typescriptlang.org/docs/handbook/2/functions.html#call-signatures)
 
 
 ## ref的TS写法{#ts-ref}
 
-> 掌握：ts中ref函数如何使用
+`ref()` 会隐式的依据数据推导类型
 
-1. 通过泛型指定value的值类型，如果是简单值，该类型可以省略
+1. 如果是简单类型，推荐使用类型推导：
 
 ```ts
-const money = ref<number>(10)
+// const money = ref<number>(10)
 
 const money = ref(10)
 ```
 
-2. 如果是复杂类型，推荐指定泛型
+2. 如果是复杂类型，推荐指定泛型：
 
 ```ts
 type Todo = {
@@ -118,35 +115,35 @@ setTimeout(() => {
     { id: 1, name: '吃饭', done: false },
     { id: 2, name: '睡觉', done: true }
   ]
-})
+}, 1000)
 ```
+复杂数据一般是后台返回数据，默认值是空，无法进行类型推导。
+
 
 ## reactive的TS写法{#ts-reactive}
-> 掌握：ts中reactive函数的使用
 
-`reactive()` 也会隐式地从它的参数中推导类型：
+`reactive()` 也会隐式的依据数据推导类型
+
+1. 默认值属性是固定的，推荐使用类型推导：
 
 ```ts
-import { reactive } from 'vue'
-
 // 推导得到的类型：{ title: string }
-const book = reactive({ title: 'Vue 3 指引' })
+const book = reactive({ title: 'Vue3 在线医疗' })  
 ```
 
-要显式地标注一个 reactive property 的类型，我们可以使用接口或类型别名：
+2. 根据默认值推导不出我们需要的类型，推荐使用接口或者类型别名给变量指定类型：
 
 ```ts
-import { reactive } from 'vue'
-
-interface Book {
+// 我们想要的类型：{ title: string, year?: number }
+type Book = {
   title: string
   year?: number
 }
-
-const book: Book = reactive({ title: 'Vue 3 指引' })
+const book: Book = reactive({ title: 'Vue3 在线医疗' })
+book.year = 2022
 ```
 
-- 不推荐使用 `reactive()` 的泛型参数，因为底层和ref实现不一样。
+- 官方：不推荐使用 `reactive()` 的泛型参数，因为底层和 `ref()` 实现不一样。
 
 
 
