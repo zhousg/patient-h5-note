@@ -218,6 +218,50 @@ onMounted(() => {
 - 这是因为直到组件被挂载前，这个 `ref` 的值都是初始的 `null`，并且在由于 `v-if` 的行为将引用的元素卸载时也可以被设置为 `null`。
 
 
+## 非空断言{#ts-non-null}
+
+处理类型可能是 null 或 undefined 的值，下面的属性或函数的访问赋值：
+
+1. 可选链
+
+```vue
+<script setup lang="ts">
+import { onMounted, ref } from 'vue';
+
+
+const input = ref< HTMLInputElement | null >(null)
+
+onMounted(()=>{
+  // 只能访问
+  console.log(input.value?.value);
+})
+
+</script>
+
+<template>
+  <div>App组件</div>
+  <input type="text" ref="input" value="abc">
+</template>
+```
+
+2. 逻辑判断
+
+```ts
+  if (input.value) {
+    console.log(input.value.value)
+    input.value.value = '123'
+  }
+```
+
+3. 非空断言
+
+```ts
+  // 一定要确定不为空！！！
+  console.log(input.value!.value)
+  input.value!.value = '123'
+```
+
+
 ## ② TypeScript类型声明文件{#ts-declare}
 :::tip
 typescript 类型声明文件相关知识
@@ -280,7 +324,7 @@ TypeScript 给 JS 运行时可用的所有标准化内置 API 都提供了声明
 - 导入 axios 后就会加载对应的类型文件，提供该库的类型声明。
 
 情况2：由 DefinitelyTyped 提供
-- 比如：lodash，安装后导入，提示：需要安装 `@types/lodash` 类型声明包
+- 比如：jquery，安装后导入，提示：需要安装 `@types/jquery` 类型声明包
 - [DefinitelyTyped](https://github.com/DefinitelyTyped/DefinitelyTyped/) 是一个 github 仓库，用来提供高质量 TypeScript 类型声明
 - 当安装 `@types/*` 类型声明包后，TS 也会自动加载该类声明包，以提供该库的类型声明
 
@@ -289,7 +333,7 @@ https://www.typescriptlang.org/dt/search  可以搜索是否有对应的 `@types
 
 ## 自定义类型声明文件{#ts-declare-custom}
 
-### 共享类型 ☆☆☆
+### 共享类型(重要)
 > 掌握：使用类型声明文件提供需要共享的TS类型
 
 - 如果多个 `.ts` 文件中都用到同一个类型，此时可以创建 `.d.ts` 文件提供该类型，实现类型共享。
@@ -319,7 +363,7 @@ const p: Person = {
 ```
 
 
-### 给JS文件提供类型{#ts-declare-with-js}
+### 给JS文件提供类型
 > 了解：使用类型声明文件给JS文件添加类型
 
 - 在导入 .js 文件时，TS 会自动加载与 .js 同名的 .d.ts 文件，以提供类型声明。
@@ -334,11 +378,11 @@ const add = (a, b) => {
   return a + b;
 };
 
-const ponit = (p) => {
+const point = (p) => {
   console.log('坐标：', p.x, p.y);
 };
 
-export { add, ponit }
+export { add, point }
 ```
 `add/index.d.ts`
 ```ts
