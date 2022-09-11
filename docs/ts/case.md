@@ -288,8 +288,8 @@ const channelId = ref(0)
 </script>
 
 <template>
-  <ChannelNav :channelId="channelId" />
-  <ArticleList />
+  <ChannelNav :channelId="channelId"></ChannelNav>
+  <ArticleList></ArticleList>
 </template>
 ```
 `ChannelNav.vue`
@@ -337,7 +337,7 @@ const channelId = ref(0)
 ```
 `App.vue`
 ```xml
-<ChannelNav :channelId="channelId" @change-channel="channelId = $event"/>
+<ChannelNav :channelId="channelId" @change-channel="channelId = $event"></ChannelNav>
 ```
 
 ## 列表更新{#case-list}
@@ -384,7 +384,7 @@ export type ArticleResData = {
 
 `App.vue`
 ```xml
-<ArticleList :channelId="channelId"/>
+<ArticleList :channelId="channelId"></ArticleList>
 ```
 `ArticleList.vue`
 ```ts
