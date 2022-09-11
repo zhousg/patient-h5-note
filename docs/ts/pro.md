@@ -393,15 +393,15 @@ type Position = {
   y: number;
 };
 
-declare const ponit: (p: Position) => void;
+declare const point: (p: Position) => void;
 
-export { add , ponit};
+export { add , point};
 ```
 `main.ts`
 ```ts
-import { add , ponit} from './add';
+import { add , point} from './add';
 
 add(3, 10)
 
-ponit({x: 100, y: 200})
+point({x: 100, y: 200})
 ```
