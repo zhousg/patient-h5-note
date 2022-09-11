@@ -10,43 +10,58 @@ https://staging-cn.vuejs.org/guide/typescript/composition-api.html
 ## defineProps与Typescript{#ts-define-props}
 > 掌握：ts中defineProps的使用
 
-1. defineProps的运行时写法
+1. defineProps 的基本使用：
 
 ```ts
-// 运行时声明
-defineProps({
+const props = defineProps({
   money: {
     type: Number,
     required: true
   },
   car: {
     type: String,
-    required: true
+    required: false,
+    default: '宝马车'
   }
 })
+console.log(props.money) // number
+console.log(props.car) // string | undefined
 ```
 
-2. defineProps配合ts的泛型定义props类型校验，这样更直接
+2. defineProps 通过泛型参数来定义 props 的类型通常更直接：
 
 ```ts
-// 使用ts的泛型指令props类型
-defineProps<{
+const props = defineProps<{
   money: number
   car?: string
 }>()
 ```
 
-3. props可以通过解构来指定默认值
+3. 如果需要给 props 设置默认值，需要使用 `withDefaults` 函数：
+
+```ts
+const props = withDefaults(defineProps<{
+  money: number;
+  car?: string;
+}>(),{
+  car: '宝马车'
+})
+```
+
+4. 上面写法太笨拙，可以使用 [响应式语法糖](https://cn.vuejs.org/guide/extras/reactivity-transform.html#reactive-props-destructure) 使用结构 + defineProps<类型> 就行：
 
 ```ts
 <script lang="ts" setup>
 // 使用ts的泛型指令props类型
-const { money, car = '小黄车' } = defineProps<{
+const { money, car = '宝马车' } = defineProps<{
   money: number
   car?: string
 }>()
 </script>
 ```
+注意：目前需要 [显式地选择开启](https://cn.vuejs.org/guide/extras/reactivity-transform.html#explicit-opt-in) ，因为它还是一个实验性特性。
+
+
 
 ## defineEmits与Typescript{#ts-define-emits}
 
