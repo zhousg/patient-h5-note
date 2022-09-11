@@ -147,39 +147,31 @@ book.year = 2022
 
 
 
-## computed与Typescript{#ts-computed}
+## computed和TS{#ts-computed}
 
-`computed()` 会从其计算函数的返回值上推导出类型：
+1. `computed()` 会从其计算函数的返回值上推导出类型：
 
 ```ts
 import { ref, computed } from 'vue'
 
-const count = ref(0)
-
-// 推导得到的类型：ComputedRef<number>
-const double = computed(() => count.value * 2)
-
-// => TS Error: Property 'split' does not exist on type 'number'
-const result = double.value.split('')
+const count = ref(100);
+const doubleCount = computed(() => count.value * 2);
 ```
 
-你还可以通过泛型参数显式指定类型：
+2. 可以通过泛型参数显式指定类型：
 
 ```ts
-const double = computed<number>(() => {
-  // 若返回值不是 number 类型则会报错
-})
+const doubleMoney = computed<string>(() => (count.value * 2).toFixed(2));
 ```
 
 
-## 事件处理与Typescript{#ts-event}
-> 掌握：在ts中如何给事件处理加类型
+## 事件处理与TS{#ts-event}
 
-没加类型：
+1. 不加类型，event默认是any，类型不安全：
 ```vue
 <script setup lang="ts">
-function handleChange(event) {
-  // `event` implicitly has `any` type
+// 提示：参数“event”隐式具有“any”类型。  
+const handleChange = (event) => {
   console.log(event.target.value)
 }
 </script>
@@ -189,20 +181,20 @@ function handleChange(event) {
 </template>
 ```
 
-处理类型：
+2. 处理类型：
+
 ```ts
 // `event` 隐式地标注为 `any` 类型，如何指定：event 类型?
 // 1. @change="handleChange($event)"" 查看$event类型
 // 2. 鼠标摸一下事件 @change 查看类型
-function handleChange(event: Event) {
+const handleChange = (event: Event) => {
   // `event.target` 是 `EventTarget | null` 类型，如何指定具体类型？
   // document.querySelector('input') 查看返回值类型
   console.log((event.target as HTMLInputElement).value)
 }
 ```
 
-## Template Ref与Typescript{#ts-ref-attr}
-> 掌握：在ts中通过ref获取dom的操作
+## Template Ref与TS{#ts-ref-attr}
 
 模板 `ref` 需要通过一个显式指定的泛型参数，（）不设置默认值
 
