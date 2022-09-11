@@ -23,10 +23,6 @@ img {
 .vp-doc :not(pre) > code {
   color: #fa7700;
 }
-.vp-doc [class*='language-'] code {
-  padding: 0;
-}
-
 
 .home-container {
   margin: 0 auto;
