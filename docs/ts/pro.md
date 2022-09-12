@@ -7,6 +7,12 @@ typescript 配合 Vue3 composition-api 使用
 https://staging-cn.vuejs.org/guide/typescript/composition-api.html
 :::
 
+前提：script 加上 `lang="ts"` 才能写ts代码
+```vue
+<script setup lang="ts"></script>
+```
+
+
 ## defineProps的TS写法{#ts-define-props}
 
 1. defineProps 的基本使用：
@@ -196,7 +202,7 @@ const handleChange = (event: Event) => {
 
 ## Template Ref与TS{#ts-ref-attr}
 
-模板 `ref` 需要通过一个显式指定的泛型参数，（）不设置默认值
+模板 `ref` 需要通过一个显式指定的泛型参数，建议默认值 `null`
 
 ```vue
 <script setup lang="ts">
