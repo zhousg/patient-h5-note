@@ -111,7 +111,7 @@ const store = useCounterStore()
 | Vuex                 | Pinia                               |
 | -------------------- | ----------------------------------- |
 | state                | `ref` 和 `reactive`创建的响应式数据 |
-| getter               | `computed` 创建的计算属性           |
+| getters               | `computed` 创建的计算属性           |
 | mutations 和 actions | 普通函数，同步异步均可              |
 
 - 使用Pinia与在组件中维护数据大体相同，这就是 `Pinia` 的状态管理基本使用
