@@ -271,6 +271,19 @@ export default router
 
 代码：
 
+`types/user.d.ts`
+```ts
+// 用户信息
+export type User = {
+  token: string
+  id: string
+  account: string
+  mobile: string
+  avatar: string
+}
+```
+
+`stores/user.ts`
 ```ts
 import type { User } from '@/types/user'
 import { defineStore } from 'pinia'
