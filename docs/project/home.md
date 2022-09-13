@@ -57,7 +57,7 @@
     .search {
       height: 40px;
       border-radius: 20px;
-      box-shadow: 0px 15px 22px -7px rgba(224, 236, 250, 0.82);
+      box-shadow: 0px 15px 22px -7px rgba(224, 236, 250, 0.8);
       background-color: #fff;
       display: flex;
       align-items: center;
@@ -315,7 +315,7 @@ import KnowledgeCard from './KnowledgeCard.vue'
       margin-right: 10px;
     }
     .info {
-      width: 226px;
+      width: 200px;
       padding-right: 10px;
       .name {
         color: var(--cp-text2);

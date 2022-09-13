@@ -456,7 +456,7 @@ pnpm add vant
 ```
 
 样式：`main.ts`
-```ts{5,6,11}
+```ts{5,6}
 import { createApp } from 'vue'
 import App from './App.vue'
 import pinia from './stores'
@@ -470,11 +470,10 @@ const app = createApp(App)
 app.use(pinia)
 app.use(router)
 app.mount('#app')
-
 ```
 
 
-使用：`App.vue`
+组件按需使用：`App.vue`
 ```vue
 <script setup lang="ts">
 import { Button as VanButton } from 'vant'
