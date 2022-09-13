@@ -173,6 +173,12 @@ Done. Now run:
 - vue 组件需要大驼峰命名，除去 index 之外，App 是默认支持的
 - 允许对 props 进行解构，我们会开启解构保持响应式的语法糖
 
+执行：
+```bash
+# 修复格式
+pnpm lint
+```
+
 vscode 开启 eslint  自动修复
 ```json
     "editor.codeActionsOnSave": {
