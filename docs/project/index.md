@@ -325,7 +325,7 @@ pnpm i pinia-plugin-persistedstate
 # or
 npm i pinia-plugin-persistedstate
 # or
-arn add pinia-plugin-persistedstate
+yarn add pinia-plugin-persistedstate
 ```
 - 使用 `main.ts`
 ```ts{1,4}
