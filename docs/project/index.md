@@ -136,6 +136,7 @@ Done. Now run:
 可选：
 - `gitLens` 代码git提交记录提示
 - `json2ts` json自动转ts类型
+- `Error Lens` 行内错误提示
 
 
 提示：
@@ -222,7 +223,7 @@ pnpm add sass -D
 ```ts
 import { createRouter, createWebHistory } from 'vue-router'
 
-// createRouter 创建络实例，===> new VueRouter()
+// createRouter 创建路由实例，===> new VueRouter()
 // history 是路由模式，hash模式，history模式
 // createWebHistory() 是开启history模块   http://xxx/user
 // createWebHashHistory() 是开启hash模式    http://xxx/#/user
