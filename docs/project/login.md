@@ -73,7 +73,7 @@ import { Button as VanButton, Checkbox as VanCheckbox } from 'vant'
 }  
 ```
 
-或者安装：Vue 3 Snippets 插件，快捷键可以看插件[文档](https://github.com/hollowtree/vscode-vue-snippets)。
+或者安装：vue-vscode-snippets 插件，快捷键可以看插件[文档](https://github.com/sdras/vue-vscode-snippets)。
 
 ## css变量主题定制{#css-var}
 
