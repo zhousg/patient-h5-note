@@ -949,104 +949,6 @@ onMounted(() => {
 - vue3 中 v-model:xxx 语法糖？
   - `:xxx="count"` 和 `@update:xxx="count=$event"`
 
-
-## 家庭档案-侧边栏显示隐藏{#patient-popup}
-> 实现：使用 van-popup 完成侧边栏效果
-
-需求：
-- 使用 van-popup 组件，实现显示隐藏
-- 不使用 v-model 实现父子数据同步，理解语法糖
-- 扩展 cp-nav-bar 组件，支持自定义返回
-
-代码：
-
-1）使用 van-popup 组件，实现显示隐藏 `User/PatientPage.vue`
-
-```ts
-// 2. 打开侧滑栏
-const show = ref(false)
-const showPopup = () => {
-  show.value = true
-}
-```
-```html
-    <!-- 侧边栏 -->
-    <van-popup v-model:show="show" position="right">
-      <cp-nav-bar title="添加患者" right-text="保存"></cp-nav-bar>
-    </van-popup>
-```
-```scss
-.patient-page {
-  padding: 46px 0 80px;
-  ::v-deep() {
-    .van-popup {
-      width: 80%;
-      height: 100%;
-    }
-  }
-}
-```
-
-2) 不使用 v-model 实现父子数据同步，理解语法糖
-
-```html
-    <van-popup :show="show" @update:show="show=$event" position="right">
-      <cp-nav-bar title="添加患者" right-text="保存"></cp-nav-bar>
-    </van-popup>
-```
-这种写法麻烦，知道写法即可，一般使用 `v-model:show="show"`
-
-3) 扩展 cp-nav-bar 组件，支持自定义返回
-
-扩展 back 属性，如果有就执行 back 对应的函数。
-
-```diff
-const router = useRouter()
-const onClickLeft = () => {
-+  if (props.back) {
-+    return props.back()
-+  }
-  // 判断历史记录中是否有回退
-  if (history.state?.back) {
-    router.back()
-  } else {
-    router.push('/')
-  }
-}
-
-// 2. 使用组件时候才能确定的功能：标题，右侧文字，点击右侧文字行为（props传入）
-+const props = defineProps<{
-  title?: string
-  rightText?: string
-+  back?: () => void
-}>()
-```
-
-`User/PatientPage.vue` 全屏展示，空出导航栏
-
-```html
-<cp-nav-bar :back="() => (show = false)" title="添加患者" right-text="保存"></cp-nav-bar>
-```
-```scss
-.patient-page {
-  padding: 46px 0 80px;
-  ::v-deep() {
-    .van-popup {
-      width: 80%;
-      height: 100%;
-      padding-top: 46px;
-      box-sizing: border-box;
-    }
-  }
-}
-```
-
-小结：
-- 属性可以传函数吗？
-  - 可以
-- popup 组件怎么双向绑定？
-  - v-model:show
-
 ## cp-radio-btn 组件封装{#patient-cp-radio-btn}
 > 实现：按钮组单选框组件
 
@@ -1232,6 +1134,104 @@ const toggleItem = (value: string | number) => {
   - 提供可选项
 - `v-model` 语法糖，拆分写法？
   - `:modelValue="count"` 和 `@update:modelValue="count=$event"`
+
+
+## 家庭档案-侧边栏显示隐藏{#patient-popup}
+> 实现：使用 van-popup 完成侧边栏效果
+
+需求：
+- 使用 van-popup 组件，实现显示隐藏
+- 不使用 v-model 实现父子数据同步，理解语法糖
+- 扩展 cp-nav-bar 组件，支持自定义返回
+
+代码：
+
+1）使用 van-popup 组件，实现显示隐藏 `User/PatientPage.vue`
+
+```ts
+// 2. 打开侧滑栏
+const show = ref(false)
+const showPopup = () => {
+  show.value = true
+}
+```
+```html
+    <!-- 侧边栏 -->
+    <van-popup v-model:show="show" position="right">
+      <cp-nav-bar title="添加患者" right-text="保存"></cp-nav-bar>
+    </van-popup>
+```
+```scss
+.patient-page {
+  padding: 46px 0 80px;
+  ::v-deep() {
+    .van-popup {
+      width: 80%;
+      height: 100%;
+    }
+  }
+}
+```
+
+2) 不使用 v-model 实现父子数据同步，理解语法糖
+
+```html
+    <van-popup :show="show" @update:show="show=$event" position="right">
+      <cp-nav-bar title="添加患者" right-text="保存"></cp-nav-bar>
+    </van-popup>
+```
+这种写法麻烦，知道写法即可，一般使用 `v-model:show="show"`
+
+3) 扩展 cp-nav-bar 组件，支持自定义返回
+
+扩展 back 属性，如果有就执行 back 对应的函数。
+
+```diff
+const router = useRouter()
+const onClickLeft = () => {
++  if (props.back) {
++    return props.back()
++  }
+  // 判断历史记录中是否有回退
+  if (history.state?.back) {
+    router.back()
+  } else {
+    router.push('/')
+  }
+}
+
+// 2. 使用组件时候才能确定的功能：标题，右侧文字，点击右侧文字行为（props传入）
++const props = defineProps<{
+  title?: string
+  rightText?: string
++  back?: () => void
+}>()
+```
+
+`User/PatientPage.vue` 全屏展示，空出导航栏
+
+```html
+<cp-nav-bar :back="() => (show = false)" title="添加患者" right-text="保存"></cp-nav-bar>
+```
+```scss
+.patient-page {
+  padding: 46px 0 80px;
+  ::v-deep() {
+    .van-popup {
+      width: 80%;
+      height: 100%;
+      padding-top: 46px;
+      box-sizing: border-box;
+    }
+  }
+}
+```
+
+小结：
+- 属性可以传函数吗？
+  - 可以
+- popup 组件怎么双向绑定？
+  - v-model:show
 
 
 ## 家庭档案-准备表单{#patient-form}
