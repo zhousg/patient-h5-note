@@ -725,7 +725,7 @@ const logout = async () => {
 
 <template>
   <div class="patient-page">
-    <cp-nav-bar title="家庭档案" />
+    <cp-nav-bar title="家庭档案"></cp-nav-bar>
     <div class="patient-list">
       <div class="patient-item">
         <div class="info">
@@ -855,13 +855,13 @@ const logout = async () => {
 ```ts
 // 家庭档案-患者信息
 export type Patient = {
-  id?: string
+  id: string
   name: string
   idCard: string
   defaultFlag: 0 | 1
   gender: 0 | 1
-  genderValue?: string
-  age?: number
+  genderValue: string
+  age: number
 }
 
 // 家庭档案-患者信息列表
@@ -979,7 +979,7 @@ onMounted(() => {
   flex-wrap: wrap;
   .item {
     height: 32px;
-    min-width: 70px;
+    min-width: 60px;
     line-height: 30px;
     padding: 0 14px;
     text-align: center;
@@ -1053,7 +1053,7 @@ const options = [
 
 使用组件：`User/PatientPage.vue`
 ```ts
-const gender = ref('1')
+const gender = ref(1)
 ```
 ```html
 <cp-radio-btn :options="options" :modelValue="gender"></cp-radio-btn>
@@ -1265,6 +1265,19 @@ const onClickLeft = () => {
 ```
 
 2）绑定数据
+`user.d.ts`
+```ts{2,7,8}
+export type Patient = {
+  id?: string
+  name: string
+  idCard: string
+  defaultFlag: 0 | 1
+  gender: 0 | 1
+  genderValue?: string
+  age?: number
+}
+```
+`PatientPage.vue`
 ```ts
 import type { Patient, PatientList } from '@/types/user'
 import { computed, onMounted, ref } from 'vue'
