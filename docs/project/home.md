@@ -787,7 +787,7 @@ import DoctorCard from './DoctorCard.vue'
 </van-swipe-item>          
 ```
 
-4）去除 指示器，关闭 无缝滚动，色值一次滚动一个卡片
+4）去除 指示器，关闭 无缝滚动，设置一次滚动一个卡片
 
 ```html
  <van-swipe :width="150" :show-indicators="false" :loop="false">
@@ -842,9 +842,6 @@ const { width } = useWindowSize()
 小结：
 - 如果遇见一些常见的需求可以先看看 @vueuse/core 是否提供，这样可以提高开发效率。
   - 如果：窗口尺寸，滚动距离，是否进入可视区，倒计时，...等等。
-
-作业：consult
-- 使用 useIntervalFn 实现下发验证码倒计时业务
 
 
 ## 首页模块-推荐关注医生-展示{#home-like-render}
