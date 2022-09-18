@@ -437,6 +437,7 @@ const active = ref<KnowledgeType>('recommend')
 <script setup lang="ts">
 import { ref } from 'vue'
 
+const list = ref<number[]>([])
 const loading = ref(false)
 const finished = ref(false)
 const onLoad = () => {
