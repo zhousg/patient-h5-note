@@ -782,7 +782,7 @@ import FollowDoctor from './components/FollowDoctor.vue'
 import DoctorCard from './DoctorCard.vue'
 ```
 ```html
-<van-swipe-item v-for="item in list" :key="item.id">
+<van-swipe-item v-for="item in 5" :key="item">
   <doctor-card />
 </van-swipe-item>          
 ```
