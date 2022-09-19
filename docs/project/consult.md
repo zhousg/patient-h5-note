@@ -598,6 +598,7 @@ const store = useConsultStore()
 
 1）路由与组件
 
+`Consult/ConsultIllness.vue`
 ```vue
 <script setup lang="ts"></script>
 
