@@ -814,13 +814,16 @@ import DoctorCard from './DoctorCard.vue'
 代码：
 
 ```ts
-import { onMounted, ref } from 'vue'
+import { onMounted, onUnMounted, ref } from 'vue'
 
+const width = ref(0)
+const setWidth = () =>  width.value = window.innerWidth
 onMounted(() => {
-  width.value = window.innerWidth
+  setWidth()
+  window.addEventListener('resize', setWidth)
 })
-window.addEventListener('resize', () => {
-  width.value = window.innerWidth
+onUnMounted(()=>{
+  window.removeEventListener('resize', setWidth)
 })
 ```
 ```html
