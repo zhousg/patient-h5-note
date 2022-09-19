@@ -613,48 +613,6 @@ import Mock from 'mockjs'
 
 const rules: MockMethod[] = [
   {
-    url: '/patient/home/knowledge',
-    method: 'get',
-    timeout: 1000,
-    response: () => {
-      const rows: KnowledgeList = []
-      for (let i = 0; i < 5; i++) {
-        const item = Mock.mock({
-          id: '@id',
-          title: '@ctitle(10,20)',
-          coverUrl:
-            i % 2
-              ? ['https://yanxuan-item.nosdn.127.net/27afb774345de98c87dddf89042ab33a.jpg']
-              : [
-                  'https://yanxuan-item.nosdn.127.net/27afb774345de98c87dddf89042ab33a.jpg',
-                  'https://yanxuan-item.nosdn.127.net/b6e1cfa68ee53719b7ab2c8e0dc20916.jpg',
-                  'https://yanxuan-item.nosdn.127.net/17d32665d53e351aa499fb1e56796e58.jpg'
-                ],
-          topics: ['@ctitle(2,4)', '@ctitle(2,4)'],
-          collectionNumber: '@integer(10,100)',
-          commentNumber: '@integer(10,100)',
-          creatorName: '@cname',
-          creatorAvatar: 'https://yanxuan-item.nosdn.127.net/ca17e384dc1c005c24c06e1abfde6ab4.jpg',
-          creatorHospatalName: '积水潭医院',
-          likeFlag: '@integer(10,100)',
-          content: '@ctitle(30,60)',
-          creatorDep: '内科',
-          creatorTitles: '主任医师'
-        })
-        rows.push(item)
-      }
-      return {
-        code: 10000,
-        message: '获取数据成功',
-        data: {
-          pageTotal: 5,
-          total: 25,
-          rows
-        }
-      }
-    }
-  },
-  {
     url: '/patient/message/list',
     method: 'get',
     timeout: 1000,
