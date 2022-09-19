@@ -1136,5 +1136,5 @@ NProgress.configure({
 ```
 
 :::tip 温馨提示
-[后置守卫](https://router.vuejs.org/zh/guide/advanced/navigation-guards.html#%E5%85%A8%E5%B1%80%E5%90%8E%E7%BD%AE%E9%92%A9%E5%AD%90) 建议修改标题放后置守卫，切换路由完成后修改标题
+建议修改标题放 [后置守卫](https://router.vuejs.org/zh/guide/advanced/navigation-guards.html#%E5%85%A8%E5%B1%80%E5%90%8E%E7%BD%AE%E9%92%A9%E5%AD%90) ，切换路由完成后修改标题
 :::
