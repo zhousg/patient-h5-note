@@ -216,10 +216,10 @@ export const useConsultStore = defineStore(
     // 设置患者
     const setPatient = (id: string) => (consult.value.patientId = id)
     // 设置优惠券
-    const setCunpon = (id?: string) => (consult.value.couponId = id)
+    const setCoupon = (id?: string) => (consult.value.couponId = id)
     // 清空记录
     const clear = () => (consult.value = {})
-    return { consult, setType, setIllnessType, setDep, setIllness, setPatient, setCunpon, clear }
+    return { consult, setType, setIllnessType, setDep, setIllness, setPatient, setCoupon, clear }
   },
   {
     persist: true
@@ -1345,7 +1345,7 @@ const loadData = async () => {
   })
   payInfo.value = res.data
   // 设置默认优惠券
-  store.setCunpon(payInfo.value.couponId)
+  store.setCoupon(payInfo.value.couponId)
 
 }
 
