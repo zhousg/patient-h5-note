@@ -243,7 +243,7 @@ const store = useConsultStore()
 ```
 
 ```html
-<router-link to="/consult" @click="store.setType(ConsultType.Fast)" class="nav">
+<router-link to="/consult/fast" @click="store.setType(ConsultType.Fast)" class="nav">
 ```
 
 ## 极速问诊-选择极速问诊类型{#consult-change-type}
