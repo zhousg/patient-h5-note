@@ -679,7 +679,6 @@ const store = useConsultStore()
 
 `types/consult.d.ts`
 ```ts
-// 问诊记录-病情描述全部必填
 export type ConsultIllness = Pick<
   PartialConsult,
   'illnessDesc' | 'illnessTime' | 'consultFlag' | 'pictures'
