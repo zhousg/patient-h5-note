@@ -450,6 +450,30 @@ socket.close()
 
 - 消息数据的类型
 
+`enums/index.ts`
+```ts
+// 消息类型
+export enum MsgType {
+  MsgText = 1,
+  MsgImage = 4,
+  CardPat = 21,
+  CardPre = 22,
+  CardEvaForm = 23,
+  CardEva = 24,
+  Notify = 31,
+  NotifyTip = 32,
+  NotifyCancel = 33
+}
+
+// 处方状态
+export enum PrescriptionStatus {
+  NotPayment = 1,
+  Payment = 2,
+  Invalid = 3
+}
+```
+
+`types/room.d.ts`
 ```ts
 import { MsgType, PrescriptionStatus } from '@/enums'
 import type { Consult, Image } from './consult'
