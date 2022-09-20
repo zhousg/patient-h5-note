@@ -205,7 +205,7 @@ export const useConsultStore = defineStore(
     // 设置科室
     const setDep = (id: string) => (consult.value.depId = id)
     // 设置病情描述
-    const setIllnes = (
+    const setIllness = (
       illness: Pick<PartialConsult, 'illnessDesc' | 'illnessTime' | 'consultFlag' | 'pictures'>
     ) => {
       consult.value.illnessDesc = illness.illnessDesc
