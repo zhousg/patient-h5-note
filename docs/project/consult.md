@@ -1467,6 +1467,29 @@ const submit = async () => {
       </div>
     </van-action-sheet>
 ```
+```scss
+.pay-type {
+  .amount {
+    padding: 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  .btn {
+    padding: 15px;
+  }
+  .van-cell {
+    align-items: center;
+    .cp-icon {
+      margin-right: 10px;
+      font-size: 18px;
+    }
+    .van-checkbox :deep(.van-checkbox__icon) {
+      font-size: 16px;
+    }
+  }
+}
+```
 ```diff
     <van-submit-bar
       button-type="primary"
@@ -1586,5 +1609,26 @@ const pay = async () => {
   })
   window.location.href = res.data.payUrl
 }
+```
+
+防止在当前页面刷新，问诊记录已经清空，组件初始化需要校验
+```ts
+onMounted(() => {
+  if (
+    !store.consult.type ||
+    !store.consult.illnessType ||
+    !store.consult.depId ||
+    !store.consult.patientId
+  ) {
+    return Dialog.alert({
+      title: '温馨提示',
+      message: '问诊信息不完整请重新填写，如有未支付的问诊订单可在问诊记录中继续支付'
+    }).then(() => {
+      router.push('/')
+    })
+  }
+  loadData()
+  loadPatient()
+})
 ```
 
