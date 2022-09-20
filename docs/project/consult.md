@@ -1469,6 +1469,14 @@ const submit = async () => {
 ```
 
 2）打开的时候生成订单ID，成功后清空本地存储的问诊订单信息
+`services/consut.ts`
+```ts
+// 生成订单
+export const createConsultOrder = (data: PartialConsult) =>
+  request<{ id: string }>('/patient/consult/order', 'POST', data)
+
+```
+`Consult/ConsultPay.ts`
 ```ts
 import { createConsultOrder, getConsultOrderPayUrl, getConsultOrderPre } from '@/services/consult'
 ```
@@ -1528,6 +1536,9 @@ const onClose = () => {
       return true
     })
 }
+```
+```html
+<van-action-sheet v-model:show="show" title="选择支付方式" :close-on-popstate="false" :closeable="false" >
 ```
 
 3）生成支付地址的 API 函数
