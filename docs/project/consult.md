@@ -1467,6 +1467,15 @@ const submit = async () => {
       </div>
     </van-action-sheet>
 ```
+```diff
+    <van-submit-bar
+      button-type="primary"
+      :price="payInfo.actualPayment * 100"
+      button-text="立即支付"
+      text-align="left"
++      @click="submit"
+    />
+```
 
 2）打开的时候生成订单ID，成功后清空本地存储的问诊订单信息
 
@@ -1497,6 +1506,16 @@ const submit = async () => {
   // 打开
   show.value = true
 }
+```
+```diff
+    <van-submit-bar
+      button-type="primary"
+      :price="payInfo.actualPayment * 100"
+      button-text="立即支付"
+      text-align="left"
++      :loading="loading"
+      @click="submit"
+    />
 ```
 
 ## 问诊支付-进行支付{#pay-logic}
