@@ -1406,7 +1406,7 @@ const agree = ref(false)
 
 ## 问诊支付-流程讲解{#pay-line}
 
-![image-20220816220114053](./images/image-20220816220114053.png)
+![image-20220920225526881](./images/image-20220920225526881.png)
 
 
 支付流程：
