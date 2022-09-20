@@ -815,6 +815,7 @@ const form = ref<ConsultIllness>({
       }
     }
   }
+}  
 ```
 
 2）配置文字和图标
