@@ -337,7 +337,7 @@ import RoomAction from './components/RoomAction.vue'
 了解 websocket api含义
 
 ```js
-// 创建ws实例，建立连接
+// 创建ws实例，建立连接  (ws://121.40.165.18:8800  有广告)
 var ws = new WebSocket("wss://javascript.info/article/websocket/demo/hello");
 
 // 连接成功事件
