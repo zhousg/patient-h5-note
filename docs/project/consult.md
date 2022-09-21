@@ -1574,6 +1574,7 @@ const onClose = () => {
       return false
     })
     .catch(() => {
+      orderId.value = ''
       router.push('/user/consult')
       return true
     })
