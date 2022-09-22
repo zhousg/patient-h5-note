@@ -808,9 +808,12 @@ pnpm add sokect.io-client
 ```
 
 ```ts
+import type { Socket } from 'socket.io-client'
+import { io } from 'socket.io-client'
+import { onMounted, onUnmounted } from 'vue'
+import { baseURL } from '@/utils/rquest'
 import { useUserStore } from '@/stores'
 import { useRoute } from 'vue-router'
-import { io, type Socket } from 'socket.io-client'
 
 const store = useUserStore()
 const route = useRoute()
