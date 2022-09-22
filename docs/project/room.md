@@ -1096,7 +1096,17 @@ export type ConsultOrderItem = Consult & {
 export const getConsultOrderDetail = (orderId: string) =>
   request<ConsultOrderItem>('/patient/consult/order/detail', 'GET', { orderId })
 ```
+```ts
+import type { ConsultOrderItem } from '@/types/consult'
+import { getConsultOrderDetail } from '@/services/consult'
 
+const consult = ref<ConsultOrderItem>()
+
+onMounted(async () => {
+  const res = await getConsultOrderDetail(route.query.orderId as string)
+  consult.value = res.data
+})  
+```
 ```ts
   // 订单状态
   socket.on('statusChange', async () => {
@@ -1161,15 +1171,6 @@ const sendText = (text: string) => {
 3）通过 `socket.emit` 的 `sendChatMsg` 发送文字给服务器
 
 ```ts
-import type { ConsultOrderItem } from '@/types/consult'
-import { getConsultOrderDetail } from '@/services/consult'
-
-const consult = ref<ConsultOrderItem>()
-
-onMounted(async () => {
-  const res = await getConsultOrderDetail(route.query.orderId as string)
-  consult.value = res.data
-})  
 
 const sendText = (text: string) => {
   // 发送信息需要  发送人  收消息人  消息类型  消息内容
