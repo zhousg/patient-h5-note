@@ -975,6 +975,137 @@ const previewImg = (pictures?: Image[]) => {
 }
 ```
 
+## 问诊室-接诊状态
+
+
+步骤：
+- 传入 订单状态 倒计时时间  给状态组件
+- 根据状态展示对应信息
+  - 待接诊，绿色文字提示
+  - 问诊中，倒计时显示
+  - 已结束or已取消，显示问诊结束
+- 订单状态发送变化，需要更新组件
+
+代码：
+
+1）传入 订单状态 倒计时时间  给状态组件
+`Room/index.vue`
+```html
+<room-status :status="consult?.status" :countdown="consult?.countdown" />
+```
+`Room/components/RoomStatus.vue`
+```ts
+import { OrderType } from '@/enums'
+
+const { status, countdown = 0 } = defineProps<{
+  status?: OrderType
+  countdown?: number
+}>()
+```
+:::warning 开启解构Props响应式转换功能，vite.config.ts
+    vue({
+      reactivityTransform: true
+    }),
+:::
+
+2）根据状态展示对应信息 `Room/components/RoomStatus.vue`
+```html
+  <div class="room-status">
+    <div class="wait" v-if="status === OrderType.ConsultWait">
+      已通知医生尽快接诊，24小时内医生未回复将自动退款
+    </div>
+    <div class="chat" v-if="status === OrderType.ConsultChat">
+      <span>咨询中</span>
+      <span class="time">剩余时间：<van-count-down :time="countdown * 1000" /></span>
+    </div>
+    <div
+      class="end"
+      v-if="status === OrderType.ConsultComplete || status === OrderType.ConsultCancel"
+    >
+      <van-icon name="passed" /> 已结束
+    </div>
+  </div>
+```
+
+3) 根据状态禁用状态栏 `Room/components/RoomAction.vue`
+
+```html
+<room-action :disabled="consult?.status !== OrderType.ConsultChat"></room-action>
+```
+
+```ts
+defineProps<{
+  disabled: boolean
+}>()
+```
+```diff
+    <van-field
++     :disabled="disabled"
+      type="text"
+      class="input"
+      :border="false"
+      placeholder="问医生"
+      autocomplete="off"
+    ></van-field>
+    <!-- 不预览，使用小图标作为上传按钮 -->
++    <van-uploader :preview-image="false" :disabled="disabled">
+      <cp-icon name="consult-img" />
+    </van-uploader>
+```
+
+4) 订单状态发送变化，需要更新组件  `Room/index.vue`
+
+`enums/index.ts`
+```ts
+export enum OrderType {
+  ConsultPay = 1,
+  ConsultWait = 2,
+  ConsultChat = 3,
+  ConsultComplete = 4,
+  ConsultCancel = 5,
+  MedicinePay = 10,
+  MedicineSend = 11,
+  MedicineTake = 12,
+  MedicineComplete = 13,
+  MedicineCancel = 14
+}
+```
+`types/consult.d.ts`
+```ts
+// 问诊订单单项信息
+export type ConsultOrderItem = Consult & {
+  createTime: string
+  docInfo?: Doctor
+  patientInfo: Patient
+  orderNo: string
+  statusValue: string
+  typeValue: string
+  status: OrderType
+  countdown: number
+  prescriptionId?: string
+  evaluateId: number
+  payment: number
+  couponDeduction: number
+  pointDeduction: number
+  actualPayment: number
+}
+```
+
+`services/consult.ts`
+```ts
+export const getConsultOrderDetail = (orderId: string) =>
+  request<ConsultOrderItem>('/patient/consult/order/detail', 'GET', { orderId })
+```
+
+```ts
+  // 订单状态
+  socket.on('statusChange', async () => {
+    const res = await getConsultOrderDetail(route.query.orderId as string)
+    consult.value = res.data
+  })
+```
+
+
 ## 问诊室-文字聊天
 > 可以发送文字消息，可以接收文字消息
 
@@ -1027,34 +1158,7 @@ const sendText = (text: string) => {
 }
 ```
 
-3）获取订单详情，需要使用医生ID，作为收信息人的标识
-`types/consult.d.ts`
-```ts
-// 问诊订单单项信息
-export type ConsultOrderItem = Consult & {
-  createTime: string
-  docInfo?: Doctor
-  patientInfo: Patient
-  orderNo: string
-  statusValue: string
-  typeValue: string
-  status: OrderType
-  countdown: number
-  prescriptionId?: string
-  evaluateId: number
-  payment: number
-  couponDeduction: number
-  pointDeduction: number
-  actualPayment: number
-}
-```
-`services/consult.ts`
-```ts
-export const getConsultOrderDetail = (orderId: string) =>
-  request<ConsultOrderItem>('/patient/consult/order/detail', 'GET', { orderId })
-```
-
-4）通过 `socket.emit` 的 `sendChatMsg` 发送文字给服务器
+3）通过 `socket.emit` 的 `sendChatMsg` 发送文字给服务器
 
 ```ts
 import type { ConsultOrderItem } from '@/types/consult'
@@ -1318,69 +1422,6 @@ socket.on('chatMsgList', ({ data }: { data: TimeMessages[] }) => {
 
 小结：
 - 这个功能是给 消息通知  默认准备的，那里有未读消息的条数。
-
-
-## 问诊室-接诊状态
-
-
-步骤：
-- 传入 订单状态 倒计时时间  给状态组件
-- 根据状态展示对应信息
-  - 待接诊，绿色文字提示
-  - 问诊中，倒计时显示
-  - 已结束or已取消，显示问诊结束
-- 订单状态发送变化，需要更新组件
-
-代码：
-
-1）传入 订单状态 倒计时时间  给状态组件
-`Room/index.vue`
-```html
-<room-status :status="consult?.status" :countdown="consult?.countdown" />
-```
-`Room/components/RoomStatus.vue`
-```ts
-import { OrderType } from '@/enums'
-
-const { status, countdown = 0 } = defineProps<{
-  status?: OrderType
-  countdown?: number
-}>()
-```
-:::warning 开启解构Props响应式转换功能，vite.config.ts
-    vue({
-      reactivityTransform: true
-    }),
-:::
-
-2）根据状态展示对应信息 `Room/components/RoomStatus.vue`
-```html
-  <div class="room-status">
-    <div class="wait" v-if="status === OrderType.ConsultWait">
-      已通知医生尽快接诊，24小时内医生未回复将自动退款
-    </div>
-    <div class="chat" v-if="status === OrderType.ConsultChat">
-      <span>咨询中</span>
-      <span class="time">剩余时间：<van-count-down :time="countdown * 1000" /></span>
-    </div>
-    <div
-      class="end"
-      v-if="status === OrderType.ConsultComplete || status === OrderType.ConsultCancel"
-    >
-      <van-icon name="passed" /> 已结束
-    </div>
-  </div>
-```
-
-3) 订单状态发送变化，需要更新组件  `Room/index.vue`
-
-```ts
-  // 订单状态
-  socket.on('statusChange', async () => {
-    const res = await getConsultOrderDetail(route.query.orderId as string)
-    consult.value = res.data
-  })
-```
 
 
 ## 问诊室-评价医生
