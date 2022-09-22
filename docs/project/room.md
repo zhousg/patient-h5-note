@@ -1026,6 +1026,15 @@ const { status, countdown = 0 } = defineProps<{
     </div>
   </div>
 ```
+```scss
+      &:last-child {
+        color: var(--cp-text2);
+        width: 130px;
+        .van-count-down {
+          display: inline;
+        }
+      }s
+```
 
 3) 根据状态禁用状态栏 `Room/components/RoomAction.vue`
 
@@ -1108,7 +1117,7 @@ onMounted(async () => {
 })  
 ```
 ```ts
-  // 订单状态
+  // 订单状态 在onMounted注册
   socket.on('statusChange', async () => {
     const res = await getConsultOrderDetail(route.query.orderId as string)
     consult.value = res.data
@@ -1186,7 +1195,7 @@ const sendText = (text: string) => {
 
 5）通过 `socket.on` 的 `receiveChatMsg` 接收发送成功或者医生发来的消息
 ```ts
- // 接收消息
+ // 接收消息 在onMounted注册
   socket.on('receiveChatMsg', async (event) => {
     list.value.push(event)
     await nextTick()
@@ -1349,7 +1358,9 @@ const time = ref(dayjs().format('YYYY-MM-DD HH:mm:ss'))
 - 触发刷新，发送获取聊天记录消息
 
 ```ts
+const onRefresh = () => {
   socket.emit('getChatMsgList', 20, time.value, route.query.orderId)
+}
 ```
 
 - 在接收聊天记录事件中
@@ -1425,6 +1436,78 @@ socket.on('chatMsgList', ({ data }: { data: TimeMessages[] }) => {
 小结：
 - 这个功能是给 消息通知  默认准备的，那里有未读消息的条数。
 
+
+## 问诊室-查看处方
+
+步骤：
+- 定义参考处方API
+- 点击查看处方预览处方图片
+
+:::tip
+  需要去辅助-超级医生开处方
+:::
+
+代码：
+
+1）定义参考处方API
+
+```ts
+// 查看处方
+export const getPrescriptionPic = (id: string) =>
+  request<{ url: string }>(`/patient/consult/prescription/${id}`)
+```
+
+2）点击查看处方预览处方图片
+
+```diff
+          <div class="head-tit">
+            <h3>电子处方</h3>
++            <p @click="showPrescription(msg.prescription?.id)">
+              原始处方 <van-icon name="arrow"></van-icon>
+            </p>
+          </div>
+```
+
+```ts
+  import { getPrescriptionPic } from '@/services/consult'
+  import { ImagePreview } from 'vant'
+
+  const showPrescription = async (id?: string) => {
+    if (id) {
+      const res = await getPrescriptionPic(id)
+      ImagePreview([res.data.url])
+    }
+  }
+```
+
+
+
+## 问诊室-购买药品
+
+
+步骤：
+- 处方状态不同此按钮操作不同：
+  - 如果处方失效：提示即可
+  - 如果没付款且有订单ID，代表已经生成订单没付款：去订单详情付款
+  - 如果没付款且没订单ID：去预支付页面
+
+代码：
+```ts
+import { useRouter } from 'vue-router'
+import { PrescriptionStatus } from '@/enums'
+import { Toast } from 'vant'
+
+// 点击处方的跳转
+const router = useRouter()
+const buy = (pre?: Prescription) => {
+  if (pre) {
+    if (pre.status === PrescriptionStatus.Invalid) return Toast('处方已失效')
+    if (pre.status === PrescriptionStatus.NotPayment && !pre.orderId)
+      return router.push(`/order/pay?id=${pre.id}`)
+    router.push(`/order/${pre.orderId}`)
+  }
+}
+```
 
 ## 问诊室-评价医生
 
@@ -1697,79 +1780,5 @@ const onSubmit = async () => {
     })
   }
 +  completeEva && completeEva(score.value)
-}
-```
-
-
-
-## 问诊室-查看处方
-
-步骤：
-- 定义参考处方API
-- 点击查看处方预览处方图片
-
-:::tip
-  需要去辅助-超级医生开处方
-:::
-
-代码：
-
-1）定义参考处方API
-
-```ts
-// 查看处方
-export const getPrescriptionPic = (id: string) =>
-  request<{ url: string }>(`/patient/consult/prescription/${id}`)
-```
-
-2）点击查看处方预览处方图片
-
-```diff
-          <div class="head-tit">
-            <h3>电子处方</h3>
-+            <p @click="showPrescription(msg.prescription?.id)">
-              原始处方 <van-icon name="arrow"></van-icon>
-            </p>
-          </div>
-```
-
-```ts
-  import { getPrescriptionPic } from '@/services/consult'
-  import { ImagePreview } from 'vant'
-
-  const showPrescription = async (id?: string) => {
-    if (id) {
-      const res = await getPrescriptionPic(id)
-      ImagePreview([res.data.url])
-    }
-  }
-```
-
-
-
-## 问诊室-购买药品
-
-
-步骤：
-- 处方状态不同此按钮操作不同：
-  - 如果处方失效：提示即可
-  - 如果没付款且有订单ID，代表已经生成订单没付款：去订单详情付款
-  - 如果没付款且没订单ID：去预支付页面
-
-代码：
-```ts
-import { useRouter } from 'vue-router'
-import { PrescriptionStatus } from '@/enums'
-import { Toast } from 'vant'
-
-// 点击处方的跳转
-const router = useRouter()
-const buy = (pre?: Prescription) => {
-  if (pre) {
-    if (pre.status === PrescriptionStatus.Invalid) return Toast('处方已失效')
-    if (pre.status === PrescriptionStatus.NotPayment && !pre.orderId)
-      return router.push(`/order/pay?id=${pre.id}`)
-    router.push(`/order/${pre.orderId}`)
-  }
 }
 ```
