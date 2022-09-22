@@ -168,8 +168,6 @@ import ConsultItem from './ConsultItem.vue'
 
 步骤：
 - 定义接口参数类型
-- 订单状态枚举
-- 单个问诊订单类型
 - 带分页问诊订单类型
 - 定义查询API函数
 
@@ -182,48 +180,7 @@ export type ConsultOrderListParams = PageParams & {
 }
 ```
 
-2）订单状态枚举 `enums/index.ts`
-```ts
-// 订单类型
-// 1待支付2待接诊3咨询中4已完成5已取消   问诊订单
-// 10待支付11待发货12待收货13已完成14已取消   药品订单
-export enum OrderType {
-  ConsultPay = 1,
-  ConsultWait = 2,
-  ConsultChat = 3,
-  ConsultComplete = 4,
-  ConsultCancel = 5,
-  MedicinePay = 10,
-  MedicineSend = 11,
-  MedicineTake = 12,
-  MedicineComplete = 13,
-  MedicineCancel = 14
-}
-```
-
-3）单个问诊订单类型 `types/consult.d.ts`
-
-```ts
-// 问诊订单单项信息
-export type ConsultOrderItem = Consult & {
-  createTime: string
-  docInfo?: Doctor
-  patientInfo: Patient
-  orderNo: string
-  statusValue: string
-  typeValue: string
-  status: OrderType
-  countdown: number
-  prescriptionId?: string
-  evaluateId: number
-  payment: number
-  couponDeduction: number
-  pointDeduction: number
-  actualPayment: number
-}
-```
-
-4）带分页问诊订单类型 `types/consult.d.ts`
+2）带分页问诊订单类型 `types/consult.d.ts`
 ```ts
 export type ConsultOrderPage = {
   pageTotal: number
@@ -232,7 +189,7 @@ export type ConsultOrderPage = {
 }
 ```
 
-5）定义查询API函数 `services/consult.ts`
+3）定义查询API函数 `services/consult.ts`
 
 ```ts
 import type { ConsultOrderListParams, ConsultOrderPage } from '@/types/consult'
