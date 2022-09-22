@@ -1679,12 +1679,12 @@ export const getPrescriptionPic = (id: string) =>
 2）点击查看处方预览处方图片
 
 ```diff
-      <van-row>
-        <van-col span="6">病情描述</van-col>
-        <van-col span="18">{{ msg.consultRecord?.illnessDesc }}</van-col>
-        <van-col span="6">图片</van-col>
-+        <van-col span="18" @click="previewImg(msg.consultRecord?.pictures)"> 点击查看 </van-col>
-      </van-row>
+          <div class="head-tit">
+            <h3>电子处方</h3>
++            <p @click="showPrescription(msg.prescription?.id)">
+              原始处方 <van-icon name="arrow"></van-icon>
+            </p>
+          </div>
 ```
 
 ```ts
