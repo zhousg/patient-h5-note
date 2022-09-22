@@ -1449,7 +1449,44 @@ socket.on('chatMsgList', ({ data }: { data: TimeMessages[] }) => {
 
 代码：
 
-1）定义参考处方API
+1) 渲染处方消息
+
+```html
+<!-- 处方 -->
+    <div class="msg msg-recipe" v-if="msgType === MsgType.CardPre">
+      <div class="content" v-if="msg.prescription">
+        <div class="head van-hairline--bottom">
+          <div class="head-tit">
+            <h3>电子处方</h3>
+            <p @click="showPrescription(msg.prescription?.id)">
+              原始处方 <van-icon name="arrow"></van-icon>
+            </p>
+          </div>
+          <p>
+            {{ msg.prescription.name }}
+            {{ msg.prescription.genderValue }}
+            {{ msg.prescription.age }}岁
+            {{ msg.prescription.diagnosis }}
+          </p>
+          <p>开方时间：{{ msg.prescription.createTime }}</p>
+        </div>
+        <div class="body">
+          <div class="body-item" v-for="med in msg.prescription.medicines" :key="med.id">
+            <div class="durg">
+              <p>{{ med.name }} {{ med.specs }}</p>
+              <p>{{ med.usageDosag }}</p>
+            </div>
+            <div class="num">x{{ med.quantity }}</div>
+          </div>
+        </div>
+        <div class="foot">
+          <span @click="buy(msg.prescription)">购买药品</span>
+        </div>
+      </div>
+    </div>
+```
+
+2）定义参考处方API
 
 ```ts
 // 查看处方
@@ -1457,7 +1494,7 @@ export const getPrescriptionPic = (id: string) =>
   request<{ url: string }>(`/patient/consult/prescription/${id}`)
 ```
 
-2）点击查看处方预览处方图片
+3）点击查看处方预览处方图片
 
 ```diff
           <div class="head-tit">
@@ -1781,4 +1818,13 @@ const onSubmit = async () => {
   }
 +  completeEva && completeEva(score.value)
 }
+```
+
+结束问诊消息：
+```html
+    <div class="msg msg-tip msg-tip-cancel" v-if="msgType === MsgType.NotifyCancel">
+      <div class="content">
+        <span>{{ msg.content }}</span>
+      </div>
+    </div>
 ```
