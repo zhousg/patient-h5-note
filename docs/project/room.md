@@ -1147,6 +1147,7 @@ const sendText = () => {
 ```
 ```html
     <van-field
+      :disabled="disabled"
       v-model="text"
       type="text"
       class="input"
@@ -1257,7 +1258,7 @@ const sendImage: UploaderAfterRead = async (data) => {
 }
 ```
 ```html
- <van-uploader :preview-image="false" :after-read="sendImage">
+ <van-uploader :preview-image="false" :disabled="disabled" :after-read="sendImage">
       <cp-icon name="consult-img" />
     </van-uploader>
 ```
