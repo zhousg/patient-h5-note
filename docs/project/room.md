@@ -784,7 +784,7 @@ export type Message = {
 
 export type TimeMessages = {
   createTime: string
-  items: RoomMessage[]
+  items: Message[]
   orderId: string
   sid: string
 }
