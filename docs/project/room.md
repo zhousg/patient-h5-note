@@ -789,6 +789,7 @@ export type TimeMessages = {
   sid: string
 }
 ```
+以上是类型
 
 
 ## 问诊室-建立连接
