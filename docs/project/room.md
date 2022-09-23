@@ -979,90 +979,16 @@ const previewImg = (pictures?: Image[]) => {
 
 
 步骤：
-- 传入 订单状态 倒计时时间  给状态组件
-- 根据状态展示对应信息
+- 初始化需要订单信息，订单状态发送变化，需要更新订单信息
+- 状态组件，根据状态展示对应信息
   - 待接诊，绿色文字提示
   - 问诊中，倒计时显示
   - 已结束or已取消，显示问诊结束
-- 订单状态发送变化，需要更新组件
+- 底部操作组件，禁用和启用
 
 代码：
 
-1）传入 订单状态 倒计时时间  给状态组件
-`Room/index.vue`
-```html
-<room-status :status="consult?.status" :countdown="consult?.countdown" />
-```
-`Room/components/RoomStatus.vue`
-```ts
-import { OrderType } from '@/enums'
-
-const { status, countdown = 0 } = defineProps<{
-  status?: OrderType
-  countdown?: number
-}>()
-```
-:::warning 开启解构Props响应式转换功能，vite.config.ts
-    vue({
-      reactivityTransform: true
-    }),
-:::
-
-2）根据状态展示对应信息 `Room/components/RoomStatus.vue`
-```html
-  <div class="room-status">
-    <div class="wait" v-if="status === OrderType.ConsultWait">
-      已通知医生尽快接诊，24小时内医生未回复将自动退款
-    </div>
-    <div class="chat" v-if="status === OrderType.ConsultChat">
-      <span>咨询中</span>
-      <span class="time">剩余时间：<van-count-down :time="countdown * 1000" /></span>
-    </div>
-    <div
-      class="end"
-      v-if="status === OrderType.ConsultComplete || status === OrderType.ConsultCancel"
-    >
-      <van-icon name="passed" /> 已结束
-    </div>
-  </div>
-```
-```scss
-      &:last-child {
-        color: var(--cp-text2);
-        width: 130px;
-        .van-count-down {
-          display: inline;
-        }
-      }s
-```
-
-3) 根据状态禁用状态栏 `Room/components/RoomAction.vue`
-
-```html
-<room-action :disabled="consult?.status !== OrderType.ConsultChat"></room-action>
-```
-
-```ts
-defineProps<{
-  disabled: boolean
-}>()
-```
-```diff
-    <van-field
-+     :disabled="disabled"
-      type="text"
-      class="input"
-      :border="false"
-      placeholder="问医生"
-      autocomplete="off"
-    ></van-field>
-    <!-- 不预览，使用小图标作为上传按钮 -->
-+    <van-uploader :preview-image="false" :disabled="disabled">
-      <cp-icon name="consult-img" />
-    </van-uploader>
-```
-
-4) 订单状态发送变化，需要更新组件  `Room/index.vue`
+1) 订单状态发送变化，需要更新组件  `Room/index.vue`
 
 `enums/index.ts`
 ```ts
@@ -1123,6 +1049,82 @@ onMounted(async () => {
     consult.value = res.data
   })
 ```
+
+2）传入 订单状态 倒计时时间  给状态组件
+`Room/index.vue`
+```html
+<room-status :status="consult?.status" :countdown="consult?.countdown" />
+```
+`Room/components/RoomStatus.vue`
+```ts
+import { OrderType } from '@/enums'
+
+const { status, countdown = 0 } = defineProps<{
+  status?: OrderType
+  countdown?: number
+}>()
+```
+:::warning 开启解构Props响应式转换功能，vite.config.ts
+    vue({
+      reactivityTransform: true
+    }),
+:::
+
+3）根据状态展示对应信息 `Room/components/RoomStatus.vue`
+```html
+  <div class="room-status">
+    <div class="wait" v-if="status === OrderType.ConsultWait">
+      已通知医生尽快接诊，24小时内医生未回复将自动退款
+    </div>
+    <div class="chat" v-if="status === OrderType.ConsultChat">
+      <span>咨询中</span>
+      <span class="time">剩余时间：<van-count-down :time="countdown * 1000" /></span>
+    </div>
+    <div
+      class="end"
+      v-if="status === OrderType.ConsultComplete || status === OrderType.ConsultCancel"
+    >
+      <van-icon name="passed" /> 已结束
+    </div>
+  </div>
+```
+```scss
+      &:last-child {
+        color: var(--cp-text2);
+        width: 130px;
+        .van-count-down {
+          display: inline;
+        }
+      }
+```
+
+4) 根据状态禁用状态栏 `Room/components/RoomAction.vue`
+
+```html
+<room-action :disabled="consult?.status !== OrderType.ConsultChat"></room-action>
+```
+
+```ts
+defineProps<{
+  disabled: boolean
+}>()
+```
+```diff
+    <van-field
++     :disabled="disabled"
+      type="text"
+      class="input"
+      :border="false"
+      placeholder="问医生"
+      autocomplete="off"
+    ></van-field>
+    <!-- 不预览，使用小图标作为上传按钮 -->
++    <van-uploader :preview-image="false" :disabled="disabled">
+      <cp-icon name="consult-img" />
+    </van-uploader>
+```
+
+
 
 
 ## 问诊室-文字聊天
