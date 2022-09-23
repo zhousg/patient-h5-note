@@ -804,7 +804,7 @@ export type TimeMessages = {
 
 - 安装 sokect.io-client 包
 ```bash
-pnpm add sokect.io-client
+pnpm add socket.io-client
 ```
 
 ```ts
