@@ -250,7 +250,7 @@ const onLoad = async () => {
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <consult-item v-for="item in list" :key="item.id" :item="item" />
+      <consult-item v-for="item in list" :key="item.id" :item="item"></consult-item>
     </van-list> 
   </div>
 </template>     
@@ -863,7 +863,7 @@ onMounted(async () => {
         <img class="avatar" src="@/assets/avatar-doctor.svg" alt="" />
         <p class="doc">
           <span>极速问诊</span>
-          <span>{{ item.docInfo.name }}</span>
+          <span>{{ item.docInfo?.name }}</span>
         </p>
         <van-icon name="arrow" />
       </div>
@@ -912,6 +912,83 @@ onMounted(async () => {
 </template>
 ```
 
+## 问诊记录-cp-consult-more组件
+
+通用问诊记录查看更多组件
+
+组件封装：`components/cp-consult-more`
+
+```vue
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+
+const props = defineProps<{
+  disabled?: boolean
+}>()
+
+const showPopover = ref(false)
+const actions = computed(() => [
+  { text: '查看处方', disabled: props.disabled },
+  { text: '删除订单' }
+])
+
+const emit = defineEmits<{
+  (e: 'on-delete'): void
+  (e: 'on-preview'): void
+}>()
+
+const onSelect = (action: { text: string }, i: number) => {
+  if (i === 0) emit('on-preview')
+  if (i === 1) emit('on-delete')
+}
+</script>
+
+<template>
+  <div class="cp-consult-more">
+    <van-popover
+      placement="top-start"
+      v-model:show="showPopover"
+      :actions="actions"
+      @select="onSelect"
+    >
+      <template #reference> 更多 </template>
+    </van-popover>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.cp-consult-more {
+  flex: 1;
+  color: var(--cp-tag);
+}
+</style>
+```
+
+```diff
++import CpConsultMore from '@/components/CpConsultMore.vue'
+
+declare module 'vue' {
+  interface GlobalComponents {
+    // 指定组件类型，typeof 从组件对象得到类型，设置给全局组件：CpNavBar
+    CpNavBar: typeof CpNavBar
+    CpIcon: typeof CpIcon
+    CpRadioBtn: typeof CpRadioBtn
++    CpConsultMore: typeof CpConsultMore
+  }
+}
+```
+
+使用组件：`User/components/ConsultItem.vue`
+
+```html
+      <cp-consult-more
+        :disabled="!item.prescriptionId"
+        @on-delete="deleteConsultOrder(item)"
+        @on-preview="showPrescription(item.prescriptionId)"
+      ></cp-consult-more>
+```
+
+
 ## 问诊记录-详情按钮处理
 
 状态梳理：
@@ -956,16 +1033,7 @@ const onSelect = () => {
       <van-button type="primary" round :to="`/room?orderId=${item.id}`">继续沟通</van-button>
     </div>
     <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultComplete">
-      <div class="more">
-        <van-popover
-          placement="top-start"
-          v-model:show="showPopover"
-          :actions="actions"
-          @select="onSelect"
-        >
-          <template #reference> 更多 </template>
-        </van-popover>
-      </div>
+      <cp-consult-more></cp-consult-more>
       <van-button type="default" round :to="`/room?orderId=${item.id}`">问诊记录</van-button>
       <van-button type="primary" round v-if="item.evaluateId">写评价</van-button>
       <van-button type="default" round v-else>查看评价</van-button>
@@ -1112,16 +1180,12 @@ const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder(() => {
 ```
 
 查看处方和删除订单
-```ts
-const onSelect = (action: { text: string }, i: number) => {
-  if (i === 0) {
-    showPrescription(item.value?.prescriptionId)
-  }
-  if (i === 1) {
-    // 删除
-    item.value && deleteConsultOrder(item.value)
-  }
-}
+```html
+      <cp-consult-more
+        :disabled="!item.prescriptionId"
+        @on-delete="deleteConsultOrder(item)"
+        @on-preview="showPrescription(item.prescriptionId)"
+      ></cp-consult-more>
 ```
 
 删除订单 `(item!)` 是ts语法非空断言
