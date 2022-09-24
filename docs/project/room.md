@@ -1844,7 +1844,7 @@ const onSubmit = async () => {
 
 思考：
 - 怎么处理？
-  - 地址栏上的 payResult 是否是 true 
+  - 地址栏上的 payResult 是否是 false，是代表失败 
 
 - 何时处理？
   - 组件挂载完毕，太晚，页面已渲染
