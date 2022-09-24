@@ -60,7 +60,7 @@ import ConsultItem from './ConsultItem.vue'
 </style>
 ```
 
-`User/components/ConsultList.vue`
+`User/components/ConsultItem.vue`
 
 ```vue
 <script setup></script>

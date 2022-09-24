@@ -360,7 +360,7 @@ onMounted(async () => {
 ## 药品订单-进行支付
 
 
-1）生成支付链接API函数
+1）生成药品订单API函数
 ```ts
 // 创建药品订单
 export const createMedicalOrder = (data: { id: string; addressId: string; couponId?: string }) =>
