@@ -1532,6 +1532,8 @@ export const getPrescriptionPic = (id: string) =>
   - 如果没付款且没订单ID：去预支付页面
 
 代码：
+
+跳转逻辑处理
 ```ts
 import { useRouter } from 'vue-router'
 import { PrescriptionStatus } from '@/enums'
@@ -1547,6 +1549,10 @@ const buy = (pre?: Prescription) => {
     router.push(`/order/${pre.orderId}`)
   }
 }
+```
+按钮事件绑定
+```html
+<div class="foot"><span @click="buy(msg.prescription)">购买药品</span></div>
 ```
 
 ## 问诊室-评价医生
