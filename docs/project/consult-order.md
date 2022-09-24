@@ -23,8 +23,8 @@ import { ConsultType } from '@/enums'
   <div class="consult-page">
     <cp-nav-bar title="问诊记录" />
     <van-tabs sticky>
-      <van-tab title="找医生"><consult-list :type="ConsultType.Doctor" /></van-tab>
       <van-tab title="极速问诊"><consult-list :type="ConsultType.Fast" /></van-tab>
+      <van-tab title="找医生"><consult-list :type="ConsultType.Doctor" /></van-tab>
       <van-tab title="开药问诊"><consult-list :type="ConsultType.Medication" /></van-tab>
     </van-tabs>
   </div>
@@ -37,6 +37,13 @@ import { ConsultType } from '@/enums'
   min-height: calc(100vh - 46px);
 }
 </style>
+```
+```ts
+    {
+      path: '/user/consult',
+      component: () => import('@/views/User/ConsultPage.vue'),
+      meta: { title: '问诊记录' }
+    }
 ```
 
 2）新建问诊订单列表组件，通过传入问诊类型展示不同列表
@@ -63,10 +70,10 @@ import ConsultItem from './ConsultItem.vue'
 `User/components/ConsultItem.vue`
 
 ```vue
-<script setup></script>
+<script setup lang="ts"></script>
 
 <template>
-  <div class="consult-item" v-for="i in 5" :key="i">
+  <div class="consult-item">
     <div class="head van-hairline--bottom">
       <img class="img" src="@/assets/avatar-doctor.svg" />
       <p>极速问诊（自动分配医生）</p>
