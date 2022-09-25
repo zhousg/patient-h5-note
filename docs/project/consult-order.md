@@ -1000,10 +1000,17 @@ declare module 'vue' {
 
 代码实现：
 
+提示：
+
 ```html
     <div class="detail-time" v-if="item.status === OrderType.ConsultPay">
       请在 <van-count-down :time="item.countdown * 1000" /> 内完成支付，超时订单将取消
     </div>
+```
+
+按钮：
+
+```html
     <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultPay">
       <div class="price">
         <span>需付款</span>
