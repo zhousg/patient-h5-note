@@ -1000,18 +1000,6 @@ declare module 'vue' {
 
 代码实现：
 
-```ts
-import { computed, onMounted, ref } from 'vue'
-// ... 
-const showPopover = ref(false)
-const actions = computed(() => [
-  { text: '查看处方', disabled: !item.value?.prescriptionId },
-  { text: '删除订单' }
-])
-const onSelect = () => {
-  //
-}
-```
 ```html
     <div class="detail-time" v-if="item.status === OrderType.ConsultPay">
       请在 <van-count-down :time="item.countdown * 1000" /> 内完成支付，超时订单将取消
