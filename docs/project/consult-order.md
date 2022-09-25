@@ -1133,16 +1133,16 @@ const { loading, cancelConsultOrder } = useCancelOrder()
 import { cancelOrder, deleteOrder, followDoctor, getPrescriptionPic } from '@/services/consult'
 
 
-export const useDeleteOrder = (cb: (id: string) => void) => {
+export const useDeleteOrder = (cb: () => void) => {
   // 删除订单
   const loading = ref(false)
   const deleteConsultOrder = async (item: ConsultOrderItem) => {
     loading.value = true
     try {
-      await deleteOrder(item.id)
+      await deleteOrder()
       // 成功，通知父组件删除这条信息，提示，详情就是跳转列表页面
       Toast.success('删除成功')
-      cb && cb(item.id)
+      cb && cb()
     } catch (e) {
       Toast.fail('删除失败')
     } finally {
@@ -1158,8 +1158,8 @@ export const useDeleteOrder = (cb: (id: string) => void) => {
 ```ts
 import { useCancelOrder, useDeleteOrder, useShowPrescription } from '@/composable'
 
-const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder((id)=>{
-  emit('on-delete', id)
+const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder(()=>{
+  emit('on-delete', props.item.id)
 })
 ```
 
@@ -1373,6 +1373,8 @@ declare module 'vue' {
 
 2）使用组件
 
+`ConsultPay.vue`
+
 ```html
       <cp-pay-sheet
         v-model:show="show"
@@ -1382,8 +1384,12 @@ declare module 'vue' {
       />
 ```
 
+`ConsultDetail.vue`
 ```ts
 const show = ref(false)
+```
+```html
+      <van-button type="primary" round @click="show = true">继续支付</van-button>
 ```
 ```diff
     <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultCancel">
