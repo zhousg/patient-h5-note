@@ -436,6 +436,9 @@ const show = ref(false)
       v-model:show="show"
     />
 ```
+:::warn
+payCallback 的域名+端口号，和自己的开发服务启动的地址和端口号一致。
+:::
 
 
 ## 药品订单-支付结果
