@@ -1133,22 +1133,21 @@ const { loading, cancelConsultOrder } = useCancelOrder()
 import { cancelOrder, deleteOrder, followDoctor, getPrescriptionPic } from '@/services/consult'
 
 
-export const useDeleteOrder = (emit: (e: 'on-delete', id: string) => void) => {
+export const useDeleteOrder = (cb: (id: string) => void) => {
   // 删除订单
   const loading = ref(false)
-  const deleteConsultOrder = (item: ConsultOrderItem) => {
+  const deleteConsultOrder = async (item: ConsultOrderItem) => {
     loading.value = true
-    deleteOrder(item.id)
-      .then(() => {
-        emit('on-delete', item.id)
-        Toast.success('删除成功')
-      })
-      .catch(() => {
-        Toast.fail('删除失败')
-      })
-      .finally(() => {
-        loading.value = false
-      })
+    try {
+      await deleteOrder(item.id)
+      // 成功，通知父组件删除这条信息，提示，详情就是跳转列表页面
+      Toast.success('删除成功')
+      cb && cb(item.id)
+    } catch (e) {
+      Toast.fail('删除失败')
+    } finally {
+      loading.value = false
+    }
   }
   return { loading, deleteConsultOrder }
 }
@@ -1159,8 +1158,8 @@ export const useDeleteOrder = (emit: (e: 'on-delete', id: string) => void) => {
 ```ts
 import { useCancelOrder, useDeleteOrder, useShowPrescription } from '@/composable'
 
-const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder(()=>{
-  emit('on-delete', item.id)
+const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder((id)=>{
+  emit('on-delete', id)
 })
 ```
 
