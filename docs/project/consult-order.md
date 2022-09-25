@@ -1231,7 +1231,7 @@ import { Toast } from 'vant'
 ```ts
 const { copy, copied, isSupported } = useClipboard()
 const onCopy = () => {
-  if (!isSupported.value) Toast('未授权，不支持')
+  if (!isSupported.value) return Toast('未授权，不支持')
   copy(item.value?.orderNo || '')
 }
 watch(copied, () => {
