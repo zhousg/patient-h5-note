@@ -1153,6 +1153,22 @@ const { order } = useOrderDetail(route.params.id as string)
 
 
 2）相关类型声明
+
+`enums/index.ts`
+```ts
+export enum ExpressStatus {
+  // 已发货
+  Delivered = 1,
+  // 已揽件
+  Received = 2,
+  // 运输中
+  Transit = 3,
+  // 派送中
+  Delivery = 4,
+  // 已签收
+  Signed = 5
+}
+```
 `types/order.d.ts`
 ```ts
 export type Express = {
