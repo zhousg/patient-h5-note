@@ -601,7 +601,7 @@ import { viteMockServe } from 'vite-plugin-mock'
 ```
 ```ts
 plugins: [
-  createHtmlPlugin()
+  viteMockServe()
 ]
 ```
 
