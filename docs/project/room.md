@@ -812,7 +812,7 @@ pnpm add socket.io-client
 import type { Socket } from 'socket.io-client'
 import { io } from 'socket.io-client'
 import { onMounted, onUnmounted } from 'vue'
-import { baseURL } from '@/utils/rquest'
+import { baseURL } from '@/utils/request'
 import { useUserStore } from '@/stores'
 import { useRoute } from 'vue-router'
 
