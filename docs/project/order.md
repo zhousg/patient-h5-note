@@ -1230,7 +1230,7 @@ onMounted(async () => {
         <van-icon name="service" />
       </div>
       <div class="current">
-        <p class="status">{{ logistics?.statusValue }}——预计{{ logistics?.estimatedTime }}</p>
+        <p class="status">{{ logistics?.statusValue }} 预计{{ logistics?.estimatedTime }}送达</p>
         <p class="predict">
           <span>{{ logistics?.name }}</span>
           <span>{{ logistics?.awbNo }}</span>
@@ -1276,14 +1276,14 @@ a. 安装
 pnpm add @amap/amap-jsapi-loader
 ```
 
-b. 配置 securityJsCode
+b. 配置 securityJsCode 
 ```ts
 window._AMapSecurityConfig = {
   securityJsCode: '415e917da833efcf2d5b69f4d821784b'
 }
 ```
 
-c. 扩展 Window 的类型
+c. 扩展 Window 的类型 `types/global.d.ts`
 ```ts
 interface Window {
   _AMapSecurityConfig: {
@@ -1337,9 +1337,9 @@ AMap.plugin('AMap.Driving', function () {
   })
 
   // 起点
-  const end = res.data.logisticsInfo.pop()
-  // 起点
   const start = res.data.logisticsInfo.shift()
+  // 终点
+  const end = res.data.logisticsInfo.pop()
 
   driving.search(
     [start?.longitude, start?.latitude],
@@ -1363,30 +1363,29 @@ AMap.plugin('AMap.Driving', function () {
   })
 ```
 ```ts
-import carImg from '@/assets/car.png'
+import endImg from '@/assets/end.png'
 import startImg from '@/assets/start.png'
 ```
 ```ts
-  // 起点
-  const end = res.data.logisticsInfo.pop()
-  const startMarker = new AMap.Marker({
-    position: [end?.longitude, end?.latitude],
-    icon: startImg
-  })
-  map.add(startMarker)
-  // 起点
-  const start = res.data.logisticsInfo.shift()
-  const marker2 = new AMap.Marker({
-    position: [start?.longitude, start?.latitude],
-    icon: endImg
-  })
-  map.add(marker2)
+      // 终点
+      const end = res.data.logisticsInfo.pop()
+      const endMarker = new AMap.Marker({
+        position: [end?.longitude, end?.latitude],
+        icon: endImg
+      })
+      map.add(endMarker)
+      // 起点
+      const start = res.data.logisticsInfo.shift()
+      const startMarker = new AMap.Marker({
+        position: [start?.longitude, start?.latitude],
+        icon: startImg
+      })
 ```
 
 3）标记当前货运位置
 
 ```ts
-import endImg from '@/assets/end.png'
+import carImg from '@/assets/car.png'
 ```
 
 ```diff
