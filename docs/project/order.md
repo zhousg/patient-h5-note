@@ -1380,6 +1380,7 @@ import startImg from '@/assets/start.png'
         position: [start?.longitude, start?.latitude],
         icon: startImg
       })
+      map.add(startMarker)
 ```
 
 3）标记当前货运位置
