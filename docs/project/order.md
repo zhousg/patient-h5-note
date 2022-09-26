@@ -732,6 +732,8 @@ onMounted(async () => {
 :deep(.van-cell) {
   .van-cell__title {
     font-size: 16px;
+    flex: none;
+    width: 100px;
   }
   .van-cell__value {
     font-size: 16px;
@@ -853,7 +855,7 @@ const { medicines = [] } = defineProps<{ medicines?: Medical[] }>()
         </p>
         <p class="price">￥{{ med.amount }}</p>
       </div>
-      <div class="desc">{{ med.usageDosag }}</div>
+      <div class="desc" v-if="med.usageDosag">{{ med.usageDosag }}</div>
     </div>
   </div>
 </template>
