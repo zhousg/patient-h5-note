@@ -645,13 +645,7 @@ export default rules
 
 
 使用注意：
-- 这些mock接口是  vite 本地服务器提供的，请求的时候不能带上其他服务器的域名
-  - `https://consult-api.itheima.net/xxx` × 其他服务
-  - `/xxx` √  本地服务
-  - `http://localhost/xxx` √  本地服务
-  - `http://consult-patients.itheima.net/xxx` √   hosts映射其实就是本地服务
-
-因为我们配置了 baseURL 使用 `/xxx` 都是走其他服务，需要走 mock 的时候可以写全域名。待接口开发完毕后，去掉本地服务的域名即可。
+- 这些mock接口是  vite 本地服务器提供的，请求的时候不能带上其他服务器的域名。
 
 ## 项目部署-pm2部署
 
