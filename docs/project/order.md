@@ -1408,7 +1408,7 @@ driving.search(
 +    map.add(marker)
 +    setTimeout(() => {
 +      map.setFitView([marker])
-+      map.setZoom(9)
++      map.setZoom(10)
 +    }, 3000)
 +  }
 )   
