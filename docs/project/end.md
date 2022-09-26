@@ -601,13 +601,15 @@ import { viteMockServe } from 'vite-plugin-mock'
 ```
 ```ts
 plugins: [
-  viteMockServe()
+    viteMockServe({
+      mockPath: './src/mock',
+      localEnabled: true
+    })
 ]
 ```
 
 3）mock文件 `src/mock/index.ts`
 ```ts
-import type { KnowledgeList } from '@/types/consult'
 import type { MockMethod } from 'vite-plugin-mock'
 import Mock from 'mockjs'
 
@@ -617,13 +619,7 @@ const rules: MockMethod[] = [
     method: 'get',
     timeout: 1000,
     response: () => {
-      const data: {
-        id: string
-        avatar: string
-        title: string
-        lastContent: string
-        sendTime: string
-      }[] = []
+      const data = []
       for (let i = 0; i < 10; i++) {
         data.push(
           Mock.mock({
