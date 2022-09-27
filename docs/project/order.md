@@ -960,7 +960,7 @@ export const useOrderDetail = (id: string) => {
 ```vue
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { useOrderDetail } from './composable'
+import { useOrderDetail } from '@/composable'
 import OrderMedical from './components/OrderMedical.vue'
 
 const route = useRoute()
