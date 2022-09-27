@@ -311,7 +311,7 @@ let timeId: number
 const send = async () => {
   if (time.value > 0) return
   await form.value?.validate('mobile')
-  await sendMobileCode(mobile.value, 'login')
+  await sendMobileCode(mobile.value, 'bindMobile')
   Toast.success('发送成功')
   time.value = 60
   // 倒计时
