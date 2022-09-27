@@ -933,7 +933,7 @@ const { medicines = [] } = defineProps<{ medicines?: Medical[] }>()
 </style>
 ```
 
-3）获取订单详情数据hook封装
+3）获取订单详情数据hook封装 
 ```ts
 import { getMedicalOrderDetail } from '@/services/order'
 import type { OrderDetail } from '@/types/order'
@@ -960,7 +960,7 @@ export const useOrderDetail = (id: string) => {
 ```vue
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
-import { useOrderDetail } from './hooks'
+import { useOrderDetail } from './composable'
 import OrderMedical from './components/OrderMedical.vue'
 
 const route = useRoute()
