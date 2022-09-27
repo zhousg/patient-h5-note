@@ -107,6 +107,15 @@ http://consult-patients.itheima.net/login/callback#access_token=B417C0C3EBF93A38
 2. 将桌面hosts文件替换c盘文件
 ```
 
+5） vite 配置
+```ts
+  server: {
+    port: 80,
+    host: true,
+    open: true
+  },
+```
+
 
 `mac OS`
 
