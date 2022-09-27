@@ -107,16 +107,6 @@ http://consult-patients.itheima.net/login/callback#access_token=B417C0C3EBF93A38
 2. 将桌面hosts文件替换c盘文件
 ```
 
-5） vite 配置
-```ts
-  server: {
-    port: 80,
-    host: true,
-    open: true
-  },
-```
-
-
 `mac OS`
 
 ```
@@ -127,6 +117,25 @@ http://consult-patients.itheima.net/login/callback#access_token=B417C0C3EBF93A38
 5. 按下：esc
 6. 按下：shift + :
 7. 输入：wq 回车即可
+```
+
+5） vite 配置
+```ts
+  server: {
+    port: 80,
+    host: true,
+    open: true
+  },
+```
+
+6）回跳地址白名单
+```diff
+router.beforeEach((to) => {
+  NProgress.start()
+  const store = useUserStore()
++  const whiteList = ['/login', '/login/callback']
+  if (!store.user?.token && !whiteList.includes(to.path)) return '/login'
+})
 ```
 
 
