@@ -45,7 +45,7 @@
 
 1） 引入QQ登录SDK
 
-`inde.html`
+`index.html`
 ```vue
 <script
   src="https://connect.qq.com/qc_jssdk.js"
