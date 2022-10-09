@@ -9,7 +9,7 @@
 
 官方网站：https://www.typescriptlang.org/
 
-~~中文官网：https://www.tslang.cn/~~
+~~中文官网：~~ https://www.tslang.cn/
 
 ![image-20220706182727310](./images/image-20220706182727310.png)
 
