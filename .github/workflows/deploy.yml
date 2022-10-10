@@ -7,19 +7,6 @@ on:
     branches: [master]
 
 jobs:
-
- artifact:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Generate artifact to delete
-        run: |
-          echo $(date) > date.txt
-      - name: Upload artifact
-        uses: actions/upload-artifact@v1
-        with:
-          name: artifact
-          path: date.txt
-
   build:
     runs-on: ubuntu-latest
     steps:
