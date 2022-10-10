@@ -19,6 +19,8 @@
 | [vant](https://vant-contrib.gitee.io/vant/v3/#/zh-CN)      | 移动端组件库：一个**轻量、可靠的移动端组件库**，于 2017 年开源                    |
 | [VueUse](https://vueuse.org/)                              | 基于 composition 组合式 api 的常用函数集合                                        |
 
+<em>中文文档</em>
+
 2. 相关文档
 
    1. Vue3 中文文档(新) https://cn.vuejs.org/
