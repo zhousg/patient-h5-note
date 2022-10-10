@@ -42,5 +42,5 @@ img {
 }
 
 em {
-  text-rendering: geometricPrecision;
+  font: 400 1rem / 1.75 -apple-system, BlinkMacSystemFont,"Segoe UI", "Roboto", "Oxygen","Ubuntu","Cantarell","Fira Sans", "Droid Sans","Helvetica Neue", sans-serif
 }

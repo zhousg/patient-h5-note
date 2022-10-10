@@ -14,11 +14,5 @@
   "devDependencies": {
     "sass": "^1.53.0",
     "vitepress": "1.0.0-alpha.13"
-  },
-  "dependencies": {
-    "@stackblitz/sdk": "^1.8.0",
-    "ace-builds": "^1.8.1",
-    "ant-design-vue": "^3.2.10",
-    "emmet": "^2.3.6"
   }
 }
