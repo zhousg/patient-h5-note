@@ -19,15 +19,15 @@
 | [vant](https://vant-contrib.gitee.io/vant/v3/#/zh-CN)      | 移动端组件库：一个**轻量、可靠的移动端组件库**，于 2017 年开源                    |
 | [VueUse](https://vueuse.org/)                              | 基于 composition 组合式 api 的常用函数集合                                        |
 
-<em>中文文档</em>
+*中文文档*
 
-2. 相关文档
+1. 相关文档
 
    1. Vue3 中文文档(新) https://cn.vuejs.org/
    2. ~~Vue2 中文文档(旧)~~ https://v2.cn.vuejs.org/
    3. Vue3 设计理念 https://vue3js.cn/vue-composition/
 
-3. 了解框架优点特点
+2. 了解框架优点特点
    1. 首次渲染更快
    2. diff 算法更快
    3. 内存占用更少
