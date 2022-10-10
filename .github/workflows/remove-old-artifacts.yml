@@ -1,7 +1,8 @@
 name: Remove old artifacts
 
-push:
-  branches: [master]
+on:
+  push:
+    branches: [master]
 # on:
 #   schedule:
 #     # Every day at 1am
