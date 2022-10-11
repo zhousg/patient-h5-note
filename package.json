@@ -13,6 +13,6 @@
   "license": "ISC",
   "devDependencies": {
     "sass": "^1.53.0",
-    "vitepress": "1.0.0-alpha.13"
+    "vitepress": "1.0.0-alpha.19"
   }
 }

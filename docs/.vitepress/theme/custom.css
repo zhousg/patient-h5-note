@@ -41,6 +41,6 @@ img {
   border-left-color: var(--vp-c-brand);
 }
 
-body {
+/* body {
   text-rendering: optimizeSpeed;
-}
+} */
