@@ -16,6 +16,9 @@
   .VPHomeHero .name .clip {
     font-size: 68px;
   }
+  .VPHomeHero .text {
+    font-size: 54px;
+  }
 }
 img {
   border-radius: 4px;
