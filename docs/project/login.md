@@ -864,7 +864,7 @@ const code = ref('')
 1）API 接口函数
 - 类型 `types/user.d.ts`
 ```ts
-// 短信验证码类型
+// 短信验证码类型，登录|注册|修改手机号|忘记密码|绑定手机号
 export type CodeType = 'login' | 'register' | 'changeMobile' | 'forgetPassword' | 'bindMobile'
 ```
 - 接口 `services/user.ts`

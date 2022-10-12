@@ -183,6 +183,7 @@ import ConsultItem from './ConsultItem.vue'
 1）定义接口参数类型 `types/consult.d.ts`
 ```ts 
 export type ConsultOrderListParams = PageParams & {
+  // 问诊记录类型
   type: ConsultType
 }
 ```
@@ -190,8 +191,11 @@ export type ConsultOrderListParams = PageParams & {
 2）带分页问诊订单类型 `types/consult.d.ts`
 ```ts
 export type ConsultOrderPage = {
+  // 总页数
   pageTotal: number
+  // 总条数
   total: number
+  // 列表数据
   rows: ConsultOrderItem[]
 }
 ```

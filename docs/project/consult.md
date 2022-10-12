@@ -121,15 +121,22 @@ showOrderStatus(OrderStatus.Complete)
 ```ts
 // 问诊类型
 export enum ConsultType {
+  // 找医生
   Doctor = 1,
+  // 快速问诊
   Fast = 2,
+  // 开药问诊
   Medication = 3
 }
 // 问诊时间，以1自增可以省略
 export enum ConsultTime {
+  // 一周内
   Week = 1,
+  // 一月内
   Month,
+  // 半年内
   HalfYear,
+  // 半年以上
   More
 }
 ```
@@ -140,20 +147,32 @@ import { ConsultType, IllnessTime } from '@/enums'
 
 // 图片列表
 export type Image = {
+  // 图片ID
   id: string
+  // 图片地址
   url: string
 }
 // 问诊记录
 export type Consult = {
+  // 问诊记录ID
   id: string
+  // 问诊类型
   type: ConsultType
+  // 快速问诊类型，0 普通 1 三甲
   illnessType: 0 | 1
+  // 科室ID
   depId: string
+  // 疾病描述
   illnessDesc: string
+  // 疾病持续时间
   illnessTime: ConsultTime
+  // 是否就诊过，0 未就诊过  1 就诊过
   consultFlag: 0 | 1
+  // 图片数组
   pictures: Image[]
+  // 患者ID
   patientId: string
+  // 优惠券ID
   couponId: string
 }
 
@@ -509,11 +528,14 @@ const active = ref(0)
 ```ts
 // 科室
 export type SubDep = {
+  // 科室ID
   id: string
+  // 科室名称
   name: string
 }
 
 export type TopDep = SubDep & {
+  // 二级科室数组
   child: SubDep[]
 }
 ```
@@ -1301,11 +1323,15 @@ export type ConsultOrderPreParams = Pick<PartialConsult, 'type' | 'illnessType'>
 
 // 问诊订单预支付信息
 export type ConsultOrderPreData = {
+  // 积分抵扣
   pointDeduction: number
+  // 优惠券抵扣
   couponDeduction: number
+  // 优惠券ID
   couponId: string
+  // 需付款
   payment: number
-  couponId: number
+  // 实付款
   actualPayment: number
 }
 ```
