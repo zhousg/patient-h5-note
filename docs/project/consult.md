@@ -129,7 +129,7 @@ export enum ConsultType {
   Medication = 3
 }
 // 问诊时间，以1自增可以省略
-export enum ConsultTime {
+export enum IllnessTime {
   // 一周内
   Week = 1,
   // 一月内
@@ -165,7 +165,7 @@ export type Consult = {
   // 疾病描述
   illnessDesc: string
   // 疾病持续时间
-  illnessTime: ConsultTime
+  illnessTime: IllnessTime
   // 是否就诊过，0 未就诊过  1 就诊过
   consultFlag: 0 | 1
   // 图片数组
