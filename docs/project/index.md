@@ -208,7 +208,7 @@ pnpm lint
 ```bash
 pnpm i lint-staged -D
 ```
-- 配置
+- 配置 `package.json`
 ```json
 {
   // ... 省略 ...
@@ -216,6 +216,14 @@ pnpm i lint-staged -D
     "*.{js,ts,vue}": [
       "pnpm lint"
     ]
+  }
+}
+```
+```json{4}
+{
+  "scripts": {
+    // ... 省略 ...
+    "lint-staged": "lint-staged"
   }
 }
 ```
