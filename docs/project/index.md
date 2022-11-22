@@ -192,6 +192,40 @@ vscode 开启 eslint  自动修复
 - https://prettier.io/docs/en/options.html 常见规则
 
 
+## 代码检查工作流
+
+#### husky 配置
+- 初始化与安装
+```bash
+pnpm dlx husky-init && pnpm install
+```
+- 修改 .husky/pre-commit 文件
+```bash
+pnpm lint
+```
+#### lint-staged 配置
+- 安装
+```bash
+pnpm i lint-staged -D
+```
+- 配置
+```json
+{
+  // ... 省略 ...
+  "lint-staged": {
+    "*.{js,ts,vue}": [
+      "pnpm lint"
+    ]
+  }
+}
+```
+- 修改 .husky/pre-commit 文件
+```bash
+pnpm lint-staged
+```
+
+
+
 ## 项目结构调整{#dir}
 
 > 了解：每一个目录结构的作用
