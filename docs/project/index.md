@@ -214,7 +214,7 @@ pnpm i lint-staged -D
   // ... 省略 ...
   "lint-staged": {
     "*.{js,ts,vue}": [
-      "pnpm lint"
+      "eslint --fix"
     ]
   }
 }
