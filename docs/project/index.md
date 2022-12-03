@@ -577,14 +577,49 @@ module.exports = {
 
 ### 拦截器逻辑{#request-interceptors}
 
+
 > 实现：token请求头携带，错误响应处理，401错误处理
 
 `utils/request.ts`
+
+模板代码：
+
+```ts
+import axios from 'axios'
+
+const instance = axios.create({
+  // TODO 1. 基础地址，超时时间
+})
+
+instance.interceptors.request.use(
+  (config) => {
+    // TODO 2. 携带token
+    return config
+  },
+  (err) => Promise.reject(err)
+)
+
+instance.interceptors.response.use(
+  (res) => {
+    // TODO 3. 处理业务失败
+    // TODO 4. 摘取核心响应数据
+    return res
+  },
+  (err) => {
+    // TODO 5. 处理401错误
+    return Promise.reject(err)
+  }
+)
+
+export default instance
+```
+代码实现：
+
 ```ts
 import { useUserStore } from '@/stores'
 import router from '@/router'
 import axios from 'axios'
-import { Toast } from 'vant'
+import { showToast } from 'vant'
 
 // 1. 新axios实例，基础配置
 const baseURL = 'https://consult-api.itheima.net/'
@@ -610,7 +645,7 @@ instance.interceptors.response.use(
   (res) => {
     // 后台约定，响应成功，但是code不是10000，是业务逻辑失败
     if (res.data?.code !== 10000) {
-      Toast(res.data?.message)
+      showToast(res.data?.message)
       return Promise.reject(res.data)
     }
     // 业务逻辑成功，返回响应数据，作为axios成功的结果
