@@ -75,62 +75,6 @@ import { Button as VanButton, Checkbox as VanCheckbox } from 'vant'
 
 或者安装：vue-vscode-snippets 插件，快捷键可以看插件[文档](https://github.com/sdras/vue-vscode-snippets)。
 
-## css变量主题定制{#css-var}
-
-> 实现：使用css变量定制项目主题，和修改vant主题
-
-
-- 如果定义 css 变量使用 css 变量
-```css
-:root {
-  --main: #999;
-}
-a {
-  color: var(--main)
-}
-```
-
-- 定义项目的颜色风格，覆盖vant的主题色  [官方文档](https://vant-contrib.gitee.io/vant/#/zh-CN/config-provider#ji-chu-bian-liang)
-
-`styles/main.scss`
-```scss
-:root {
-  // 问诊患者：色板
-  --cp-primary: #16C2A3;
-  --cp-plain: #EAF8F6;
-  --cp-orange: #FCA21C;
-  --cp-text1: #121826;
-  --cp-text2: #3C3E42;
-  --cp-text3: #6F6F6F;
-  --cp-tag: #848484;
-  --cp-dark: #979797;
-  --cp-tip: #C3C3C5;
-  --cp-disable: #D9DBDE;
-  --cp-line: #EDEDED;
-  --cp-bg: #F6F7F9;
-  --cp-price: #EB5757;
-  // 覆盖vant主体色
-  --van-primary-color: var(--cp-primary);
-}
-```
-
-`App.vue`
-```vue
-<script setup lang="ts"></script>
-
-<template>
-  <!-- 验证vant颜色被覆盖 -->
-  <van-button type="primary">按钮</van-button>
-  <a href="#">123</a>
-</template>
-
-<style scoped lang="scss">
-// 使用 css 变量
-a {
-  color: var(--cp-primary);
-}
-</style>
-```
 
 ## 自动按需加载{#auto-import}
 

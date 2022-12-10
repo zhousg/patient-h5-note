@@ -304,6 +304,148 @@ export default router
 - `base` 作用是什么?
   - 项目的基础路径前缀，默认是 `/`
 
+## vant组件库{#vant}
+
+> 实现：完整使用vant组件库
+
+[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/quickstart#dao-ru-suo-you-zu-jian-bu-tui-jian)
+
+安装：
+```bash
+# Vue 3 项目，安装最新版 Vant
+npm i vant
+# 通过 yarn 安装
+yarn add vant
+# 通过 pnpm 安装
+pnpm add vant
+```
+
+样式：`main.ts`
+```ts{5,6}
+import { createApp } from 'vue'
+import App from './App.vue'
+import pinia from './stores'
+import router from './router'
+// 样式全局使用
+import 'vant/lib/index.css'
+import './styles/main.scss'
+
+const app = createApp(App)
+
+app.use(pinia)
+app.use(router)
+app.mount('#app')
+```
+
+
+组件按需使用：`App.vue`
+```vue
+<script setup lang="ts">
+import { Button as VanButton } from 'vant'
+</script>
+
+<template>
+  <van-button>按钮</van-button>
+</template>
+
+<style scoped></style>
+```
+
+提问：为什么不全局使用？
+- 全局使用是全量加载，是项目体积变大，加载慢
+
+## 移动端适配{#vw}
+
+> 实现：使用 vw 完成移动端适配
+
+[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/advanced-usage#viewport-bu-ju)
+
+安装：
+```bash
+npm install postcss-px-to-viewport -D
+# or
+yarn add -D postcss-px-to-viewport
+# or
+pnpm add -D postcss-px-to-viewport
+```
+
+配置：
+`postcss.config.js`
+
+```js
+// eslint-disable-next-line no-undef
+module.exports = {
+  plugins: {
+    'postcss-px-to-viewport': {
+      // 设备宽度375计算vw的值
+      viewportWidth: 375,
+    },
+  },
+};
+```
+
+测试：
+
+![image-20220731214535978](./images/image-20220731214535978.png)
+
+- 有一个控制台警告可忽略，或者使用 `postcss-px-to-viewport-8-plugin` 代替当前插件
+
+## css变量主题定制{#css-var}
+
+> 实现：使用css变量定制项目主题，和修改vant主题
+
+
+- 如果定义 css 变量使用 css 变量
+```css
+:root {
+  --main: #999;
+}
+a {
+  color: var(--main)
+}
+```
+
+- 定义项目的颜色风格，覆盖vant的主题色  [官方文档](https://vant-contrib.gitee.io/vant/#/zh-CN/config-provider#ji-chu-bian-liang)
+
+`styles/main.scss`
+```scss
+:root {
+  // 问诊患者：色板
+  --cp-primary: #16C2A3;
+  --cp-plain: #EAF8F6;
+  --cp-orange: #FCA21C;
+  --cp-text1: #121826;
+  --cp-text2: #3C3E42;
+  --cp-text3: #6F6F6F;
+  --cp-tag: #848484;
+  --cp-dark: #979797;
+  --cp-tip: #C3C3C5;
+  --cp-disable: #D9DBDE;
+  --cp-line: #EDEDED;
+  --cp-bg: #F6F7F9;
+  --cp-price: #EB5757;
+  // 覆盖vant主体色
+  --van-primary-color: var(--cp-primary);
+}
+```
+
+`App.vue`
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <!-- 验证vant颜色被覆盖 -->
+  <van-button type="primary">按钮</van-button>
+  <a href="#">123</a>
+</template>
+
+<style scoped lang="scss">
+// 使用 css 变量
+a {
+  color: var(--cp-primary);
+}
+</style>
+```
 
 
 ## 用户状态仓库{#store}
@@ -487,91 +629,6 @@ export * from './modules/user'
 - 统一导出是什么意思？
   - 一个模块下的所有资源通过index导出
 
-## vant组件库{#vant}
-
-> 实现：完整使用vant组件库
-
-[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/quickstart#dao-ru-suo-you-zu-jian-bu-tui-jian)
-
-安装：
-```bash
-# Vue 3 项目，安装最新版 Vant
-npm i vant
-# 通过 yarn 安装
-yarn add vant
-# 通过 pnpm 安装
-pnpm add vant
-```
-
-样式：`main.ts`
-```ts{5,6}
-import { createApp } from 'vue'
-import App from './App.vue'
-import pinia from './stores'
-import router from './router'
-// 样式全局使用
-import 'vant/lib/index.css'
-import './styles/main.scss'
-
-const app = createApp(App)
-
-app.use(pinia)
-app.use(router)
-app.mount('#app')
-```
-
-
-组件按需使用：`App.vue`
-```vue
-<script setup lang="ts">
-import { Button as VanButton } from 'vant'
-</script>
-
-<template>
-  <van-button>按钮</van-button>
-</template>
-
-<style scoped></style>
-```
-
-提问：为什么不全局使用？
-- 全局使用是全量加载，是项目体积变大，加载慢
-
-## 移动端适配{#vw}
-
-> 实现：使用 vw 完成移动端适配
-
-[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/advanced-usage#viewport-bu-ju)
-
-安装：
-```bash
-npm install postcss-px-to-viewport -D
-# or
-yarn add -D postcss-px-to-viewport
-# or
-pnpm add -D postcss-px-to-viewport
-```
-
-配置：
-`postcss.config.js`
-
-```js
-// eslint-disable-next-line no-undef
-module.exports = {
-  plugins: {
-    'postcss-px-to-viewport': {
-      // 设备宽度375计算vw的值
-      viewportWidth: 375,
-    },
-  },
-};
-```
-
-测试：
-
-![image-20220731214535978](./images/image-20220731214535978.png)
-
-- 有一个控制台警告可忽略，或者使用 `postcss-px-to-viewport-8-plugin` 代替当前插件
 
 ## 请求工具函数{#request}
 
@@ -622,9 +679,8 @@ import axios from 'axios'
 import { showToast } from 'vant'
 
 // 1. 新axios实例，基础配置
-const baseURL = 'https://consult-api.itheima.net/'
 const instance = axios.create({
-  baseURL,
+  baseURL: 'https://consult-api.itheima.net/',
   timeout: 10000
 })
 
@@ -645,7 +701,7 @@ instance.interceptors.response.use(
   (res) => {
     // 后台约定，响应成功，但是code不是10000，是业务逻辑失败
     if (res.data?.code !== 10000) {
-      showToast(res.data?.message)
+      showToast(res.data?.message || '业务失败')
       return Promise.reject(res.data)
     }
     // 业务逻辑成功，返回响应数据，作为axios成功的结果
@@ -657,7 +713,10 @@ instance.interceptors.response.use(
       const store = useUserStore()
       store.delUser()
       // 跳转登录，带上接口失效所在页面的地址，登录完成后回跳使用
-      router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
+      router.push({
+        path: '/login',
+        query: { returnUrl: router.currentRoute.value.fullPath }
+      })
     }
     return Promise.reject(err)
   }
@@ -682,12 +741,14 @@ export { baseURL, instance }
 
 - 导出一个通用的请求工具函数
 ```ts
+import axios, { AxiosError, type Method } from 'axios'
+
 // 4. 请求工具函数
-const request = (url: string, method = 'get', submitData?: object) => {
+const request = (url: string, method: Method = 'GET', submitData?: object) => {
   return instance.request({
     url,
     method,
-    [method.toLowerCase() === 'get' ? 'params' : 'data']: submitData
+    [method.toUpperCase() === 'GET' ? 'params' : 'data']: submitData
   })
 }
 ```
@@ -777,7 +838,6 @@ const login = async () => {
 |   /   |   1    |  布局容器    |
 |   /user   |   ②    |   个人中心   |
 |   /user/patient   |   1   |   家庭档案   |
-|   /user/address   |   1   |   地址管理   |
 |   /home   |   ②   |   首页   |
 |   /consult/fast   |   1   |   快速问诊   |
 |   /consult/dep   |   1   |   选择科室   |
@@ -788,7 +848,6 @@ const login = async () => {
 |   /user/consult/:id   |   1   |   问诊详情   |
 |   /order/pay   |   1   |   药品订单支付   |
 |   /order/pay/result   |   1   |   药品订单支付结果   |
-|   /order   |   1   |   药品订单列表   |
 |   /order/:id   |   1   |   药品订单详情   |
 |   /order/logistics/:id   |   1   |   药品订单物流   |
 |   /login/callback   |   1   |   QQ登录回跳   |
