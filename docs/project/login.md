@@ -39,15 +39,10 @@
 
 - 基础组件结构 `views/Login/index.vue`
 ```vue
-<script setup lang="ts">
-import { Button as VanButton, Checkbox as VanCheckbox } from 'vant'
-</script>
+<script setup lang="ts"></script>
 
 <template>
-  <div class="login-page">
-    <van-button type="primary">按钮</van-button>
-    <van-checkbox :checked="true">复选框</van-checkbox>
-  </div>
+  <div class="login-page">login</div>
 </template>
 
 <style lang="scss" scoped></style>
@@ -70,8 +65,6 @@ import { Button as VanButton, Checkbox as VanCheckbox } from 'vant'
 疑问：
 - vueps 生成组件基础结构？
   - 使用vscode代码片段，或插件
-- vant 的主题色和项目的不一致？
-  - css变量定制主题
 - 每次这样导入 vant 的组件非常麻烦？
   - 可以使用自动导入vite插件
 
@@ -87,9 +80,9 @@ import { Button as VanButton, Checkbox as VanCheckbox } from 'vant'
 3. 拷贝一下代码，保存即可，输入vueps
 ```json
 {
-  "vuets页面": {
+  "Vue 页面 TS 版": {
 		"scope": "vue,markdown",
-		"prefix": "vueps",
+		"prefix": "vpt",
 		"body": [
 			"<script setup lang=\"ts\"></script>",
 			"",
@@ -100,7 +93,7 @@ import { Button as VanButton, Checkbox as VanCheckbox } from 'vant'
 			"<style lang=\"scss\" scoped></style>",
 			""
 		],
-		"description": "Log output to console"
+		"description": "Vue 页面 TS 版"
 	}
 }  
 ```
@@ -173,7 +166,7 @@ export default defineConfig({
 
 提取原因：
 - 样式需要需改
-- 项目中使用的 nav-bar 组件功能有相似之处
+- 项目中使用的 cp-nav-bar 组件功能有相似之处
 
 组件使用：了解 van-nav-bar 组件的基本功能属性[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/nav-bar#api)
 
@@ -181,29 +174,27 @@ export default defineConfig({
 
 ```vue
 <script setup lang="ts">
-// 一定有的功能：返回图标，返回效果，固定定位（组件内部实现）
-// 使用组件时候才能确定的功能：标题，右侧文字，点击右侧文字行为（props传入）
 const onClickLeft = () => {
-  //
+  // TODO 点击左侧返回按钮
 }
 const onClickRight = () => {
-  //
+  // TODO 点击右侧文字按钮
 }
 </script>
 
 <template>
   <van-nav-bar
-    left-arrow
-    @click-left="onClickLeft"
     fixed
-    title="注册"
+    left-arrow
+    title="登录"
     right-text="注册"
+    @click-left="onClickLeft"
     @click-right="onClickRight"
   ></van-nav-bar>
 </template>
 
 <style lang="scss" scoped>
-::v-deep() {
+:deep() {
   .van-nav-bar {
     &__arrow {
       font-size: 18px;
@@ -219,7 +210,7 @@ const onClickRight = () => {
 
 提问：
 - 怎么深度作用其他组件样式？
-  - `::v-deep(){  // 样式  }`
+  - `:deep(){  // 样式  }`
 
 ## cp-nav-bar 组件功能{#cp-nav-bar-logic}
 
