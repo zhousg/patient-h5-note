@@ -26,7 +26,7 @@ export default defineConfig({
     ],
     // search: true,
     socialLinks: [
-      { icon: 'github', link: 'http://git.itcast.cn/zhousg/consult-patients-h5-vue3-preview' },
+      { icon: 'github', link: 'https://github.com/zhousg/consult-patient-h5-vue3-ts-pinia-vant' },
     ],
     footer: {
       message: 'Released under the MIT License.',
