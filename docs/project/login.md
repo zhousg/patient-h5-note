@@ -257,7 +257,7 @@ const onClickRight = () => {
 </template>
 
 <style lang="scss" scoped>
-::v-deep() {
+:deep() {
   .van-nav-bar {
     &__arrow {
       font-size: 18px;
@@ -343,16 +343,28 @@ declare module 'vue' {
   - key组件名称支持大驼峰，value是组件类型,通过 typeof 组件实例得到
 
 
-## 页面布局-头底{#login-html}
-> 实现：页面的基础布局，定制 `van-cell` 的样式
+## 页面布局{#login-html}
 
-- 基础布局 `vies/Login/index.vue`
-```vue
-<script setup lang="ts"></script>
-
-<template>
+- 准备全局重置样式 `style/main.scss`
+```css
+// 全局样式
+body {
+  font-size: 14px;
+  color: var(--cp-text1);
+}
+a {
+  color: var(--cp-text2);
+}
+h1,h2,h3,h4,h5,h6,p,ul,ol {
+  margin: 0;
+  padding: 0;
+}
+```
+- 登录页面的头部与底部 `vies/Login/index.vue`
+```html
   <div class="login-page">
     <cp-nav-bar right-text="注册" @click-right="$router.push('/register')"></cp-nav-bar>
+    <!-- 头部 -->
     <div class="login-head">
       <h3>密码登录</h3>
       <a href="javascript:;">
@@ -360,7 +372,8 @@ declare module 'vue' {
         <van-icon name="arrow"></van-icon>
       </a>
     </div>
-    <!-- form 表单 -->
+    <!-- 表单 -->
+    <!-- 底部 -->
     <div class="login-other">
       <van-divider>第三方登录</van-divider>
       <div class="icon">
@@ -368,16 +381,15 @@ declare module 'vue' {
       </div>
     </div>
   </div>
-</template>
-
-<style lang="scss" scoped>
+```
+```scss
 .login {
   &-page {
     padding-top: 46px;
   }
   &-head {
-    padding: 30px 30px 50px;
     display: flex;
+    padding: 30px 30px 50px;
     justify-content: space-between;
     align-items: flex-end;
     line-height: 1;
@@ -403,72 +415,6 @@ declare module 'vue' {
     }
   }
 }
-</style>
-```
-
-- 全局样式
-`styles/main.scss`
-```scss
-// 全局样式
-body {
-  font-size: 14px;
-  color: var(--cp-text1);
-}
-a {
-  color: var(--cp-text2);
-}
-h1,h2,h3,h4,h5,h6,p,ul,ol {
-  margin: 0;
-  padding: 0;
-}
-```
-
-小结：
-- 使用 `van-icon` `van-divider` 组件完成登录，头部和底部布局。
-
-## 页面布局-表单{#login-form}
-> 实现：表单的绘制，以及表单根据项目需要进行定制
-
-- css变量定制表单
-`styles/main.scss`
-```scss{3-8}
-  // 覆盖vant主体色
-  --van-primary-color: var(--cp-primary);
-  // 单元格上下间距
-  --van-cell-vertical-padding: 14px;
-  // 复选框大小
-  --van-checkbox-size: 14px;
-  // 默认按钮文字大小
-  --van-button-normal-font-size: 16px;
-```
-- 组件结构 `Login/index.vue`
-
-```ts
-import { ref } from 'vue'
-
-const agree = ref(false)
-```
-```html
-    <van-form autocomplete="off">
-      <van-field placeholder="请输入手机号" type="tel"></van-field>
-      <van-field placeholder="请输入密码" type="password"></van-field>
-      <div class="cp-cell">
-        <van-checkbox v-model="agree">
-          <span>我已同意</span>
-          <a href="javascript:;">用户协议</a>
-          <span>及</span>
-          <a href="javascript:;">隐私条款</a>
-        </van-checkbox>
-      </div>
-      <div class="cp-cell">
-        <van-button block round type="primary">登 录</van-button>
-      </div>
-      <div class="cp-cell">
-        <a href="javascript:;">忘记密码？</a>
-      </div>
-    </van-form>
-```
-```scss
 .van-form {
   padding: 0 14px;
   .cp-cell {
@@ -487,11 +433,38 @@ const agree = ref(false)
   }
 }
 ```
-
-小结：
-- 覆盖 vant 的样式方式有？
-  - `css变量（通用）`，组件内直接样式覆盖（局部）
-
+- 登录页面的表单 `vies/Login/index.vue`
+```html
+    <van-form autocomplete="off">
+      <van-field placeholder="请输入手机号" type="tel"></van-field>
+      <van-field placeholder="请输入密码" type="password"></van-field>
+      <div class="cp-cell">
+        <van-checkbox>
+          <span>我已同意</span>
+          <a href="javascript:;">用户协议</a>
+          <span>及</span>
+          <a href="javascript:;">隐私条款</a>
+        </van-checkbox>
+      </div>
+      <div class="cp-cell">
+        <van-button block round type="primary">登 录</van-button>
+      </div>
+      <div class="cp-cell">
+        <a href="javascript:;">忘记密码？</a>
+      </div>
+    </van-form>
+```
+- 定制表单样式 `style/main.scss`
+```scss{3-8}
+  // 覆盖vant主体色
+  --van-primary-color: var(--cp-primary);
+  // 单元格上下间距
+  --van-cell-vertical-padding: 14px;
+  // 复选框大小
+  --van-checkbox-size: 14px;
+  // 默认按钮文字大小
+  --van-button-normal-font-size: 16px;
+```
 
 ## 图标组件-打包svg地图{#svg-plugin}
 
@@ -543,7 +516,7 @@ import 'vant/lib/index.css'
 
 - 使用svg精灵地图
 
-```html
+```xml
     <svg aria-hidden="true">
       <!-- #icon-文件夹名称-图片名称 -->
       <use href="#icon-login-eye-off" />
