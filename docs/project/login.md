@@ -361,9 +361,15 @@ h1,h2,h3,h4,h5,h6,p,ul,ol {
 }
 ```
 - 登录页面的头部与底部 `vies/Login/index.vue`
-```html
+```vue
+  <script setup lang="ts"></script>
+
+<template>
   <div class="login-page">
-    <cp-nav-bar right-text="注册" @click-right="$router.push('/register')"></cp-nav-bar>
+    <cp-nav-bar
+      right-text="注册"
+      @click-right="$router.push('/register')"
+    ></cp-nav-bar>
     <!-- 头部 -->
     <div class="login-head">
       <h3>密码登录</h3>
@@ -399,8 +405,9 @@ h1,h2,h3,h4,h5,h6,p,ul,ol {
       </div>
     </div>
   </div>
-```
-```scss
+</template>
+
+<style lang="scss" scoped>
 .login {
   &-page {
     padding-top: 46px;
@@ -450,6 +457,7 @@ h1,h2,h3,h4,h5,h6,p,ul,ol {
     }
   }
 }
+</style>
 ```
 
 - 定制样式 `style/main.scss`
