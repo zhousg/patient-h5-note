@@ -373,6 +373,24 @@ h1,h2,h3,h4,h5,h6,p,ul,ol {
       </a>
     </div>
     <!-- 表单 -->
+    <van-form autocomplete="off">
+      <van-field placeholder="请输入手机号" type="tel"></van-field>
+      <van-field placeholder="请输入密码" type="password"></van-field>
+      <div class="cp-cell">
+        <van-checkbox>
+          <span>我已同意</span>
+          <a href="javascript:;">用户协议</a>
+          <span>及</span>
+          <a href="javascript:;">隐私条款</a>
+        </van-checkbox>
+      </div>
+      <div class="cp-cell">
+        <van-button block round type="primary">登 录</van-button>
+      </div>
+      <div class="cp-cell">
+        <a href="javascript:;">忘记密码？</a>
+      </div>
+    </van-form>
     <!-- 底部 -->
     <div class="login-other">
       <van-divider>第三方登录</van-divider>
@@ -433,28 +451,8 @@ h1,h2,h3,h4,h5,h6,p,ul,ol {
   }
 }
 ```
-- 登录页面的表单 `vies/Login/index.vue`
-```html
-    <van-form autocomplete="off">
-      <van-field placeholder="请输入手机号" type="tel"></van-field>
-      <van-field placeholder="请输入密码" type="password"></van-field>
-      <div class="cp-cell">
-        <van-checkbox>
-          <span>我已同意</span>
-          <a href="javascript:;">用户协议</a>
-          <span>及</span>
-          <a href="javascript:;">隐私条款</a>
-        </van-checkbox>
-      </div>
-      <div class="cp-cell">
-        <van-button block round type="primary">登 录</van-button>
-      </div>
-      <div class="cp-cell">
-        <a href="javascript:;">忘记密码？</a>
-      </div>
-    </van-form>
-```
-- 定制表单样式 `style/main.scss`
+
+- 定制样式 `style/main.scss`
 ```scss{3-8}
   // 覆盖vant主体色
   --van-primary-color: var(--cp-primary);
@@ -465,137 +463,6 @@ h1,h2,h3,h4,h5,h6,p,ul,ol {
   // 默认按钮文字大小
   --van-button-normal-font-size: 16px;
 ```
-
-## 图标组件-打包svg地图{#svg-plugin}
-
-> 实现：根据 icons 文件svg图片打包到项目中，通过组件使用图标
-
-[参考文档](https://github.com/vbenjs/vite-plugin-svg-icons)
-
-- 安装插件
-
-```bash
-yarn add vite-plugin-svg-icons -D
-# or
-npm i vite-plugin-svg-icons -D
-# or
-pnpm install vite-plugin-svg-icons -D
-```
-
-- 使用插件
-
-`vite.config.ts`
-```diff
-import { VantResolver } from 'unplugin-vue-components/resolvers'
-+import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
-+import path from 'path'
-
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-    Components({
-      dts: false,
-      resolvers: [VantResolver({ importStyle: false })]
-    }),
-+    createSvgIconsPlugin({
-+      // 指定图标文件夹，绝对路径（NODE代码）
-+      iconDirs: [path.resolve(process.cwd(), 'src/icons')]
-+    })
-  ],
-```
-
-- 导入到main
-
-```diff
-import router from './router'
-+import 'virtual:svg-icons-register'
-
-import 'vant/lib/index.css'
-```
-
-- 使用svg精灵地图
-
-```xml
-    <svg aria-hidden="true">
-      <!-- #icon-文件夹名称-图片名称 -->
-      <use href="#icon-login-eye-off" />
-    </svg>
-```
-
-小结：
-- icons文件打包的产物？
-  - 会生成一个 svg 结构（js创建的）包含所有图标，理解为 `精灵图`
-
-- 怎么使用svg图标？
-  - 通过 svg 标签 `#icon-文件夹名称-图片名称` 指定图片，理解 `精灵图定位坐标`
-
-
-## 图标组件-封装svg组件{#svg-com}
-
-> 实现：把 svg 标签使用图标封装起来，使用组件完成密码可见切换功能。
-
-- 组件 `components/CpIcon.vue`
-
-```vue
-<script setup lang="ts">
-// 提供name属性即可
-defineProps<{
-  name: string
-}>()
-</script>
-
-<template>
-  <svg aria-hidden="true" class="cp-icon">
-    <use :href="`#icon-${name}`" />
-  </svg>
-</template>
-
-<style lang="scss" scoped>
-.cp-icon {
-  // 和字体一样大
-  width: 1em;
-  height: 1em;
-}
-</style>
-```
-
-- 类型 `types/components.d.ts`
-
-```ts{2,7}
-import CpNavBar from '@/components/CpNavBar.vue'
-import CpIcon from '@/components/CpIcon.vue'
-
-declare module 'vue' {
-  interface GlobalComponents {
-    CpNavBar: typeof CpNavBar
-    CpIcon: typeof CpIcon
-  }
-}
-```
-
-提示：
-- 有些图标可以根据 style 中 `color` 的值来设置颜色，图标是否有这个功能取决于 UI 做图片时否开启。
-
-
-实现切换密码可见功能：`Login/index.vue`
-```ts
-// 表单数据
-const mobile = ref('')
-const password = ref('')
-// 控制密码是否显示
-const show = ref(false)
-```
-```html
-<van-field v-model="mobile" placeholder="请输入手机号" type="tel"></van-field>
-<van-field v-model="password" placeholder="请输入密码" :type="show ? 'text' : 'password'">
-  <template #button>
-    <cp-icon @click="show = !show" :name="`login-eye-${show ? 'on' : 'off'}`"></cp-icon>
-  </template>
-</van-field>
-```
-小结：
-- 表单绑定数据后，通过 show 切换 text 和 password，对应切换图标组件的 name 即可。
 
 
 ## 表单校验{#login-form-validate}
@@ -947,3 +814,134 @@ const login = async () => {
 ```
 小结：
 - 处理接口和传参不一样，成功后的逻辑都一样的。
+
+## 图标组件-打包svg地图{#svg-plugin}
+
+> 实现：根据 icons 文件svg图片打包到项目中，通过组件使用图标
+
+[参考文档](https://github.com/vbenjs/vite-plugin-svg-icons)
+
+- 安装插件
+
+```bash
+yarn add vite-plugin-svg-icons -D
+# or
+npm i vite-plugin-svg-icons -D
+# or
+pnpm install vite-plugin-svg-icons -D
+```
+
+- 使用插件
+
+`vite.config.ts`
+```diff
+import { VantResolver } from 'unplugin-vue-components/resolvers'
++import { createSvgIconsPlugin } from 'vite-plugin-svg-icons'
++import path from 'path'
+
+// https://vitejs.dev/config/
+export default defineConfig({
+  plugins: [
+    vue(),
+    Components({
+      dts: false,
+      resolvers: [VantResolver({ importStyle: false })]
+    }),
++    createSvgIconsPlugin({
++      // 指定图标文件夹，绝对路径（NODE代码）
++      iconDirs: [path.resolve(process.cwd(), 'src/icons')]
++    })
+  ],
+```
+
+- 导入到main
+
+```diff
+import router from './router'
++import 'virtual:svg-icons-register'
+
+import 'vant/lib/index.css'
+```
+
+- 使用svg精灵地图
+
+```xml
+    <svg aria-hidden="true">
+      <!-- #icon-文件夹名称-图片名称 -->
+      <use href="#icon-login-eye-off" />
+    </svg>
+```
+
+小结：
+- icons文件打包的产物？
+  - 会生成一个 svg 结构（js创建的）包含所有图标，理解为 `精灵图`
+
+- 怎么使用svg图标？
+  - 通过 svg 标签 `#icon-文件夹名称-图片名称` 指定图片，理解 `精灵图定位坐标`
+
+
+## 图标组件-封装svg组件{#svg-com}
+
+> 实现：把 svg 标签使用图标封装起来，使用组件完成密码可见切换功能。
+
+- 组件 `components/CpIcon.vue`
+
+```vue
+<script setup lang="ts">
+// 提供name属性即可
+defineProps<{
+  name: string
+}>()
+</script>
+
+<template>
+  <svg aria-hidden="true" class="cp-icon">
+    <use :href="`#icon-${name}`" />
+  </svg>
+</template>
+
+<style lang="scss" scoped>
+.cp-icon {
+  // 和字体一样大
+  width: 1em;
+  height: 1em;
+}
+</style>
+```
+
+- 类型 `types/components.d.ts`
+
+```ts{2,7}
+import CpNavBar from '@/components/CpNavBar.vue'
+import CpIcon from '@/components/CpIcon.vue'
+
+declare module 'vue' {
+  interface GlobalComponents {
+    CpNavBar: typeof CpNavBar
+    CpIcon: typeof CpIcon
+  }
+}
+```
+
+提示：
+- 有些图标可以根据 style 中 `color` 的值来设置颜色，图标是否有这个功能取决于 UI 做图片时否开启。
+
+
+实现切换密码可见功能：`Login/index.vue`
+```ts
+// 表单数据
+const mobile = ref('')
+const password = ref('')
+// 控制密码是否显示
+const show = ref(false)
+```
+```html
+<van-field v-model="mobile" placeholder="请输入手机号" type="tel"></van-field>
+<van-field v-model="password" placeholder="请输入密码" :type="show ? 'text' : 'password'">
+  <template #button>
+    <cp-icon @click="show = !show" :name="`login-eye-${show ? 'on' : 'off'}`"></cp-icon>
+  </template>
+</van-field>
+```
+小结：
+- 表单绑定数据后，通过 show 切换 text 和 password，对应切换图标组件的 name 即可。
