@@ -456,6 +456,12 @@ h1,h2,h3,h4,h5,h6,p,ul,ol {
       }
     }
   }
+  .btn-send {
+    color: var(--cp-primary);
+    &.active {
+      color: rgba(22,194,163,0.5);
+    }
+  }
 }
 </style>
 ```
@@ -630,15 +636,7 @@ const isPass = ref(true)
         </template>
       </van-field>
 ```
-```scss
-  // van-form 下添加
-  .btn-send {
-    color: var(--cp-primary);
-    &.active {
-      color: rgba(22,194,163,0.5);
-    }
-  }
-```
+
 
 2）完成code校验
 
