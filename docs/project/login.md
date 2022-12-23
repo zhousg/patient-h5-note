@@ -360,9 +360,9 @@ h1,h2,h3,h4,h5,h6,p,ul,ol {
   padding: 0;
 }
 ```
-- 登录页面的头部与底部 `vies/Login/index.vue`
+- 登录页面整体结构 `vies/Login/index.vue`
 ```vue
-  <script setup lang="ts"></script>
+<script setup lang="ts"></script>
 
 <template>
   <div class="login-page">
