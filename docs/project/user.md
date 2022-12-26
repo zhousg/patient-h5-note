@@ -144,13 +144,14 @@
 
 <style lang="scss" scoped>
 .layout-page {
-  ::v-deep() {
+  :deep() {
     .van-tabbar-item {
       &__icon {
         font-size: 21px;
       }
       &__text {
         font-size: 11px;
+        color: var(--cp-text3);
       }
     }
   }
