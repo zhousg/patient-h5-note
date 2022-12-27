@@ -464,7 +464,7 @@ a {
 
 `types/user.d.ts`
 ```ts
-/* 用户信息 */
+// 用户信息
 export type User = {
   /* token令牌 */
   token: string

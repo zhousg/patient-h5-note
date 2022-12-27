@@ -257,7 +257,7 @@ declare module 'vue-router' {
 }
 ```
 
-## 加载进度
+## 布局容器-加载进度{#layout-loading}
 
 > 实现加载进度显示
 
@@ -364,14 +364,22 @@ export type CodeType = 'login' | 'register' | 'changeMobile' | 'forgetPassword' 
 // 个人信息
 type OmitUser = Omit<User, 'token'>
 export type UserInfo = OmitUser & {
+  /* 关注 */
   likeNumber: number
+  /* 收藏 */
   collectionNumber: number
+  /* 积分 */
   score: number
+  /* 优惠券 */
   couponNumber: number
   orderInfo: {
+    /* 待付款 */
     paidNumber: number
+    /* 待发货 */
     receivedNumber: number
+    /* 待收货 */
     shippedNumber: number
+    /* 已完成 */
     finishedNumber: number
   }
 }
@@ -537,6 +545,30 @@ export type UserInfo = OmitUser & {
       }
     }
   }
+  // 分组
+  &-group {
+    background-color: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    h3 {
+      padding-left: 16px;
+      line-height: 44px;
+    }
+    .van-cell {
+      align-items: center;
+    }
+    .cp-icon {
+      font-size: 17px;
+      margin-right: 10px;
+    }
+  }
+  .logout {
+    display: block;
+    margin: 20px auto;
+    width: 100px;
+    text-align: center;
+    color: var(--cp-price);
+  }
 }
 </style>
 ```
@@ -653,25 +685,6 @@ onMounted(async () => {
       </van-cell>
     </div>
 ```
-```scss
-  // 分组
-  &-group {
-    background-color: #fff;
-    border-radius: 8px;
-    overflow: hidden;
-    h3 {
-      padding-left: 16px;
-      line-height: 44px;
-    }
-    .van-cell {
-      align-items: center;
-    }
-    .cp-icon {
-      font-size: 17px;
-      margin-right: 10px;
-    }
-  }
-```
 
 2）准备初始化数据
 
@@ -721,22 +734,13 @@ const tools = [
 ```html
 <a class="logout" href="javascript:;">退出登录</a>
 ```
-```scss
-  .logout {
-    display: block;
-    margin: 20px auto;
-    width: 100px;
-    text-align: center;
-    color: var(--cp-price);
-  }
-```
 
 2）实现退出
 
 ```ts
 import { useUserStore } from '@/stores/index'
 
-// ... 胜省略 ...
+// ... 省略 ...
 
 const store = useUserStore()
 const router = useRouter()
@@ -909,19 +913,19 @@ const logout = async () => {
 ```ts
 // 家庭档案-患者信息
 export type Patient = {
-  // 患者ID
+  /* 患者ID */
   id: string
-  // 患者名称
+  /* 患者名称 */
   name: string
-  // 身份证号
+  /* 身份证号 */
   idCard: string
-  // 0不默认  1默认
+  /* 0不默认  1默认 */
   defaultFlag: 0 | 1
-  // 0 女  1 男
+  /* 0 女  1 男 */
   gender: 0 | 1
-  // 性别文字
+  /* 性别文字 */
   genderValue: string
-  // 年龄
+  /* 年龄 */
   age: number
 }
 
