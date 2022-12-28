@@ -13,7 +13,7 @@
 
 ```bash
 # 测试用 appid 
-# 100556005
+# 102015968
 # 测试用 redirect_uri
 # http://consult-patients.itheima.net/login/callback
 ```
