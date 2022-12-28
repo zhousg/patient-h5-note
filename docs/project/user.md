@@ -747,9 +747,7 @@ const router = useRouter()
 const logout = async () => {
   await Dialog.confirm({
     title: '温馨提示',
-    message: '您确认要退出优医问诊吗？',
-    cancelButtonText: '取消',
-    confirmButtonText: '确认'
+    message: '您确认要退出优医问诊吗？'
   })
   store.delUser()
   router.push('/login')
