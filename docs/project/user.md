@@ -747,7 +747,7 @@ import { useUserStore } from '@/stores/index'
 const store = useUserStore()
 const router = useRouter()
 const logout = async () => {
-  await Dialog.confirm({
+  await showConfirmDialog({
     title: '温馨提示',
     message: '您确认要退出优医问诊吗？'
   })
