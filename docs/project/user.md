@@ -151,6 +151,8 @@
       }
       &__text {
         font-size: 11px;
+      }
+      &:not(.van-tabbar-item--active) {
         color: var(--cp-text3);
       }
     }
