@@ -3,7 +3,7 @@
 
 
 
-## 🪵布局容器{#layout}
+## 🪵 布局容器 > {#layout}
 
 ![image-20220808185458747](./images/image-20220808185458747.png)
 
@@ -315,7 +315,7 @@ NProgress.configure({
 
 
 
-## 🛖个人中心{#user}
+## 🛖 个人中心 > {#user}
 
 ![image-20220808185103327](./images/image-20220808185103327.png)
 
@@ -758,7 +758,7 @@ const logout = async () => {
 
 
 
-## 🏥家庭档案{#patient}
+## 🏥 家庭档案 > {#patient}
 
 ![image-20220808184827626](./images/image-20220808184827626.png)
 
@@ -1229,7 +1229,7 @@ const showPopup = () => {
 ```scss
 .patient-page {
   padding: 46px 0 80px;
-  ::v-deep() {
+  :deep() {
     .van-popup {
       width: 80%;
       height: 100%;
@@ -1281,7 +1281,7 @@ const onClickLeft = () => {
 ```scss
 .patient-page {
   padding: 46px 0 80px;
-  ::v-deep() {
+  :deep() {
     .van-popup {
       width: 100%;
       height: 100%;
