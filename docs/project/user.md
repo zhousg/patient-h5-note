@@ -1508,7 +1508,7 @@ const onSubmit = async () => {
 const onSubmit = async () => {
   await form.value?.validate()
   // 身份证倒数第二位，单数是男，双数是女
-  const gender = +patient.value.idCard.substring(16, 1) % 2
+  const gender = +patient.value.idCard.slice(-2, -1) % 2
   if (gender !== patient.value.gender) {
     await showConfirmDialog({
       title: '温馨提示',
@@ -1552,7 +1552,7 @@ export const addPatient = (patient: Patient) => request('/patient/add', 'POST', 
 const submit = async () => {
   await form.value?.validate()
   // 身份证倒数第二位，单数是男，双数是女
-  const gender = +patient.value.idCard.substring(16, 1) % 2
+  const gender = +patient.value.idCard.slice(-2, -1) % 2
   if (gender !== patient.value.gender) {
     await showConfirmDialog({
       title: '温馨提示',
@@ -1625,7 +1625,7 @@ import { addPatient, getPatientList, editPatient } from '@/services/user'
 const submit = async () => {
   await form.value?.validate()
   // 身份证倒数第二位，单数是男，双数是女
-  const gender = +patient.value.idCard.substring(16, 1) % 2
+  const gender = +patient.value.idCard.slice(-2, -1) % 2
   if (gender !== patient.value.gender) {
     await showConfirmDialog({
       title: '温馨提示',
