@@ -1204,7 +1204,7 @@ const toggleItem = (value: string | number) => {
   - `:modelValue="count"` 和 `@update:modelValue="count=$event"`
 
 
-## 家庭档案-侧边栏显示隐藏{#patient-popup}
+## 家庭档案-侧滑层显示隐藏{#patient-popup}
 > 实现：使用 van-popup 完成侧边栏效果
 
 需求：
@@ -1321,7 +1321,7 @@ const onClickLeft = () => {
   - v-model:show
 
 
-## 家庭档案-准备表单{#patient-form}
+## 家庭档案-表单数据绑定{#patient-form}
 
 > 实现：患者信息录入的表单和绑定数据
 
