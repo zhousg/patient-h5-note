@@ -1621,7 +1621,7 @@ export const editPatient = (patient: Patient) => request('/patient/update', 'PUT
 ```ts
 import { addPatient, getPatientList, editPatient } from '@/services/user'
 ```
-```ts{9-13}
+```ts{12-16}
 const submit = async () => {
   await form.value?.validate()
   // 身份证倒数第二位，单数是男，双数是女
