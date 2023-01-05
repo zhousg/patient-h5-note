@@ -1590,18 +1590,21 @@ import { addPatient, getPatientList, editPatient } from '@/services/user'
 ```
 ```ts{9-13}
 const submit = async () => {
-  if (!patient.value.name) return Toast('请输入真实姓名')
-  if (!patient.value.idCard) return Toast('请输入身份证号')
-  const validate = new Validator()
-  if (!validate.isValid(patient.value.idCard)) return Toast('身份证格式错误')
-  const { sex } = validate.getInfo(patient.value.idCard)
-  if (patient.value.gender !== sex) return Toast('性别和身份证不符')
+  await form.value?.validate()
+  // 身份证倒数第二位，单数是男，双数是女
+  const gender = +patient.value.idCard.substring(16, 1) % 2
+  if (gender !== patient.value.gender) {
+    await showConfirmDialog({
+      title: '温馨提示',
+      message: '填写的性别和身份证号中的不一致\n您确认提交吗？'
+    })
+  }
 
   // 添加 & 修改
   patient.value.id ? await editPatient(patient.value) : await addPatient(patient.value)
   show.value = false
   loadList()
-  Toast.success(patient.value.id ? '编辑成功' : '添加成功')
+  showSuccessToast(patient.value.id ? '编辑成功' : '添加成功')
 }
 ```
 
@@ -1659,14 +1662,12 @@ const remove = async () => {
   if (patient.value.id) {
     await Dialog.confirm({
       title: '温馨提示',
-      message: `您确认要删除 ${patient.value.name} 患者信息吗 ？`,
-      cancelButtonText: '取消',
-      confirmButtonText: '确认'
+      message: `您确认要删除 ${patient.value.name} 患者信息吗 ？`
     })
     await delPatient(patient.value.id)
     show.value = false
     loadList()
-    Toast.success('删除成功')
+    showSuccessToast('删除成功')
   }
 }
 ```
