@@ -1225,6 +1225,9 @@ const showPopup = () => {
 }
 ```
 ```html
+<div class="patient-add" v-if="list.length < 6" @click="showPopup()">
+```
+```html
     <!-- 侧边栏 -->
     <van-popup v-model:show="show" position="right">
       <cp-nav-bar title="添加患者" right-text="保存"></cp-nav-bar>
