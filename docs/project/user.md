@@ -1401,7 +1401,7 @@ const showPopup = () => {
   - 克隆一份新数据，要不然是同一个对象。
 
 
-## 家庭档案-身份证校验{#patient-validate}
+## 家庭档案-表单校验{#patient-validate}
 
 > 实现：提交的时候校验表单，身份证需要校验格式
 
