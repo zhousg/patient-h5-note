@@ -789,7 +789,7 @@ const logout = async () => {
       <div class="patient-item">
         <div class="info">
           <span class="name">李富贵</span>
-          <span class="id">321***********6164</span>
+          <span class="id">321111********6164</span>
           <span>男</span>
           <span>32岁</span>
         </div>
@@ -799,7 +799,7 @@ const logout = async () => {
       <div class="patient-item">
         <div class="info">
           <span class="name">李富贵</span>
-          <span class="id">321***********6164</span>
+          <span class="id">321333********6164</span>
           <span>男</span>
           <span>32岁</span>
         </div>
@@ -892,6 +892,9 @@ const logout = async () => {
 .patient-tip {
   color: var(--cp-tag);
   padding: 12px 0;
+}
+.pb4 {
+  padding-bottom: 4px;
 }
 </style>
 ```
@@ -1208,6 +1211,7 @@ const toggleItem = (value: string | number) => {
 - 使用 van-popup 组件，实现显示隐藏
 - 不使用 v-model 实现父子数据同步，理解语法糖
 - 扩展 cp-nav-bar 组件，支持自定义返回
+- 绘制表单
 
 代码：
 
@@ -1291,6 +1295,24 @@ const onClickLeft = () => {
   }
 }
 ```
+4）绘制表单
+```html
+      <van-form autocomplete="off" ref="form">
+        <van-field label="真实姓名" placeholder="请输入真实姓名" />
+        <van-field label="身份证号" placeholder="请输入身份证号" />
+        <van-field label="性别" class="pb4">
+          <!-- 单选按钮组件 -->
+          <template #input>
+            <cp-radio-btn :options="options"></cp-radio-btn>
+          </template>
+        </van-field>
+        <van-field label="默认就诊人">
+          <template #input>
+            <van-checkbox :icon-size="18" round />
+          </template>
+        </van-field>
+      </van-form>
+```
 
 小结：
 - 属性可以传函数吗？
@@ -1304,32 +1326,14 @@ const onClickLeft = () => {
 > 实现：患者信息录入的表单和绑定数据
 
 需求：
-- 绘制表单
-- 绑定数据
+- 绑定表单项数据
+- 绑定复选框数据
 - 打开侧滑栏重置表单
 
 代码：`User/PatientPage.vue` 
 
-1）绘制表单
-```html
-<van-form autocomplete="off">
-  <van-field label="真实姓名" placeholder="请输入真实姓名" />
-  <van-field label="身份证号" placeholder="请输入身份证号" />
-  <van-field label="性别">
-    <!-- 单选按钮组件 -->
-    <template #input>
-      <cp-radio-btn :options="options"></cp-radio-btn>
-    </template>
-  </van-field>
-  <van-field label="默认就诊人">
-    <template #input>
-      <van-checkbox round />
-    </template>
-  </van-field>
-</van-form>
-```
 
-2）绑定数据
+1）绑定数据
 `user.d.ts`
 ```ts{2,7,8}
 export type Patient = {
@@ -1354,6 +1358,11 @@ const patient = ref<Patient>({
   gender: 1,
   defaultFlag: 0
 })
+```
+
+2）绑定复选框数据
+
+```ts
 // 默认值需要转换
 const defaultFlag = computed({
   get() {
@@ -1364,6 +1373,7 @@ const defaultFlag = computed({
   }
 })
 ```
+
 
 3）打开侧滑栏重置表单
 ```ts
@@ -1395,31 +1405,13 @@ const showPopup = () => {
 
 > 实现：提交的时候校验表单，身份证需要校验格式
 
+
 需求：
-- 点击保存按钮进行校验
-  - 名字非空，身份证非空
-  - 身份证格式，性别需要和填写的一致
+- 姓名，非空，2-18字符,身份证，非空，格式校验
+- 保存的时候校验，整体校验
+- 性别需要和身份证包含性别填写的一致，确认框提示
 
-代码：
-
-1）名字非空，身份证非空
-```html{5}
-      <cp-nav-bar
-        :back="() => (show = false)"
-        title="添加患者"
-        right-text="保存"
-        @click-right="submit"
-      ></cp-nav-bar>
-```
-```ts
-const submit = () => {
-  if (!patient.value.name) return Toast('请输入真实姓名')
-  if (!patient.value.idCard) return Toast('请输入身份证号')
-}
-```
-
-2）身份证格式，性别需要和填写的一致
-- 测试号 
+测试：
 - 110101198307212600 
 - 110101196107145504 
 - 11010119890512132X 
@@ -1429,47 +1421,75 @@ const submit = () => {
 - 110101198203195893
 - 如有雷同纯属巧合，可删除。
 
-[身份证验证](https://github.com/mc-zone/IDValidator) 
+代码：
 
-```bash
-npm i id-validator --save
-```
+1）姓名，非空，2-18字符,身份证，非空，格式校验
 
-由于是比较老的库，没有提供类型，自己定义类型 `types/id-validator`
+`rules.ts`
 ```ts
-declare module 'id-validator' {
-  // 默认导出的，class是es6的类语法，对应 es5 的构造函数
-  export default class {
-    // es6 类中的方法，对应 es5 的原型方法
-    isValid(id: tring): boolean
-    getInfo(id: tring): {
-      sex: number
-    }
+const nameRules: FieldRule[] = [
+  { required: true, message: '请输入姓名' },
+  { pattern: /^(?:[\u4e00-\u9fa5·]{2,16})$/, message: '中文2-16个字符' }
+]
+
+const idCardRules: FieldRule[] = [
+  { required: true, message: '请输入身份证号' },
+  {
+    pattern:
+      /^[1-9]\d{5}(?:18|19|20)\d{2}(?:0[1-9]|10|11|12)(?:0[1-9]|[1-2]\d|30|31)\d{3}[\dXx]$/,
+    message: '身份证号不正确'
   }
-}
+]
+
+export { mobileRules, passwordRules, codeRules, nameRules, idCardRules }
+```
+`PatientPage.vue`
+```html
+        <van-field
+          v-model="patient.name"
+          label="真实姓名"
+          placeholder="请输入真实姓名"
+          :rules="nameRules"
+        />
+        <van-field
+          v-model="patient.idCard"
+          label="身份证号"
+          placeholder="请输入身份证号"
+          :rules="idCardRules"
+        />
 ```
 
-`User/PatientPage.vue` 使用库进行校验
-
+2）保存的时候校验，整体校验
+`PatientPage.vue`
 ```ts
-import { Toast } from 'vant'
-import Validator from 'id-validator'
+const form = ref<FormInstance>()
+const onSubmit = async () => {
+  await form.value?.validate()
+  // 校验通过
+}
 ```
-```ts{4-7}
-const submit = () => {
-  if (!patient.value.name) return Toast('请输入真实姓名')
-  if (!patient.value.idCard) return Toast('请输入身份证号')
-  const validate = new Validator()
-  if (!validate.isValid(patient.value.idCard)) return Toast('身份证格式错误')
-  const { sex } = validate.getInfo(patient.value.idCard)
-  if (patient.value.gender !== sex) return Toast('性别和身份证不符')
+```html
+<van-form autocomplete="off" ref="form">
+```
+
+3）性别需要和身份证包含性别填写的一致，确认框提示
+`PatientPage.vue`
+```ts
+const onSubmit = async () => {
+  await form.value?.validate()
+  // 身份证倒数第二位，单数是男，双数是女
+  const gender = +patient.value.idCard.substring(16, 1) % 2
+  if (gender !== patient.value.gender) {
+    await showConfirmDialog({
+      title: '温馨提示',
+      message: '填写的性别和身份证号中的不一致\n您确认提交吗？'
+    })
+  }
+  console.log('通过校验')
 }
 ```
 
-小结：
-- 模块默认返回是构造函数怎么写类型声明文件？
-  - `declare module 'id-validate' { export default class {}  }`
-
+提示：使用 any-rule 使用常用正则
 
 
 ## 家庭档案-添加患者{#patient-add}
@@ -1511,7 +1531,7 @@ const submit = async () => {
 +  await addPatient(patient.value)
 +  show.value = false
 +  loadList()
-+  Toast.success('添加成功')
++  showSuccessToast('添加成功')
 }
 ```
 
