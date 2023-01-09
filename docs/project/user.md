@@ -970,7 +970,7 @@ onMounted(() => {
       <div class="patient-item" v-for="item in list" :key="item.id">
         <div class="info">
           <span class="name">{{ item.name }}</span>
-          <span class="id">{{ item.idCard.replace(/^(.{6})(?:\d+)(.{4})$/, '\$1******\$2') }}</span>
+          <span class="id">{{ item.idCard.replace(/^(.{6}).+(.{4})$/, '\$1******\$2') }}</span>
           <span>{{ item.genderValue }}</span>
           <span>{{ item.age }}岁</span>
         </div>
@@ -979,9 +979,9 @@ onMounted(() => {
       </div>
       <div class="patient-add" v-if="list.length < 6">
 ```
-身份证脱敏处理：`/^(.{6})(?:\d+)(.{4})$/`
+身份证脱敏处理：`/^(.{6}).+(.{4})$/`
 - 匹配第一个$1 `^(.{6})` 
-- `?:` 不作为匹配结果存储
+- `.+` 匹配中间字符
 - 匹配第二个$2 `(.{4})$`
 
 
