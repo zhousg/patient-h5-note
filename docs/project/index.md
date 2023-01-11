@@ -4,7 +4,7 @@
 > 知道：整体项目概况，并且知道课程中会实现哪些功能
 
 - [产品原型](https://app.mockplus.cn/s/dtKxarcngm8)
-- [产品设计](https://app.mockplus.cn/s/S77krW4rKh)
+- [产品设计](https://app.mockplus.cn/s/klLPNrzsU)
 - [接口文档](https://www.apifox.cn/apidoc/shared-16a58bff-e4db-465c-9c8b-859c839318ac)
 - [演示项目](https://cp.itheima.net/)
 
