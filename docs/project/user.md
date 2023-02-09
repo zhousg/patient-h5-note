@@ -1453,7 +1453,7 @@ const showPopup = () => {
 
 代码：
 
-1）姓名，非空，2-18字符,身份证，非空，格式校验
+1）姓名，非空，2-16字符   身份证，非空，格式校验
 
 `rules.ts`
 ```ts
@@ -1497,9 +1497,6 @@ const onSubmit = async () => {
   await form.value?.validate()
   // 校验通过
 }
-```
-```html
-<van-form autocomplete="off" ref="form">
 ```
 
 3）性别需要和身份证包含性别填写的一致，确认框提示
