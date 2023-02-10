@@ -8,75 +8,25 @@
 > 实现：首页基础结构搭建
 
 步骤：
-- 头部
-- 导航
-- 轮播图
+- 页面基本结构
+- 知识列表tab
 
-代码：`Home/index.vue`
-- 头部
+代码：
+
+`Home/index.vue`
+- 页面基本结构
 
 ```html
   <div class="home-page">
+    <!-- 头部 -->
     <div class="home-header">
       <div class="con">
         <h1>优医</h1>
         <div class="search"><cp-icon name="home-search" /> 搜一搜：疾病/症状/医生/健康知识</div>
       </div>
     </div>
-  </div>  
-```
-```scss
-.home-page {
-  padding-bottom: 50px;
-}
-.home-header {
-  height: 100px;
-  position: relative;
-  &::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 90px;
-    background: linear-gradient(180deg, rgba(62, 206, 197, 0.85), #26bcc6);
-    border-bottom-left-radius: 150px 20px;
-    border-bottom-right-radius: 150px 20px;
-  }
-  .con {
-    position: relative;
-    padding: 0 15px;
-    > h1 {
-      font-size: 18px;
-      color: #fff;
-      font-weight: normal;
-      padding: 20px 0;
-      line-height: 1;
-      padding-left: 5px;
-    }
-    .search {
-      height: 40px;
-      border-radius: 20px;
-      box-shadow: 0px 15px 22px -7px rgba(224, 236, 250, 0.8);
-      background-color: #fff;
-      display: flex;
-      align-items: center;
-      padding: 0 20px;
-      color: var(--cp-dark);
-      font-size: 13px;
-      .cp-icon {
-        font-size: 16px;
-        margin-right: 5px;
-      }
-    }
-  }
-}
-```
-
-- 导航
-
-```html
-<div class="home-navs">
+    <!-- 导航 -->
+    <div class="home-navs">
       <van-row>
         <van-col span="8">
           <router-link to="/" class="nav">
@@ -127,8 +77,65 @@
         </van-col>
       </van-row>
     </div>
+    <!-- 轮播图 -->
+    <div class="home-banner">
+      <van-swipe indicator-color="#fff">
+        <van-swipe-item>
+          <img src="@/assets/ad.png" alt="" />
+        </van-swipe-item>
+        <van-swipe-item>
+          <img src="@/assets/ad.png" alt="" />
+        </van-swipe-item>
+      </van-swipe>
+    </div>
+  </div>  
 ```
 ```scss
+.home-page {
+  padding-bottom: 50px;
+}
+.home-header {
+  height: 100px;
+  position: relative;
+  &::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 90px;
+    background: linear-gradient(180deg, rgba(62, 206, 197, 0.85), #26bcc6);
+    border-bottom-left-radius: 150px 20px;
+    border-bottom-right-radius: 150px 20px;
+  }
+  .con {
+    position: relative;
+    padding: 0 15px;
+    > h1 {
+      font-size: 18px;
+      color: #fff;
+      font-weight: normal;
+      padding: 20px 0;
+      line-height: 1;
+      padding-left: 5px;
+    }
+    .search {
+      height: 40px;
+      border-radius: 20px;
+      box-shadow: 0px 15px 22px -7px rgba(224, 236, 250, 0.8);
+      background-color: #fff;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      color: var(--cp-dark);
+      font-size: 13px;
+      .cp-icon {
+        font-size: 16px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
 .home-navs {
   padding: 10px 15px 0 15px;
   .nav {
@@ -161,22 +168,6 @@
     }
   }
 }
-```
-- 轮播图
-
-```html
-<div class="home-banner">
-      <van-swipe indicator-color="#fff">
-        <van-swipe-item>
-          <img src="@/assets/ad.png" alt="" />
-        </van-swipe-item>
-        <van-swipe-item>
-          <img src="@/assets/ad.png" alt="" />
-        </van-swipe-item>
-      </van-swipe>
-    </div>
-```
-```scss
 .home-banner {
   padding: 10px 15px;
   height: 100px;
@@ -187,34 +178,20 @@
 }
 ```
 
-提问：
-- 首页的金刚区如何实现？
-  - van-col  van-row
-- 首页的轮播图如何实现？
-  - van-swipe 
+- 知识列表tab
 
-
-## 首页模块-切换知识列表{#home-knowledge-html}
-> 实现：tab切换效果，准备知识列表组件
-
-步骤：
-- 使用 van-tabs 组件，重置样式
-- 提取 knowledge-list 组件展示知识文章列表
-- 默认激活 推荐tab , 结合查询列表接口的知识类型
-
-代码：
-
-1）使用 van-tabs 组件，重置样式
-
- `Home/index.vue`
+`Home/index.vue`
 ```html
     <van-tabs shrink sticky v-model:active="active">
-      <van-tab title="关注">1 </van-tab>
-      <van-tab title="推荐">2</van-tab>
+      <van-tab title="关注">1</van-tab>
+      <van-tab title="推荐" >
+        <p v-for="i in 100" :key="i">内容</p>
+      </van-tab>
       <van-tab title="减脂">3</van-tab>
       <van-tab title="饮食">4</van-tab>
     </van-tabs>
 ```
+
 `styles/main.scss` 全局tab的样式都一样
 ```scss
 // 全局覆盖van-tab样式
@@ -231,8 +208,32 @@
   }
 }
 ```
+`Home/index.vue` 激活推荐 tab 
+```ts
+// active 的值是 tab 的索引
+const active = ref(1)
+```
 
-2）提取 knowledge-list knowledge-card 组件展示知识文章列表
+
+提问：
+- 首页的金刚区如何实现？
+  - van-col  van-row
+- 首页的轮播图如何实现？
+  - van-swipe 
+- 知识列表切换？
+  - van-tabs
+
+
+## 首页模块-切换知识列表{#home-knowledge-html}
+> 实现：准备知识列表组件，模拟加载更多效果
+
+步骤：
+- 提取 knowledge-list knowledge-card 组件展示知识文章列表
+- vant-list 组件基本使用，模拟加载更多效果
+
+代码：
+
+1）提取 knowledge-list knowledge-card 组件展示知识文章列表
 
 `Home/components/KnowledgeList.vue`
 ```vue
@@ -390,7 +391,7 @@ import KnowledgeCard from './KnowledgeCard.vue'
 import KnowledgeList from './components/KnowledgeList.vue'
 ```
 ```html
-    <van-tabs shrink sticky>
+    <van-tabs shrink sticky v-model:actie="active">
       <van-tab title="关注"><knowledge-list /> </van-tab>
       <van-tab title="推荐"><knowledge-list /></van-tab>
       <van-tab title="减脂"><knowledge-list /></van-tab>
@@ -398,40 +399,8 @@ import KnowledgeList from './components/KnowledgeList.vue'
     </van-tabs>
 ```
 
-2）默认激活 推荐tab , 结合查询列表接口的知识类型
-- recommend推荐，fatReduction减脂，food健康饮食，like关注医生页面文章
+2）vant-list 组件基本使用，模拟加载更多效果
 
-`types/consult.d.ts`
-```ts
-// 文章类型，关注医生的文章|推荐的文章|减脂|饮食
-export type KnowledgeType = 'like' | 'recommend' | 'fatReduction' | 'food'
-```
-
-`Home/index.vue`
-```ts
-import { ref } from 'vue'
-import KnowledgeList from './components/KnowledgeList.vue'
-import type { KnowledgeType } from '@/types/consult'
-
-const active = ref<KnowledgeType>('recommend')
-```
-```html
-    <van-tabs shrink sticky v-model:active="active">
-      <van-tab title="关注" name="like"><knowledge-list /> </van-tab>
-      <van-tab title="推荐" name="recommend"><knowledge-list /></van-tab>
-      <van-tab title="减脂" name="fatReduction"><knowledge-list /></van-tab>
-      <van-tab title="饮食" name="food"><knowledge-list /></van-tab>
-    </van-tabs>
-```
-
-提问：
-- active 的值是什么？
-  - 将来查询知识问诊列表的类型，局限于4个值。
-
-
-## 首页模块-知识加载-效果{#home-knowledge-load}
-
-> 实现：使用 van-list 组件完成加载更多效果
 
 ```vue
 <script setup lang="ts">
@@ -478,9 +447,15 @@ const onLoad = () => {
 - 触发加载事件，做什么？
   - 发请求，追加数据，判断是否加载完成
 
+
+
 ## 首页模块-知识数据-类型{#home-knowledge-type}
 
 > 实现：接口是分页，数据类型的定和传参类型的定义
+
+`types/consult.d.ts`
+
+1）响应数据类型
 
 ```ts
 // 文章信息类型
@@ -510,6 +485,13 @@ export type KnowledgePage = {
   total: number
   rows: KnowledgeList
 }
+```
+
+2）查询参数类型
+
+```ts
+// props类型 recommend推荐，fatReduction减脂，food健康饮食，like关注医生页面文章
+export type KnowledgeType = 'like' | 'recommend' | 'fatReduction' | 'food'
 
 // 文章列表查询参数
 export type KnowledgeParams = {
@@ -518,23 +500,9 @@ export type KnowledgeParams = {
   pageSize: number
 }
 ```
-小结：
-- 拆分类型的目的？
-  - 尽量复用
 
+3）组件 props 类型
 
-
-## 首页模块-知识加载-实现{#home-knowledge-logic}
-> 实现：知识列表组件滚动加载
-
-步骤：
-- 给组件传入 type 查询类型
-- 定义 api 函数
-- 实现加载数据和渲染
-
-代码：
-
-1）给组件传入 type 查询类型
 `Home/components/KnowledgeList.vue`
 ```ts
 const props = defineProps<{
@@ -544,14 +512,35 @@ const props = defineProps<{
 `Home/index.vue`
 ```html
     <van-tabs shrink sticky v-model:active="active">
-      <van-tab title="关注" name="like"><knowledge-list type="like" /> </van-tab>
-      <van-tab title="推荐" name="recommend"><knowledge-list type="recommend" /></van-tab>
-      <van-tab title="减脂" name="fatReduction"><knowledge-list type="fatReduction" /></van-tab>
-      <van-tab title="饮食" name="food"><knowledge-list type="food" /></van-tab>
+      <van-tab title="关注">
+        <knowledge-list type="like" />
+      </van-tab>
+      <van-tab title="推荐">
+        <knowledge-list type="recommend" />
+      </van-tab>
+      <van-tab title="减脂">
+        <knowledge-list type="fatReduction" />
+      </van-tab>
+      <van-tab title="饮食">
+        <knowledge-list type="food" />
+      </van-tab>
     </van-tabs>
 ```
 
-2）定义 api 函数 `services/consult.ts`
+
+## 首页模块-知识加载-实现{#home-knowledge-logic}
+> 实现：知识列表组件滚动加载
+
+步骤：
+- 定义 api 函数
+- 准备查询参数
+- 实现加载数据
+- 知识卡片渲染
+
+代码：
+
+
+1）定义 api 函数 `services/consult.ts`
 ```ts
 import type { KnowledgePage, KnowledgeParams } from '@/types/consult'
 import { request } from '@/utils/request'
@@ -560,8 +549,7 @@ export const getKnowledgePage = (params: KnowledgeParams) =>
   request<KnowledgePage>('/patient/home/knowledge', 'GET', params)
 ```
 
-
-3）实现加载数据和渲染
+2）实现加载数据
 
 `Home/components/KnowledgeList.vue`
 ```vue
@@ -609,6 +597,9 @@ const onLoad = async () => {
   </div>
 </template>
 ```
+
+3）渲染
+
 `Home/components/KnowledgeCard.vue`
 ```vue
 <script setup lang="ts">
@@ -648,7 +639,6 @@ defineProps<{ item: Knowledge }>()
   </div>
 </template>
 ```
-
 
 ## 首页模块-推荐关注医生-结构{#home-doctor}
 > 实现：在关注医生的文章列表下加上医生列表
