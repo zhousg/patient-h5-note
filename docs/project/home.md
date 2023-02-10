@@ -224,7 +224,7 @@ const active = ref(1)
   - van-tabs
 
 
-## 首页模块-切换知识列表{#home-knowledge-html}
+## 首页模块-列表加载更多{#home-knowledge-html}
 > 实现：准备知识列表组件，模拟加载更多效果
 
 步骤：
