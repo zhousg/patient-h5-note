@@ -468,18 +468,31 @@ const onLoad = () => {
 // 文章信息类型
 export type Knowledge = {
   id: string
+  /** 标题 */
   title: string
+  /** 封面[] */
   coverUrl: string[]
+  /** 标签[] */
   topics: string[]
+  /** 收藏数 */
   collectionNumber: number
+  /** 评论数 */
   commentNumber: number
+  /** 医生名称 */
   creatorName: string
+  /** 医生头像 */
   creatorAvatar: string
+  /** 医生医院 */
   creatorHospatalName: string
+  /** 关注文章 */
   likeFlag: 0 | 1
+  /** 内容 */
   content: string
+  /** 医生科室 */
   creatorDep: string
+  /** 医生职称 */
   creatorTitles: string
+  /** 医生ID */
   creatorId: string
 }
 
