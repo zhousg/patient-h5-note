@@ -872,43 +872,43 @@ const { width } = useWindowSize()
 ```ts
 // 通用的分页查询参数
 export type PageParams = {
-  // 当前页码
+  /** 当前页码 */
   current: number
-  // 每页条数
+  /** 每页条数 */
   pageSize: number
 }
 
 // 文章列表查询参数
 export type KnowledgeParams = PageParams & {
-  // 文章类型
+  /** 文章类型 */
   type: KnowledgeType
 }
 
 // 医生卡片对象
 export type Doctor = {
-  // 医生ID
+  /** 医生ID */
   id: string
-  // 医生名称
+  /** 医生名称 */
   name: string
-  // 头像
+  /** 头像 */
   avatar: string
-  // 医院名称
+  /** 医院名称 */
   hospitalName: string
-  // 医院等级
+  /** 医院等级 */
   gradeName: string
-  // 科室
+  /** 科室 */
   depName: string
-  // 职称
+  /** 职称 */
   positionalTitles: string
-  // 是否关注，0 未关注 1 已关注
+  /** 是否关注，0 未关注 1 已关注 */
   likeFlag: 0 | 1
-  // 接诊服务费
+  /** 接诊服务费 */
   serviceFee: number
-  // 接诊人数
+  /** 接诊人数 */
   consultationNum: number
-  // 评分
+  /** 评分 */
   score: number
-  // 主攻方向
+  /** 主攻方向 */
   major: string
 }
 
