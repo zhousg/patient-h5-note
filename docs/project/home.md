@@ -824,7 +824,7 @@ import DoctorCard from './DoctorCard.vue'
 代码：
 
 ```ts
-import { onMounted, onUnMounted, ref } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
 
 const width = ref(0)
 const setWidth = () =>  width.value = window.innerWidth
@@ -832,7 +832,7 @@ onMounted(() => {
   setWidth()
   window.addEventListener('resize', setWidth)
 })
-onUnMounted(()=>{
+onUnmounted(()=>{
   window.removeEventListener('resize', setWidth)
 })
 ```
