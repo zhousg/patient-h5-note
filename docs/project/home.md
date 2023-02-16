@@ -1104,9 +1104,15 @@ const { loading, follow } = useFollow()
 const { loading, follow } = useFollow('knowledge')
 ```
 ```html
- <van-button :loading="loading" @click="follow(item)" round size="small" type="primary">
-              {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
-            </van-button>
+      <van-button
+        class="btn"
+        size="small"
+        round
+        :loading="loading"
+        @click="follow(item)"
+      >
+        {{ item.likeFlag === 1 ? '已关注' : '+ 关注' }}
+      </van-button>
 ```
 
 小结：
