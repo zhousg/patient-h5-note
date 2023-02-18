@@ -168,7 +168,7 @@ export type PartialConsult = Partial<Consult>
 1）定义仓库 `stores/modules/consult.ts`
 
 ```ts
-import { ConsultType } from '@/enums'
+import type { ConsultType } from '@/enums'
 import type { PartialConsult } from '@/types/consult'
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
