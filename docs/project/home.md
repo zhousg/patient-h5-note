@@ -1008,7 +1008,7 @@ export type FollowType = 'doc' | 'knowledge' | 'topic' | 'disease'
 `service/consult.ts`
 ```ts
 
-export const followDoctor = (id: string, type: FollowType = 'doc') =>
+export const followOrUnfollow = (id: string, type: FollowType = 'doc') =>
   request('/like', 'POST', { id, type })
 ```
 
@@ -1022,18 +1022,18 @@ export const followDoctor = (id: string, type: FollowType = 'doc') =>
 ```
 ```ts
 import type { Doctor } from '@/types/consult'
-import { followDoctor } from '@/services/consult'
+import { followOrUnfollow } from '@/services/consult'
 import { ref } from 'vue'
 
 defineProps<{ item: Doctor }>()
 
 // 关注逻辑
 const loading = ref(false)
-const follow = async (doc: Doctor) => {
+const follow = async (item: Doctor) => {
   loading.value = true
   try {
-    await followDoctor(doc.id)
-    doc.likeFlag = doc.likeFlag === 1 ? 0 : 1
+    await followOrUnfollow(item.id)
+    item.likeFlag = item.likeFlag === 1 ? 0 : 1
   } finally {
     loading.value = false
   }
@@ -1052,18 +1052,18 @@ const follow = async (doc: Doctor) => {
 `composable/index.ts`
 ```ts
 import { ref } from 'vue'
-import { followDoctor } from '@/services/consult'
+import { followOrUnfollow } from '@/services/consult'
 import type { FollowType } from '@/types/consult'
 
 // 封装逻辑，规范 useXxx，表示使用某功能
 export const useFollow = (type: FollowType = 'doc') => {
   const loading = ref(false)
   // {a, b} 类型，传值得时候 {a, b, c} 也可以，这是类型兼容：多的可以给少的
-  const follow = async (obj: { id: string; likeFlag: 0 | 1 }) => {
+  const follow = async (item: { id: string; likeFlag: 0 | 1 }) => {
     loading.value = true
     try {
-      await followDoctor(obj.id, type)
-      obj.likeFlag = obj.likeFlag === 1 ? 0 : 1
+      await followOrUnfollow(item.id, type)
+      item.likeFlag = item.likeFlag === 1 ? 0 : 1
     } finally {
       loading.value = false
     }
