@@ -371,8 +371,7 @@ const store = useConsultStore()
 
 步骤：
 - 组件与路由
-- 一级科室使用 sidebar 组件
-- 二级科室绘制
+- 页面结构
 
 代码：
 
@@ -397,8 +396,7 @@ const store = useConsultStore()
     }
 ```
 
-1) 页面布局-一级科室
-
+1) 页面布局
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -416,6 +414,11 @@ const active = ref(0)
         <van-sidebar-item title="皮肤科" />
         <van-sidebar-item title="骨科" />
       </van-sidebar>
+      <div class="sub-dep">
+        <router-link to="/consult/illness">科室一</router-link>
+        <router-link to="/consult/illness">科室二</router-link>
+        <router-link to="/consult/illness">科室三</router-link>
+      </div>
     </div>
   </div>
 </template>
@@ -437,34 +440,23 @@ const active = ref(0)
 }
 .consult-dep-page {
   padding-top: 46px;
-}
-</style>
-```
-
-3) 页面布局-二级科室
-```html
-      <div class="sub-dep">
-        <router-link to="/consult/illness">科室一</router-link>
-        <router-link to="/consult/illness">科室二</router-link>
-        <router-link to="/consult/illness">科室三</router-link>
-      </div>
-```
-```scss
-.wrapper {
-  height: calc(100vh - 46px);
-  overflow: hidden;
-  display: flex;
-  .sub-dep {
-    flex: 1;
-    height: 100%;
-    overflow-y: auto;
-    > a {
-      display: block;
-      padding: 14px 30px;
-      color: var(--cp-dark);
+  .wrapper {
+    height: calc(100vh - 46px);
+    overflow: hidden;
+    display: flex;
+    .sub-dep {
+      flex: 1;
+      height: 100%;
+      overflow-y: auto;
+      > a {
+        display: block;
+        padding: 14px 30px;
+        color: var(--cp-dark);
+      }
     }
   }
 }
+</style>
 ```
 
 小结
