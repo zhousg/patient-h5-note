@@ -396,7 +396,7 @@ const store = useConsultStore()
     }
 ```
 
-1) 页面布局
+2) 页面布局
 ```vue
 <script setup lang="ts">
 import { ref } from 'vue'
