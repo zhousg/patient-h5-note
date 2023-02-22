@@ -572,23 +572,6 @@ const store = useConsultStore()
 
 1）路由与组件
 
-`Consult/ConsultIllness.vue`
-```vue
-<script setup lang="ts"></script>
-
-<template>
-  <div class="consult-illness-page">
-    <cp-nav-bar title="图文问诊" />
-  </div>
-</template>
-
-<style lang="scss" scoped>
-.consult-illness-page {
-  padding-top: 46px;
-}
-</style>
-```
-
 ```ts
     {
       path: '/consult/illness',
@@ -597,20 +580,48 @@ const store = useConsultStore()
     },
 ```
 
-2) 病情描述头部提示
+`ConsultIllness.vue`
+```vue
+<script setup lang="ts"></script>
 
-```html
+<template>
+  <div class="consult-illness-page">
+    <cp-nav-bar title="图文问诊" />
     <!-- 医生提示 -->
     <div class="illness-tip van-hairline--bottom">
       <img class="img" src="@/assets/avatar-doctor.svg" />
       <div class="info">
         <p class="tit">在线医生</p>
-        <p class="tip">请描述你的疾病或症状、是否用药、就诊经历，需要我听过什么样的帮助</p>
-        <p class="safe"><cp-icon name="consult-safe" /><span>内容仅医生可见</span></p>
+        <p class="tip">
+          请描述你的疾病或症状、是否用药、就诊经历，需要我听过什么样的帮助
+        </p>
+        <p class="safe">
+          <cp-icon name="consult-safe" /><span>内容仅医生可见</span>
+        </p>
       </div>
     </div>
-```
-```scss
+    <!-- 收集信息 -->
+    <!-- 表单 -->
+    <div class="illness-form">
+      <van-field
+        type="textarea"
+        rows="3"
+        placeholder="请详细描述您的病情，病情描述不能为空"
+      ></van-field>
+      <div class="item">
+        <p>本次患病多久了？</p>
+      </div>
+      <div class="item">
+        <p>此次病情是否去医院就诊过？</p>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style lang="scss" scoped>
+.consult-illness-page {
+  padding-top: 46px;
+}
 .illness-tip {
   display: flex;
   padding: 15px;
@@ -647,7 +658,24 @@ const store = useConsultStore()
     }
   }
 }
+.illness-form {
+  padding: 15px;
+  .van-field {
+    padding: 0;
+    &::after {
+      border-bottom: none;
+    }
+  }
+  .item {
+    > p {
+      color: var(--cp-text3);
+      padding: 15px 0;
+    }
+  }
+}
+</style>
 ```
+
 
 2）准备表单数据
 
@@ -657,19 +685,6 @@ export type ConsultIllness = Pick<
   PartialConsult,
   'illnessDesc' | 'illnessTime' | 'consultFlag' | 'pictures'
 >
-```
-`stores/modules/consult.ts`
-```ts
-import type { PartialConsult, ConsultIllness } from '@/types/consult'
-```
-```diff
-    // 设置病情描述
-+    const setIllness = (illness: ConsultIllness) => {
-      consult.value.illnessDesc = illnesss.illnessDesc
-      consult.value.illnessTime = illnesss.illnessTime
-      consult.value.consultFlag = illnesss.consultFlag
-      consult.value.pictures = illnesss.pictures
-    }
 ```
 `Consult/ConsultIllness.vue`
 ```ts
@@ -694,43 +709,25 @@ const form = ref<ConsultIllness>({
   pictures: []
 })
 ```
-```html
-<!-- 表单 -->
+```diff
     <div class="illness-form">
       <van-field
         type="textarea"
         rows="3"
         placeholder="请详细描述您的病情，病情描述不能为空"
-        v-model="form.illnessDesc"
++        v-model="form.illnessDesc"
       ></van-field>
       <div class="item">
         <p>本次患病多久了？</p>
-        <cp-radio-btn :options="timeOptions" v-model="form.illnessTime" />
++        <cp-radio-btn :options="timeOptions" v-model="form.illnessTime" />
       </div>
       <div class="item">
         <p>此次病情是否去医院就诊过？</p>
-        <cp-radio-btn :options="flagOptions" v-model="form.consultFlag" />
++        <cp-radio-btn :options="flagOptions" v-model="form.consultFlag" />
       </div>
     </div>
 ```
 
-```scss
-.illness-form {
-  padding: 15px;
-  .van-field {
-    padding: 0;
-    &::after {
-      border-bottom: none;
-    }
-  }
-  .item {
-    > p {
-      color: var(--cp-text3);
-      padding: 15px 0;
-    }
-  }
-}
-```
 
 ## 病情描述-图片上传-组件{#illness-img}
 > 实现：使用 van-upload 组件，进行样式和功能配置
