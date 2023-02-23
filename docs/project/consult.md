@@ -601,7 +601,6 @@ const store = useConsultStore()
       </div>
     </div>
     <!-- 收集信息 -->
-    <!-- 表单 -->
     <div class="illness-form">
       <van-field
         type="textarea"
@@ -945,7 +944,7 @@ const disabled = computed(
 2）提交校验 保存数据，跳转选择患者 
 ```ts
 import { useRouter } from 'vue-router'
-import { Toast } from 'vant'
+import { showToast } from 'vant'
 import { useConsultStore } from '@/stores'
 ```
 
@@ -953,9 +952,9 @@ import { useConsultStore } from '@/stores'
 const store = useConsultStore()
 const router = useRouter()
 const next = () => {
-  if (!form.value.illnessDesc) return Toast('请输入病情描述')
-  if (form.value.illnessTime === undefined) return Toast('请选择症状持续时间')
-  if (form.value.consultFlag === undefined) return Toast('请选择是否已经就诊')
+  if (!form.value.illnessDesc) return showToast('请输入病情描述')
+  if (form.value.illnessTime === undefined) return showToast('请选择症状持续时间')
+  if (form.value.consultFlag === undefined) return showToast('请选择是否已经就诊')
   store.setIllness(form.value)
   // 跳转档案管理，需要根据 isChange 实现选择功能
   router.push('/user/patient?isChange=1')
@@ -976,10 +975,9 @@ import { computed, onMounted, ref } from 'vue'
 // 回显数据
 onMounted(() => {
   if (store.consult.illnessDesc) {
-    Dialog.confirm({
+    showConfirmDialog({
       title: '温馨提示',
       message: '是否恢复您之前填写的病情信息呢？',
-      confirmButtonColor: 'var(--cp-primary)'
     }).then(() => {
       // 确认
     })
