@@ -1112,7 +1112,7 @@ const loadList = async () => {
 
 ```ts
 const next = async () => {
-  if (!patientId.value) return Toast('请选就诊择患者')
+  if (!patientId.value) return showToast('请选就诊择患者')
   store.setPatient(patientId.value)
   router.push('/consult/pay')
 }
