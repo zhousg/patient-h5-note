@@ -1042,11 +1042,11 @@ const isChange = computed(() => route.query.isChange === '1')
       <h3>请选择患者信息</h3>
       <p>以便医生给出更准确的治疗，信息仅医生可见</p>
     </div>
-```
-```html
+
+
     <!-- 底部按钮 -->
     <div class="patient-next" v-if="isChange">
-      <van-button type="primary" @click="next" round block>下一步</van-button>
+      <van-button type="primary" round block>下一步</van-button>
     </div>
 ```
 ```scss
