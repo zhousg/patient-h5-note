@@ -1132,16 +1132,10 @@ const next = async () => {
 <script setup lang="ts"></script>
 
 <template>
-  <div class="consult-pay-page">
-    <cp-nav-bar title="支付" />
-  </div>
+  <div class="consult-pay-page">consult-pay</div>
 </template>
 
-<style lang="scss" scoped>
-.consult-pay-page {
-  padding: 46px 0 50px 0;
-}
-</style>
+<style lang="scss" scoped></style>
 ```
 路由 `router/index.ts`
 
@@ -1156,7 +1150,12 @@ const next = async () => {
 2）基础布局
 
 ```html
-<div class="pay-info">
+<script setup lang="ts"></script>
+
+<template>
+  <div class="consult-pay-page">
+    <cp-nav-bar title="支付" />
+    <div class="pay-info">
       <p class="tit">图文问诊 49 元</p>
       <img class="img" src="@/assets/avatar-doctor.svg" />
       <p class="desc">
@@ -1164,8 +1163,27 @@ const next = async () => {
         <span>自动分配医生</span>
       </p>
     </div>
-```
-```scss
+    <van-cell-group>
+      <van-cell title="优惠券" value="-¥10.00" />
+      <van-cell title="积分抵扣" value="-¥10.00" />
+      <van-cell title="实付款" value="¥29.00" class="pay-price" />
+    </van-cell-group>
+    <div class="pay-space"></div>
+    <van-cell-group>
+      <van-cell title="患者信息" value="李富贵 | 男 | 30岁"></van-cell>
+      <van-cell title="病情描述" label="头痛，头晕，恶心"></van-cell>
+    </van-cell-group>
+    <div class="pay-schema">
+      <van-checkbox>我已同意 <span class="text">支付协议</span></van-checkbox>
+    </div>
+    <van-submit-bar button-type="primary" :price="2900" button-text="立即支付" text-align="left" />
+  </div>
+<template>
+
+<style lang="scss" scoped>
+.consult-pay-page {
+  padding: 46px 0 50px 0;
+}
 .pay-info {
   display: flex;
   padding: 15px;
@@ -1195,18 +1213,6 @@ const next = async () => {
     }
   }
 }
-```
-
-支付信息
-```html
-    <van-cell-group>
-      <van-cell title="优惠券" value="-¥10.00" />
-      <van-cell title="积分抵扣" value="-¥10.00" />
-      <van-cell title="实付款" value="¥29.00" class="pay-price" />
-    </van-cell-group>
-    <div class="pay-space"></div>
-```
-```scss
 .pay-price {
   ::v-deep() {
     .vam-cell__title {
@@ -1222,20 +1228,6 @@ const next = async () => {
   height: 12px;
   background-color: var(--cp-bg);
 }
-```
-
-患者信息
-
-```html
-<van-cell-group>
-      <van-cell title="患者信息" value="李富贵 | 男 | 30岁"></van-cell>
-      <van-cell title="病情描述" label="头痛，头晕，恶心"></van-cell>
-    </van-cell-group>
-    <div class="pay-schema">
-      <van-checkbox>我已同意 <span class="text">支付协议</span></van-checkbox>
-    </div>
-```
-```scss
 .pay-schema {
   height: 56px;
   display: flex;
@@ -1245,20 +1237,13 @@ const next = async () => {
     color: var(--cp-primary);
   }
 }
-```
-
-底部按钮
-
-```html
-    <van-submit-bar button-type="primary" :price="2900" button-text="立即支付" text-align="left" />
-```
-```scss
 ::v-deep() {
   .van-submit-bar__button {
     font-weight: normal;
     width: 160px;
   }
 }
+</style>
 ```
 
 3）定义 API 函数，获取预支付信息
