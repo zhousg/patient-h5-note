@@ -1178,7 +1178,7 @@ const next = async () => {
     </div>
     <van-submit-bar button-type="primary" :price="2900" button-text="立即支付" text-align="left" />
   </div>
-<template>
+</template>
 
 <style lang="scss" scoped>
 .consult-pay-page {
@@ -1445,29 +1445,6 @@ const submit = async () => {
         </div>
       </div>
     </van-action-sheet>
-```
-```scss
-.pay-type {
-  .amount {
-    padding: 20px;
-    text-align: center;
-    font-size: 16px;
-    font-weight: bold;
-  }
-  .btn {
-    padding: 15px;
-  }
-  .van-cell {
-    align-items: center;
-    .cp-icon {
-      margin-right: 10px;
-      font-size: 18px;
-    }
-    .van-checkbox :deep(.van-checkbox__icon) {
-      font-size: 16px;
-    }
-  }
-}
 ```
 ```diff
     <van-submit-bar
