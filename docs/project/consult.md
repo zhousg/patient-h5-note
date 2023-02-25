@@ -1345,10 +1345,10 @@ const agree = ref(false)
 </script>
 
 <template>
-  <div class="consult-pay-page" v-if="payInfo">
+  <div class="consult-pay-page" v-if="payInfo & patient">
     <cp-nav-bar title="支付" />
     <div class="pay-info">
-      <p class="tit">图文问诊 {{ payInfo?.payment }} 元</p>
+      <p class="tit">图文问诊 {{ payInfo.payment }} 元</p>
       <img class="img" src="@/assets/avatar-doctor.svg" />
       <p class="desc">
         <span>极速问诊</span>
@@ -1364,7 +1364,7 @@ const agree = ref(false)
     <van-cell-group>
       <van-cell
         title="患者信息"
-        :value="`${patient?.name} | ${patient?.genderValue} | ${patient?.age}岁`"
+        :value="`${patient.name} | ${patient.genderValue} | ${patient.age}岁`"
       ></van-cell>
       <van-cell title="病情描述" :label="store.consult.illnessDesc"></van-cell>
     </van-cell-group>
