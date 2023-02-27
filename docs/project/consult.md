@@ -1397,7 +1397,7 @@ const agree = ref(false)
 
 回跳地址：
 ```
-http://localhost/room
+http://localhost:5173/room
 ```
 
 支付宝沙箱账号：
@@ -1412,6 +1412,29 @@ http://localhost/room
 
 ## 问诊支付-生成订单{#pay-create-order}
 
+
+抽屉模版
+
+```html
+    <van-action-sheet v-model:show="show" title="选择支付方式">
+      <div class="pay-type">
+        <p class="amount">￥20.00</p>
+        <van-cell-group>
+          <van-cell title="微信支付">
+            <template #icon><cp-icon name="consult-wechat" /></template>
+            <template #extra><van-checkbox/></template>
+          </van-cell>
+          <van-cell title="支付宝支付">
+            <template #icon><cp-icon name="consult-alipay" /></template>
+            <template #extra><van-checkbox/></template>
+          </van-cell>
+        </van-cell-group>
+        <div class="btn">
+          <van-button type="primary" round block>立即支付</van-button>
+        </div>
+      </div>
+    </van-action-sheet>
+```
 
 1）打开选项支付抽屉
 
@@ -1476,7 +1499,7 @@ const show = ref(false)
 const paymentMethod = ref<0 | 1>()
 +const orderId = ref('')
 const submit = async () => {
-  if (!agree.value) return Toast('请勾选我已同意支付协议')
+  if (!agree.value) return showToast('请勾选我已同意支付协议')
 +  loading.value = true
 +  const res = await createConsultOrder(store.consult)
 +  orderId.value = res.data.id
@@ -1497,9 +1520,7 @@ const submit = async () => {
     />
 ```
 
-## 问诊支付-进行支付{#pay-logic}
-
-![image-20220824154549604](./images/image-20220824154549604.png)
+## 问诊支付-用户引导{#pay-tip}
 
 
 1）生成订单后不可回退
@@ -1519,12 +1540,11 @@ onBeforeRouteLeave(() => {
 ```ts
 const router = useRouter()
 const onClose = () => {
-  return Dialog.confirm({
+  return showConfirmDialog({
     title: '关闭支付',
     message: '取消支付将无法获得医生回复，医生接诊名额有限，是否确认关闭？',
     cancelButtonText: '仍要关闭',
     confirmButtonText: '继续支付',
-    confirmButtonColor: 'var(--cp-primary)'
   })
     .then(() => {
       return false
@@ -1540,7 +1560,45 @@ const onClose = () => {
 <van-action-sheet v-model:show="show" title="选择支付方式" :close-on-popstate="false" :closeable="false" >
 ```
 
-3）生成支付地址的 API 函数
+3）刷新页面，数据丢失，关在后提示
+
+```ts
+type Key = keyof typeof store.consult
+
+onMounted(() => {
+  const validKeys: Key[] = [
+    'type',
+    'illnessType',
+    'depId',
+    'illnessDesc',
+    'illnessTime',
+    'consultFlag',
+    'patientId'
+  ]
+  const valid = validKeys.every((key) => store.consult[key] !== undefined)
+  if (!valid) {
+    return showDialog({
+      title: '温馨提示',
+      message:
+        '问诊信息不完整请重新填写，如有未支付的问诊订单可在问诊记录中继续支付！',
+      closeOnPopstate: false
+    }).then(() => {
+      router.push('/')
+    })
+  }
+
+  loadData()
+  loadPatient()
+})
+```
+
+
+## 问诊支付-进行支付{#pay-logic}
+
+![image-20220824154549604](./images/image-20220824154549604.png)
+
+
+1）生成支付地址的 API 函数
 
 ```ts
 // 获取支付地址  0 是微信  1 支付宝
@@ -1551,41 +1609,39 @@ export const getConsultOrderPayUrl = (params: {
 }) => request<{ payUrl: string }>('/patient/consult/pay', 'POST', params)
 ```
 
-4）跳转到支付宝页面
+2）跳转到支付宝页面
 
 ```ts
 // 跳转支付
 const pay = async () => {
-  if (paymentMethod.value === undefined) return Toast('请选择支付方式')
-  Toast.loading('跳转支付')
+  if (paymentMethod.value === undefined) return showToast('请选择支付方式')
+  showLoadingToast({ message: '跳转支付', duration: 0 })
   const res = await getConsultOrderPayUrl({
     orderId: orderId.value,
     paymentMethod: paymentMethod.value,
-    payCallback: 'http://localhost/room'
+    payCallback: 'http://localhost:5173/room'
   })
   window.location.href = res.data.payUrl
 }
 ```
+```text
+买家账号：jfjbwb4477@sandbox.com
+登录密码：111111
+支付密码：111111
+```
 
-防止在当前页面刷新，问诊记录已经清空，组件初始化需要校验
+3）支付失败
+
+`router/index.ts`
+
 ```ts
-onMounted(() => {
-  if (
-    !store.consult.type ||
-    !store.consult.illnessType ||
-    !store.consult.depId ||
-    !store.consult.patientId
-  ) {
-    return Dialog.alert({
-      title: '温馨提示',
-      message: '问诊信息不完整请重新填写，如有未支付的问诊订单可在问诊记录中继续支付',
-      closeOnPopstate: false
-    }).then(() => {
-      router.push('/')
-    })
-  }
-  loadData()
-  loadPatient()
-})
+    {
+      path: '/room',
+      component: () => import('@/views/Room/index.vue'),
+      meta: { title: '问诊室' },
+      beforeEnter(to) {
+        if (to.query.payResult === 'false') return '/user/consult'
+      }
+    },
 ```
 
