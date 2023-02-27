@@ -1443,7 +1443,7 @@ const agree = ref(false)
 const show = ref(false)
 const paymentMethod = ref<0 | 1>()
 const submit = async () => {
-  if (!agree.value) return Toast('请勾选我已同意支付协议')
+  if (!agree.value) return showToast('请勾选我已同意支付协议')
   // 打开
   show.value = true
 }
