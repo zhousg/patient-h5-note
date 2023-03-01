@@ -82,7 +82,10 @@
       }
       &:last-child {
         color: var(--cp-text2);
-        width: 120px;
+        width: 130px;
+        .van-count-down {
+          display: inline;
+        }
       }
     }
   }
@@ -1168,15 +1171,6 @@ const { status, countdown = 0 } = defineProps<{
       <van-icon name="passed" /> 已结束
     </div>
   </div>
-```
-```scss
-      &:last-child {
-        color: var(--cp-text2);
-        width: 130px;
-        .van-count-down {
-          display: inline;
-        }
-      }
 ```
 
 4) 根据状态禁用状态栏 `Room/components/RoomAction.vue`

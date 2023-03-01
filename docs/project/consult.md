@@ -1563,7 +1563,7 @@ const onClose = () => {
 3）刷新页面，数据丢失，关在后提示
 
 ```ts
-type Key = keyof typeof store.consult
+type Key = keyof PartialConsult
 
 onMounted(() => {
   const validKeys: Key[] = [
