@@ -2,7 +2,7 @@
 
 <img src="./images/room.png" width="414" />
 
-## 组件拆分{#room-components}
+## 问诊室-组件拆分{#room-components}
 
 1）状态栏组件
 
