@@ -9,9 +9,9 @@
 ## 问诊室-路由与组件
 
 
-1）路由与组件
+组件
 
-- 组件
+- 导航
 ```vue
 <script setup lang="ts"></script>
 
@@ -24,14 +24,6 @@
 <style lang="scss" scoped>
 
 </style>
-```
-- 路由
-```ts
-    {
-      path: '/room',
-      component: () => import('@/views/Room/index.vue'),
-      meta: { title: '问诊室' }
-    },
 ```
 
 2）准备顶部订单状态
@@ -1910,27 +1902,4 @@ const onSubmit = async () => {
         <span>{{ msg.content }}</span>
       </div>
     </div>
-```
-
-## 问诊室-支付失败
-
-> 处理问诊室支付失败情况
-
-思考：
-- 怎么处理？
-  - 地址栏上的 payResult 是否是 false，是代表失败 
-
-- 何时处理？
-  - 组件挂载完毕，太晚，页面已渲染
-  - 进入路由前处理即可
-
-```ts
-    {
-      path: '/room',
-      component: () => import('@/views/Room/index.vue'),
-      meta: { title: '问诊室' },
-      beforeEnter(to) {
-        if (to.query.payResult === 'false') return '/user/consult'
-      }
-    },
 ```
