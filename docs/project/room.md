@@ -1,6 +1,6 @@
 # 问诊室模块
 
-![image-20220824154943859](./images/room.png)
+<img src="./images/room.png" width="414" />
 
 ## 组件拆分{#room-components}
 
@@ -248,7 +248,6 @@ import RoomStatus from './components/RoomStatus.vue'
 <style lang="scss" scoped>
 @import '@/styles/room.scss';
 </style>
-
 ```
 
 `/styles/room.scss`
@@ -505,11 +504,6 @@ import RoomMessage from './components/RoomMessage.vue'
 }
 </style>
 ```
-
-
-小结：
-- 知道问诊室大概有哪些消息卡片（类型）
-
 
 ## 问诊室-websocket介绍
 
