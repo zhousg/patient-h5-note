@@ -1,30 +1,10 @@
 # 问诊室模块
 
-![image-20220824154943859](./images/image-20220824154943859.png)
+![image-20220824154943859](./images/room.png)
 
-![image-20220824155012193](./images/image-20220824155012193.png)
+## 组件拆分{#room-components}
 
-![image-20220824155114135](./images/image-20220824155114135.png)
-
-## 问诊室-路由与组件
-
-
-组件
-
-- 导航
-```vue
-<script setup lang="ts"></script>
-
-<template>
-  <div class="room-page">
-    <cp-nav-bar title="问诊室" />
-  </div>
-</template>
-
-<style lang="scss" scoped></style>
-```
-
-2）准备顶部订单状态
+1）状态栏组件
 
 - 等待接诊，咨询中，已结束
 
@@ -108,7 +88,9 @@ import RoomStatus from './components/RoomStatus.vue'
 </template>
 ```
 
-3）准备底部订单操作栏
+2）操作栏组件
+
+- 需要禁用，接诊后开启
 
 ```vue
 <script setup lang="ts"></script>
@@ -121,8 +103,9 @@ import RoomStatus from './components/RoomStatus.vue'
       :border="false"
       placeholder="问医生"
       autocomplete="off"
+      :disabled="true"
     ></van-field>
-    <van-uploader :preview-image="false">
+    <van-uploader :preview-image="false" :disabled="true">
       <cp-icon name="consult-img" />
     </van-uploader>
   </div>
@@ -155,44 +138,10 @@ import RoomStatus from './components/RoomStatus.vue'
 }
 </style>
 ```
-```vue
-<script setup lang="ts">
-import RoomStatus from './components/RoomStatus.vue'
-import RoomAction from './components/RoomAction.vue'
-</script>
 
-<template>
-  <div class="room-page">
-    <cp-nav-bar title="问诊室" />
-    <!-- 状态栏 -->
-    <room-status></room-status>
-    <!-- 消息 item -->
-    <!-- 操作栏 -->
-    <room-action></room-action>
-  </div>
-</template>
+3）消息卡片组件
 
-<style lang="scss" scoped>
-.room-page {
-  padding-top: 90px;
-  padding-bottom: 60px;
-  min-height: 100vh;
-  box-sizing: border-box;
-  background-color: var(--cp-bg);
-  .van-pull-refresh {
-    width: 100%;
-    min-height: calc(100vh - 150px);
-  }
-}
-</style>
-```
-
-
-
-
-## 问诊室-消息卡片
-
-1）组件 
+- 根据消息类型判断显示不同消息卡片
 
 `Room/components/RoomMessage.vue` 
 
@@ -303,6 +252,7 @@ import RoomAction from './components/RoomAction.vue'
 ```
 
 `/styles/room.scss`
+
 ```scss
 .msg {
   display: flex;
@@ -522,7 +472,8 @@ import RoomAction from './components/RoomAction.vue'
 ```
 
 
-2）使用：
+4）问诊室页面
+
 `Room/index.vue` 
 ```vue
 <script setup lang="ts">
@@ -539,6 +490,20 @@ import RoomMessage from './components/RoomMessage.vue'
     <room-action></room-action>
   </div>
 </template>
+
+<style lang="scss" scoped>
+.room-page {
+  padding-top: 90px;
+  padding-bottom: 60px;
+  min-height: 100vh;
+  box-sizing: border-box;
+  background-color: var(--cp-bg);
+  .van-pull-refresh {
+    width: 100%;
+    min-height: calc(100vh - 150px);
+  }
+}
+</style>
 ```
 
 
