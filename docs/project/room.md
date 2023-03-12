@@ -1692,7 +1692,7 @@ defineProps<{
 }>()
 ```
 ```diff
-+  <div class="evalutate-card" v-if="evaluateDoc">
++  <div class="evaluate-card" v-if="evaluateDoc">
     <p class="title">医生服务评价</p>
     <p class="desc">我们会更加努力提升服务质量</p>
     <van-rate
@@ -1704,7 +1704,7 @@ defineProps<{
       void-color="rgba(0,0,0,0.04)"
     />
   </div>
-+  <div class="evalutate-card" v-else>
++  <div class="evaluate-card" v-else>
 ```
 
 3）评价表单数据绑定和校验
