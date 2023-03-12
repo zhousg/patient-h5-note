@@ -1575,9 +1575,11 @@ const buy = (pre?: Prescription) => {
 
 1）准备评价组件 `Room/components/evaluateCard.vue`
 
-显示卡片
-```html
-  <div class="evalutate-card">
+```vue
+<script setup lang="ts"></script>
+
+<template>
+  <div class="evaluate-card">
     <p class="title">医生服务评价</p>
     <p class="desc">我们会更加努力提升服务质量</p>
     <van-rate
@@ -1589,10 +1591,7 @@ const buy = (pre?: Prescription) => {
       void-color="rgba(0,0,0,0.04)"
     />
   </div>
-```
-评价表单
-```html
-  <div class="evalutate-card">
+  <div class="evaluate-card">
     <p class="title">感谢您的评价</p>
     <p class="desc">本次在线问诊服务您还满意吗？</p>
     <van-rate
@@ -1611,15 +1610,13 @@ const buy = (pre?: Prescription) => {
     ></van-field>
     <div class="footer">
       <van-checkbox>匿名评价</van-checkbox>
-      <van-button type="primary" size="small" round>
-        提交评价
-      </van-button>
+      <van-button type="primary" size="small" round> 提交评价 </van-button>
     </div>
   </div>
-```
-样式
-```scss
-.evalutate-card {
+</template>
+
+<style lang="scss" scoped>
+.evaluate-card {
   width: 100%;
   background-color: #fff;
   border-radius: 8px;
@@ -1645,7 +1642,7 @@ const buy = (pre?: Prescription) => {
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
-    ::v-deep() {
+    :deep() {
       .van-checkbox {
         .van-icon {
           font-size: 12px;
@@ -1668,6 +1665,7 @@ const buy = (pre?: Prescription) => {
     }
   }
 }
+</style>
 ```
 
 2）展示评价组件
@@ -1721,8 +1719,8 @@ const content = ref('')
 const disabled = computed(() => !score.value || !content.value)
 
 const onSubmit = async () => {
-  if (!score.value) return Toast('请选择评分')
-  if (!content.value) return Toast('请输入评价')
+  if (!score.value) return showToast('请选择评分')
+  if (!content.value) return showToast('请输入评价')
   
 }
 ```
@@ -1783,9 +1781,9 @@ const consult = inject<Ref<ConsultOrderItem>>('consult')
 提交评价
 ```diff
 const onSubmit = async () => {
-  if (!score.value) return Toast('请选择评分')
-  if (!content.value) return Toast('请输入评价')
-+  if (!consult?.value) return Toast('未找到订单')
+  if (!score.value) return showToast('请选择评分')
+  if (!content.value) return showToast('请输入评价')
++  if (!consult?.value) return showToast('未找到订单')
 +  if (consult.value.docInfo?.id) {
 +    await evaluateConsultOrder({
 +      docId: consult.value?.docInfo?.id,
