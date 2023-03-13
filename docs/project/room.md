@@ -1541,13 +1541,13 @@ export const getPrescriptionPic = (id: string) =>
 ```ts
 import { useRouter } from 'vue-router'
 import { PrescriptionStatus } from '@/enums'
-import { Toast } from 'vant'
+import { showToast } from 'vant'
 
 // 点击处方的跳转
 const router = useRouter()
 const buy = (pre?: Prescription) => {
   if (pre) {
-    if (pre.status === PrescriptionStatus.Invalid) return Toast('处方已失效')
+    if (pre.status === PrescriptionStatus.Invalid) return showToast('处方已失效')
     if (pre.status === PrescriptionStatus.NotPayment && !pre.orderId)
       return router.push(`/order/pay?id=${pre.id}`)
     router.push(`/order/${pre.orderId}`)
@@ -1710,7 +1710,7 @@ defineProps<{
 3）评价表单数据绑定和校验
 
 ```ts
-import { Toast } from 'vant'
+import { showToast } from 'vant'
 import { computed, inject, ref } from 'vue'
 
 const score = ref(0)
@@ -1815,9 +1815,9 @@ provide('completeEva', completeEva)
 
 
 const onSubmit = async () => {
-  if (!score.value) return Toast('请选择评分')
-  if (!content.value) return Toast('请输入评价')
-  if (!consult?.value) return Toast('未找到订单')
+  if (!score.value) return showToast('请选择评分')
+  if (!content.value) return showToast('请输入评价')
+  if (!consult?.value) return showToast('未找到订单')
   if (consult.value.docInfo?.id) {
     await evaluateConsultOrder({
       docId: consult.value.docInfo?.id,
