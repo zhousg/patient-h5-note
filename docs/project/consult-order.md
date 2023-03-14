@@ -16,16 +16,15 @@
 ```vue
 <script setup lang="ts">
 import ConsultList from './components/ConsultList.vue'
-import { ConsultType } from '@/enums'
 </script>
 
 <template>
   <div class="consult-page">
     <cp-nav-bar title="问诊记录" />
     <van-tabs sticky>
-      <van-tab title="极速问诊"><consult-list :type="ConsultType.Fast" /></van-tab>
-      <van-tab title="找医生"><consult-list :type="ConsultType.Doctor" /></van-tab>
-      <van-tab title="开药问诊"><consult-list :type="ConsultType.Medication" /></van-tab>
+      <van-tab title="极速问诊"><consult-list /></van-tab>
+      <van-tab title="找医生"><consult-list /></van-tab>
+      <van-tab title="开药问诊"><consult-list /></van-tab>
     </van-tabs>
   </div>
 </template>
@@ -169,6 +168,13 @@ import ConsultItem from './ConsultItem.vue'
   }
 }
 </style>
+```
+3） 传入类型
+
+```html
+      <van-tab title="极速问诊"><consult-list :type="ConsultType.Fast" /></van-tab>
+      <van-tab title="找医生"><consult-list :type="ConsultType.Doctor" /></van-tab>
+      <van-tab title="开药问诊"><consult-list :type="ConsultType.Medication" /></van-tab>
 ```
 
 ## 问诊记录-类型定义与API函数{#consult-order-type}
@@ -800,6 +806,22 @@ const { onShowPrescription } = useShowPrescription()
 .van-cell {
   padding-left: 18px;
   padding-right: 18px;
+}
+.detail-time {
+  position: fixed;
+  left: 0;
+  bottom: 65px;
+  width: 100%;
+  height: 44px;
+  background-color: #fff7eb;
+  text-align: center;
+  line-height: 44px;
+  font-size: 13px;
+  color: #f2994a;
+  .van-count-down {
+    display: inline;
+    color: #f2994a;
+  }
 }
 </style>
 ```
