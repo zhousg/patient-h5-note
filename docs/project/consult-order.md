@@ -317,10 +317,10 @@ defineProps<{ item: ConsultOrderItem }>()
 import { computed, ref } from 'vue'
 import type { ConsultOrderItem } from '@/types/consult'
 
-const { item } = defineProps<{ item: ConsultOrderItem }>()
+const props = defineProps<{ item: ConsultOrderItem }>()
 const showPopover = ref(false)
 const actions = computed(() => [
-  { text: '查看处方', disabled: !item.prescriptionId },
+  { text: '查看处方', disabled: !props.item.prescriptionId },
   { text: '删除订单' }
 ])
 const onSelect = () => {
@@ -394,25 +394,23 @@ export const cancelOrder = (id: string) => request(`/patient/order/cancel/${id}`
 2）取消订单逻辑函数 `ConsultItem.vue`
 ```ts
 import { cancelOrder } from '@/services/consult'
-import { Toast } from 'vant'
+import { showSuccessToast, showFailToast } from 'vant'
 ```
 ```ts
 // 取消订单
 const loading = ref(false)
-const cancelConsultOrder = (item: ConsultOrderItem) => {
-  loading.value = true
-  cancelOrder(item.id)
-    .then(() => {
-      item.status = OrderType.ConsultCancel
-      item.statusValue = '已取消'
-      Toast.success('取消成功')
-    })
-    .catch(() => {
-      Toast.fail('取消失败')
-    })
-    .finally(() => {
-      loading.value = false
-    })
+const cancelConsultOrder = async (item: ConsultOrderItem) => {
+  try {
+    loading.value = true
+    await cancelOrder(item.id)
+    item.status = OrderType.ConsultCancel
+    item.statusValue = '已取消'
+    showSuccessToast('取消成功')
+  } catch (error) {
+    showFailToast('取消失败')
+  } finally {
+    loading.value = false
+  }
 }
 ```
 
@@ -478,21 +476,23 @@ export const deleteOrder = (id: string) => request(`/patient/order/${id}`, 'DELE
 import { deleteOrder } from '@/services/consult'
 ```
 ```ts
+const emit = defineEmits<{
+  (e: 'on-delete', id: string): void
+}>()
 // 删除订单
 const deleteLoading = ref(false)
-const deleteConsultOrder = (item: ConsultOrderItem) => {
-  deleteLoading.value = true
-  deleteOrder(item.id)
-    .then(() => {
-      emit('on-delete', item.id)
-      Toast.success('删除成功')
-    })
-    .catch(() => {
-      Toast.fail('删除失败')
-    })
-    .finally(() => {
-      deleteLoading.value = false
-    })
+const deleteConsultOrder = async (item: ConsultOrderItem) => {
+  try {
+    deleteLoading.value = true
+    await deleteOrder(item.id)
+    emit('on-delete', item.id)
+    showSuccessToast('删除成功')
+    deleteLoading.value = false
+  } catch (error) {
+    showFailToast('删除失败')
+  } finally {
+    deleteLoading.value = false
+  }
 }
 ```
 
@@ -503,7 +503,7 @@ const deleteConsultOrder = (item: ConsultOrderItem) => {
 const onSelect = (action: { text: string }, i: number) => {
   if (i === 1) {
     // 删除
-    deleteConsultOrder(item)
+    deleteConsultOrder(props.item)
   }
 }
 ```
@@ -547,18 +547,18 @@ const onDelete = (id: string) => {
 1）提取hook函数  `composable/index.ts`
 ```ts
 import { getPrescriptionPic } from '@/services/consult'
-import { ImagePreview } from 'vant'
+import { onShowPrescription } from 'vant'
 ```
 ```ts
 // 封装查看处方逻辑
 export const useShowPrescription = () => {
-  const showPrescription = async (id?: string) => {
+  const onShowPrescription = async (id?: string) => {
     if (id) {
       const res = await getPrescriptionPic(id)
-      ImagePreview([res.data.url])
+      showImagePreview([res.data.url])
     }
   }
-  return { showPrescription }
+  return { onShowPrescription }
 }
 ```
 
@@ -568,12 +568,12 @@ export const useShowPrescription = () => {
 ```ts
 import { useShowPrescription } from '@/composable'
 
-const { showPrescription } = useShowPrescription()
+const { onShowPrescription } = useShowPrescription()
 ```
 ```diff
           <div class="head-tit">
             <h3>电子处方</h3>
-+            <p @click="showPrescription(msg.prescription?.id)">
++            <p @click="onShowPrescription(msg.prescription?.id)">
               原始处方 <van-icon name="arrow"></van-icon>
             </p>
           </div>
@@ -585,14 +585,14 @@ import { useShowPrescription } from '@/composable'
 ```ts
 const onSelect = (action: { text: string }, i: number) => {
   if (i === 0) {
-    showPrescription(item.prescriptionId)
+    onShowPrescription(props.item.prescriptionId)
   }
   if (i === 1) {
     // 删除
-    deleteConsultOrder(item)
+    deleteConsultOrder(props.item)
   }
 }
-const { showPrescription } = useShowPrescription()
+const { onShowPrescription } = useShowPrescription()
 ```
 
 小结：
