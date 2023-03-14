@@ -531,6 +531,7 @@ const onSelect = (action: { text: string }, i: number) => {
 ```ts
 const onDelete = (id: string) => {
   list.value = list.value.filter((item) => item.id !== id)
+  if (!list.value.length) onLoad()
 }
 ```
 
