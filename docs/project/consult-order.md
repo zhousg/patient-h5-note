@@ -287,7 +287,7 @@ defineProps<{ item: ConsultOrderItem }>()
       </div>
       <div class="body-row">
         <div class="body-label">价格</div>
-        <div class="body-value">¥ {{ item.actualPayment.toFixed(2) }}</div>
+        <div class="body-value">¥ {{ item.payment.toFixed(2) }}</div>
       </div>
       <div class="body-row">
         <div class="body-label">创建时间</div>
