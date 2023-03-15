@@ -659,6 +659,9 @@ const { onShowPrescription } = useShowPrescription()
         <van-cell title="实付款" value="￥39" class="price" />
       </van-cell-group>
     </div>
+    <!-- <div class="detail-time">
+      请在 <van-count-down :time="10000 * 1000" /> 内完成支付，超时订单将取消
+    </div> -->
     <div class="detail-action van-hairline--top">
       <div class="price">
         <span>需付款</span>
@@ -918,10 +921,13 @@ onMounted(async () => {
         <van-cell title="实付款" :value="`￥${item.actualPayment}`" class="price" />
       </van-cell-group>
     </div>
+    <!-- <div class="detail-time">
+      请在 <van-count-down :time="10000 * 1000" /> 内完成支付，超时订单将取消
+    </div> -->
     <div class="detail-action van-hairline--top">
       <div class="price">
         <span>需付款</span>
-        <span>￥{{ item.actualPayment }}</span>
+        <span>￥39.00</span>
       </div>
       <van-button type="default" round>取消问诊</van-button>
       <van-button type="primary" round>继续支付</van-button>
@@ -939,7 +945,7 @@ onMounted(async () => {
 
 通用问诊记录查看更多组件
 
-组件封装：`components/cp-consult-more`
+组件封装：`User/components/ConsultMore.vue`
 
 ```vue
 <script setup lang="ts">
@@ -967,7 +973,7 @@ const onSelect = (action: { text: string }, i: number) => {
 </script>
 
 <template>
-  <div class="cp-consult-more">
+  <div class="consult-more">
     <van-popover
       placement="top-start"
       v-model:show="showPopover"
@@ -980,26 +986,12 @@ const onSelect = (action: { text: string }, i: number) => {
 </template>
 
 <style lang="scss" scoped>
-.cp-consult-more {
+.consult-more {
   flex: 1;
   color: var(--cp-tag);
 }
 </style>
-```
-
-```diff
-+import CpConsultMore from '@/components/CpConsultMore.vue'
-
-declare module 'vue' {
-  interface GlobalComponents {
-    // 指定组件类型，typeof 从组件对象得到类型，设置给全局组件：CpNavBar
-    CpNavBar: typeof CpNavBar
-    CpIcon: typeof CpIcon
-    CpRadioBtn: typeof CpRadioBtn
-+    CpConsultMore: typeof CpConsultMore
-  }
-}
-```
+``
 
 使用组件：`User/components/ConsultItem.vue`
 
@@ -1007,7 +999,7 @@ declare module 'vue' {
       <cp-consult-more
         :disabled="!item.prescriptionId"
         @on-delete="deleteConsultOrder(item)"
-        @on-preview="showPrescription(item.prescriptionId)"
+        @on-preview="onShowPrescription(item.prescriptionId)"
       ></cp-consult-more>
 ```
 
@@ -1034,7 +1026,10 @@ declare module 'vue' {
 按钮：
 
 ```html
-    <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultPay">
+    <div
+      class="detail-action van-hairline--top"
+      v-if="item.status === OrderType.ConsultPay"
+    >
       <div class="price">
         <span>需付款</span>
         <span>￥{{ item.actualPayment }}</span>
@@ -1042,43 +1037,46 @@ declare module 'vue' {
       <van-button type="default" round>取消问诊</van-button>
       <van-button type="primary" round>继续支付</van-button>
     </div>
-    <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultWait">
+    <div
+      class="detail-action van-hairline--top"
+      v-if="item.status === OrderType.ConsultWait"
+    >
       <van-button type="default" round>取消问诊</van-button>
-      <van-button type="primary" round :to="`/room?orderId=${item.id}`">继续沟通</van-button>
+      <van-button type="primary" round :to="`/room?orderId=${item.id}`">
+        继续沟通
+      </van-button>
     </div>
-    <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultChat">
-      <van-button type="default" round v-if="item.prescriptionId">查看处方</van-button>
-      <van-button type="primary" round :to="`/room?orderId=${item.id}`">继续沟通</van-button>
+    <div
+      class="detail-action van-hairline--top"
+      v-if="item.status === OrderType.ConsultChat"
+    >
+      <van-button type="default" round v-if="item.prescriptionId">
+        查看处方
+      </van-button>
+      <van-button type="primary" round :to="`/room?orderId=${item.id}`">
+        继续沟通
+      </van-button>
     </div>
-    <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultComplete">
-      <cp-consult-more></cp-consult-more>
-      <van-button type="default" round :to="`/room?orderId=${item.id}`">问诊记录</van-button>
-      <van-button type="primary" round v-if="item.evaluateId">写评价</van-button>
-      <van-button type="default" round v-else>查看评价</van-button>
+    <div
+      class="detail-action van-hairline--top"
+      v-if="item.status === OrderType.ConsultComplete"
+    >
+      <consult-more></consult-more>
+      <van-button type="default" round :to="`/room?orderId=${item.id}`">
+        问诊记录
+      </van-button>
+      <van-button type="default" round v-if="item.evaluateId">
+        查看评价
+      </van-button>
+      <van-button type="primary" round v-else> 写评价 </van-button>
     </div>
-    <div class="detail-action van-hairline--top" v-if="item.status === OrderType.ConsultCancel">
+    <div
+      class="detail-action van-hairline--top"
+      v-if="item.status === OrderType.ConsultCancel"
+    >
       <van-button type="default" round>删除订单</van-button>
       <van-button type="primary" round to="/">咨询其他医生</van-button>
     </div>
-```
-
-```scss
-.detail-time {
-  position: fixed;
-  left: 0;
-  bottom: 65px;
-  width: 100%;
-  height: 44px;
-  background-color: #fff7eb;
-  text-align: center;
-  line-height: 44px;
-  font-size: 13px;
-  color: #f2994a;
-  .van-count-down {
-    display: inline;
-    color: #f2994a;
-  }
-}
 ```
 
 ## 问诊记录-取消订单Hook
@@ -1087,30 +1085,23 @@ declare module 'vue' {
 
 
 `composable/index.ts`
-```ts
-import { cancelOrder, followDoctor, getPrescriptionPic } from '@/services/consult'
-import type { ConsultOrderItem, FollowType } from '@/types/consult'
-import { ImagePreview, Toast } from 'vant'
-import { OrderType } from '@/enums'
-```
+
 ```ts
 // 封装取消订单逻辑
 export const useCancelOrder = () => {
   const loading = ref(false)
   const cancelConsultOrder = (item: ConsultOrderItem) => {
-    loading.value = true
-    cancelOrder(item.id)
-      .then(() => {
-        item.status = OrderType.ConsultCancel
-        item.statusValue = '已取消'
-        Toast.success('取消成功')
-      })
-      .catch(() => {
-        Toast.fail('取消失败')
-      })
-      .finally(() => {
-        loading.value = false
-      })
+    try {
+      loading.value = true
+      await cancelOrder(item.id)
+      item.status = OrderType.ConsultCancel
+      item.statusValue = '已取消'
+      showSuccessToast('取消成功')
+    } catch (error) {
+      showFailToast('取消失败')
+    } finally {
+      loading.value = false
+    }
   }
   return { loading, cancelConsultOrder }
 }
@@ -1153,21 +1144,18 @@ const { loading, cancelConsultOrder } = useCancelOrder()
 > 实现，取消删除逻辑复用，提取hook函数
 
 ```ts
-import { cancelOrder, deleteOrder, followDoctor, getPrescriptionPic } from '@/services/consult'
-
-
 export const useDeleteOrder = (cb: () => void) => {
   // 删除订单
   const loading = ref(false)
   const deleteConsultOrder = async (item: ConsultOrderItem) => {
-    loading.value = true
     try {
+      loading.value = true
       await deleteOrder()
-      // 成功，通知父组件删除这条信息，提示，详情就是跳转列表页面
-      Toast.success('删除成功')
+      showSuccessToast('删除成功')
+      // 成功，做其他业务
       cb && cb()
     } catch (e) {
-      Toast.fail('删除失败')
+      showFailToast('删除失败')
     } finally {
       loading.value = false
     }
@@ -1196,16 +1184,18 @@ const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder(() => {
 })
 ```
 
-查看处方和删除订单
+更多：查看处方和删除订单
+
 ```html
       <cp-consult-more
         :disabled="!item.prescriptionId"
         @on-delete="deleteConsultOrder(item)"
-        @on-preview="showPrescription(item.prescriptionId)"
+        @on-preview="onShowPrescription(item.prescriptionId)"
       ></cp-consult-more>
 ```
 
 删除订单 `(item!)` 是ts语法非空断言
+
 ```html
       <van-button type="default" round :loading="deleteLoading" @click="deleteConsultOrder(item!)">
         删除订单
@@ -1218,7 +1208,7 @@ const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder(() => {
         type="default"
         round
         v-if="item.prescriptionId"
-+        @click="showPrescription(item?.prescriptionId)"
++        @click="onShowPrescription(item?.prescriptionId)"
       >
         查看处方
       </van-button>
@@ -1248,17 +1238,17 @@ const { loading: deleteLoading, deleteConsultOrder } = useDeleteOrder(() => {
 
 ```ts
 import { useClipboard } from '@vueuse/core'
-import { Toast } from 'vant'
+import { showToast } from 'vant'
 ```
 
 ```ts
 const { copy, copied, isSupported } = useClipboard()
 const onCopy = () => {
-  if (!isSupported.value) return Toast('未授权，不支持')
+  if (!isSupported.value) return showToast('未授权，不支持')
   copy(item.value?.orderNo || '')
 }
 watch(copied, () => {
-  if (copied.value) Toast('已复制')
+  if (copied.value) showToast('已复制')
 })
 ```
 
@@ -1292,7 +1282,7 @@ watch(copied, () => {
 1）封装组件 `components/CpPaySheet.vue`
 ```vue
 <script setup lang="ts">
-import { Toast } from 'vant'
+import { showToast, showLoadingToast } from 'vant'
 import { ref } from 'vue'
 import { getConsultOrderPayUrl } from '@/services/consult'
 
@@ -1310,8 +1300,8 @@ const paymentMethod = ref<0 | 1>()
 
 // 跳转支付
 const pay = async () => {
-  if (paymentMethod.value === undefined) return Toast('请选择支付方式')
-  Toast.loading('跳转支付')
+  if (paymentMethod.value === undefined) return showToast('请选择支付方式')
+  showLoadingToast({message: '跳转支付', duration: 0})
   const res = await getConsultOrderPayUrl({
     orderId: orderId,
     paymentMethod: paymentMethod.value,
@@ -1388,8 +1378,6 @@ declare module 'vue' {
     CpIcon: typeof CpIcon
     CpRadioBtn: typeof CpRadioBtn
 +    CpPaySheet: typeof CpPaySheet
-    RouterLink: typeof RouterLink
-    RouterView: typeof RouterView
   }
 }
 ```
