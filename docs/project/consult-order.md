@@ -491,9 +491,8 @@ const deleteConsultOrder = async (item: ConsultOrderItem) => {
   try {
     deleteLoading.value = true
     await deleteOrder(item.id)
-    emit('on-delete', item.id)
     showSuccessToast('删除成功')
-    deleteLoading.value = false
+    emit('on-delete', item.id)
   } catch (error) {
     showFailToast('删除失败')
   } finally {
