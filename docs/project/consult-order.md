@@ -1090,7 +1090,7 @@ const onSelect = (action: { text: string }, i: number) => {
 // 封装取消订单逻辑
 export const useCancelOrder = () => {
   const loading = ref(false)
-  const cancelConsultOrder = (item: ConsultOrderItem) => {
+  const cancelConsultOrder = async (item: ConsultOrderItem) => {
     try {
       loading.value = true
       await cancelOrder(item.id)
@@ -1150,7 +1150,7 @@ export const useDeleteOrder = (cb: () => void) => {
   const deleteConsultOrder = async (item: ConsultOrderItem) => {
     try {
       loading.value = true
-      await deleteOrder()
+      await deleteOrder(item.id)
       showSuccessToast('删除成功')
       // 成功，做其他业务
       cb && cb()
@@ -1286,7 +1286,7 @@ import { showToast, showLoadingToast } from 'vant'
 import { ref } from 'vue'
 import { getConsultOrderPayUrl } from '@/services/consult'
 
-const { orderId, show } = defineProps<{
+const props = defineProps<{
   orderId: string
   actualPayment: number
   onClose?: () => void
@@ -1303,7 +1303,7 @@ const pay = async () => {
   if (paymentMethod.value === undefined) return showToast('请选择支付方式')
   showLoadingToast({message: '跳转支付', duration: 0})
   const res = await getConsultOrderPayUrl({
-    orderId: orderId,
+    orderId: props.orderId,
     paymentMethod: paymentMethod.value,
     payCallback: 'http://localhost/room'
   })
