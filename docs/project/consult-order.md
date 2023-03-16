@@ -941,7 +941,7 @@ onMounted(async () => {
 </template>
 ```
 
-## 问诊记录-cp-consult-more组件
+## 问诊记录-consult-more组件
 
 通用问诊记录查看更多组件
 
