@@ -989,6 +989,7 @@ const onSelect = (action: { text: string }, i: number) => {
 .consult-more {
   flex: 1;
   color: var(--cp-tag);
+  font-size: 13px;
 }
 </style>
 ``
@@ -1242,14 +1243,13 @@ import { showToast } from 'vant'
 ```
 
 ```ts
-const { copy, copied, isSupported } = useClipboard()
-const onCopy = () => {
+// 复制
+const { copy, isSupported } = useClipboard()
+const onCopy = async () => {
   if (!isSupported.value) return showToast('未授权，不支持')
-  copy(item.value?.orderNo || '')
+  await copy(item.value?.orderNo || '')
+  showToast('已复制')
 }
-watch(copied, () => {
-  if (copied.value) showToast('已复制')
-})
 ```
 
 ```html
@@ -1305,7 +1305,7 @@ const pay = async () => {
   const res = await getConsultOrderPayUrl({
     orderId: props.orderId,
     paymentMethod: paymentMethod.value,
-    payCallback: 'http://localhost/room'
+    payCallback: 'http://localhost:5173/room'
   })
   window.location.href = res.data.payUrl
 }
