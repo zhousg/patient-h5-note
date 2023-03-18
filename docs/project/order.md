@@ -263,14 +263,8 @@ export type Address = {
   county: string
   /** 详细地址 */
   addressDetail: string
-}
-
-// 订单列表
-export type AddressItem = Address & {
-  /** 是否默认地址，0 不是 1 是 */
+    /** 是否默认地址，0 不是 1 是 */
   isDefault: 0 | 1
-  /** 邮政编码 */
-  postalCode: string
 }
 ```
 `services/order.ts`
@@ -294,18 +288,27 @@ import { onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+// 预支付信息
 const orderPre = ref<OrderPre>()
-const address = ref<AddressItem>()
-onMounted(async () => {
-  const res = await getMedicalOrderPre({ prescriptionId: route.query.id as string })
-  const addRes = await getAddressList()
+const loadOrderPre = async () => {
+  const res = await getMedicalOrderPre({
+    prescriptionId: route.query.id as string
+  })
   orderPre.value = res.data
-  // 设置收货地址
+}
+// 收货地址
+const address = ref<AddressItem>()
+const loadAddress = async () => {
+  const addRes = await getAddressList()
   if (addRes.data.length) {
     const defAddress = addRes.data.find((item) => item.isDefault === 0)
     if (defAddress) address.value = defAddress
     else address.value = addRes.data[0]
   }
+}
+onMounted(async () => {
+  loadOrderPre()
+  loadAddress()
 })
 </script>
 
@@ -320,7 +323,7 @@ onMounted(async () => {
       <p class="detail">{{ address.addressDetail }}</p>
       <p>
         {{ address.receiver }}
-        {{ address.mobile.replace(/^(\d{3})(?:\d{4})(\d{4})$/, '\$1****\$2') }}
+        {{ address.mobile.replace(/^(\d{3})\d+(\d{4})$/, '\$1****\$2') }}
       </p>
     </div>
     <div class="order-medical">
@@ -368,8 +371,9 @@ onMounted(async () => {
   </div>
   <div class="order-pay-page" v-else>
     <cp-nav-bar title="药品支付" />
-    <van-skeleton title :row="4" style="margin-top: 30px" />
-    <van-skeleton title :row="4" style="margin-top: 30px" />
+    <van-skeleton title avatar row="2" style="margin-top: 15px" />
+    <van-skeleton title row="4" style="margin-top: 50px" />
+    <van-skeleton title row="4" style="margin-top: 50px" />
   </div>
 </template>
 ```
@@ -380,13 +384,16 @@ onMounted(async () => {
 1）生成药品订单API函数
 ```ts
 // 创建药品订单
-export const createMedicalOrder = (data: { id: string; addressId: string; couponId?: string }) =>
-  request<{ id: string }>('/patient/medicine/order', 'POST', data)
+export const createMedicalOrder = (data: {
+  id: string
+  addressId: string
+  couponId?: string
+}) => request<{ id: string }>('/patient/medicine/order', 'POST', data)
 ```
 
 2）支付抽屉支持，设置回跳地址
 ```diff
-const { orderId, show, payCallback } = defineProps<{
+const props = defineProps<{
   orderId: string
   actualPayment: number
   onClose?: () => void
@@ -397,12 +404,12 @@ const { orderId, show, payCallback } = defineProps<{
 ```diff
 // 跳转支付
 const pay = async () => {
-  if (paymentMethod.value === undefined) return Toast('请选择支付方式')
-  Toast.loading('跳转支付')
+  if (paymentMethod.value === undefined) showToast('请选择支付方式')
+  showLoadingToast({ message: '跳转支付', duration: 0 })
   const res = await getConsultOrderPayUrl({
-    orderId: orderId,
+    orderId: props.orderId,
     paymentMethod: paymentMethod.value,
-+    payCallback
++    payCallback: 'http://localhost:5173' + props.payCallback
   })
   window.location.href = res.data.payUrl
 }
@@ -419,13 +426,13 @@ const agree = ref(false)
 const loading = ref(false)
 const orderId = ref('')
 const submit = async () => {
-  if (!agree.value) return Toast('请同意支付协议')
-  if (!address.value?.id) return Toast('请选择收货地址')
-  if (!orderPre.value?.id) return Toast('未找到处方')
+  if (!agree.value) return showToast('请同意支付协议')
+  if (!address.value?.id) return showToast('请选择收货地址')
+  if (!orderPre.value?.id) return showToast('未找到处方')
   // 没有生成订单ID
   if (!orderId.value) {
-    loading.value = true
     try {
+      loading.value = true
       const res = await createMedicalOrder({
         id: orderPre.value?.id,
         addressId: address.value?.id,
@@ -447,15 +454,12 @@ const show = ref(false)
 ```
 ```html
     <cp-pay-sheet
+      v-model:show="show"
       :orderId="orderId"
       :actualPayment="orderPre.actualPayment"
-      payCallback="http://localhost/order/pay/result"
-      v-model:show="show"
+      payCallback="/order/pay/result"
     />
 ```
-:::warn
-payCallback 的域名+端口号，和自己的开发服务启动的地址和端口号一致。
-:::
 
 
 ## 药品订单-支付结果
