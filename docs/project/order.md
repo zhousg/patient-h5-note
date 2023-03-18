@@ -483,14 +483,22 @@ const show = ref(false)
   <div class="order-pay-result-page">
     <cp-nav-bar title="药品支付结果" />
     <div class="result">
+      <van-icon name="clear" />
+      <p class="price">￥ 100.00</p>
+      <p class="status">支付失败</p>
+      <p class="tip">
+        订单支付失败，可以点击查看订单继续支付，如有疑问联系客服~
+      </p>
+    </div>
+    <div class="result">
       <van-icon name="checked" />
-      <p class="price">￥ 35.00</p>
+      <p class="price">￥ 100.00</p>
       <p class="status">支付成功</p>
       <p class="tip">订单支付成功，已通知药房尽快发出， 请耐心等待~</p>
-      <div class="btn">
-        <van-button type="primary">查看订单</van-button>
-        <van-button>返回诊室</van-button>
-      </div>
+    </div>
+    <div class="btn">
+      <van-button type="primary" :to="`/order/10000`">查看订单</van-button>
+      <van-button :to="`/room?orderId=10000`">返回诊室</van-button>
     </div>
   </div>
 </template>
@@ -498,38 +506,40 @@ const show = ref(false)
 <style lang="scss" scoped>
 .order-pay-result-page {
   padding-top: 46px;
-}
-.result {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  .van-icon {
-    font-size: 75px;
-    color: var(--cp-primary);
-    margin-top: 60px;
-  }
-  .price {
-    font-size: 22px;
-    margin-top: 10px;
-  }
-  .status {
-    color: var(--cp-text3);
-  }
-  .tip {
-    color: var(--cp-tip);
-    width: 240px;
-    text-align: center;
-    margin-top: 20px;
+  .result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    .van-icon {
+      font-size: 75px;
+      margin-top: 60px;
+    }
+    .van-icon-clear {
+      color: var(--cp-price);
+    }
+    .van-icon-checked {
+      color: var(--cp-primary);
+    }
+    .price {
+      font-size: 22px;
+      margin-top: 10px;
+    }
+    .status {
+      color: var(--cp-text3);
+    }
+    .tip {
+      color: var(--cp-tip);
+      width: 240px;
+      text-align: center;
+      margin-top: 20px;
+    }
   }
   .btn {
     margin-top: 60px;
+    display: flex;
+    justify-content: center;
     .van-button--primary {
       margin-right: 20px;
-    }
-  }
-  &.error {
-    .van-icon {
-      color: var(--cp-price);
     }
   }
 }
@@ -545,7 +555,7 @@ export type OrderDetail = {
   /** 药品订单编号 */
   orderNo: string
   /** 订单类型 */
-  type: 4
+  type: number
   /** 创建时间 */
   createTime: string
   /** 处方ID */
@@ -559,7 +569,7 @@ export type OrderDetail = {
   /** 支付倒计时时间 */
   countDown: number
   /** 收货地址 */
-  addressInfo: Address
+  addressInfo: AddressItem
   /** 物流信息 */
   expressInfo: {
     /** 物流最新位置 */
@@ -609,25 +619,21 @@ onMounted(async () => {
 <template>
   <div class="order-pay-result-page">
     <cp-nav-bar title="药品支付结果" />
-    <div class="result error" v-if="order?.status === OrderType.ConsultPay">
+    <div class="result" v-if="order?.status === OrderType.ConsultPay">
       <van-icon name="clear" />
       <p class="price">￥ {{ order?.actualPayment }}</p>
       <p class="status">支付失败</p>
       <p class="tip">订单支付失败，可以点击查看订单继续支付，如有疑问联系客服~</p>
-      <div class="btn">
-        <van-button type="primary" :to="`/order/${order?.id}`">查看订单</van-button>
-        <van-button :to="`/room?orderId=${order?.roomId}`">返回诊室</van-button>
-      </div>
     </div>
     <div class="result" v-else>
       <van-icon name="checked" />
       <p class="price">￥ {{ order?.actualPayment }}</p>
       <p class="status">支付成功</p>
       <p class="tip">订单支付成功，已通知药房尽快发出， 请耐心等待~</p>
-      <div class="btn">
-        <van-button type="primary" :to="`/order/${order?.id}`">查看订单</van-button>
-        <van-button :to="`/room?orderId=${order?.roomId}`">返回诊室</van-button>
-      </div>
+    </div>
+    <div class="btn">
+      <van-button type="primary" :to="`/order/${order?.id}`">查看订单</van-button>
+      <van-button :to="`/room?orderId=${order?.roomId}`">返回诊室</van-button>
     </div>
   </div>
 </template>
