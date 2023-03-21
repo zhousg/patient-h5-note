@@ -248,7 +248,7 @@ export type OrderPre = {
   /** 药品订单 */
   medicines: Medical[]
 }
-export type Address = {
+export type AddressItem = {
   /** 地址ID */
   id: string
   /** 联系方式 */
@@ -549,6 +549,8 @@ const show = ref(false)
 2）展示信息
 
 ```ts
+type Address = Omit<AddressItem, 'isDefault'>
+
 export type OrderDetail = {
   /** 药品订单ID */
   id: string
@@ -569,7 +571,7 @@ export type OrderDetail = {
   /** 支付倒计时时间 */
   countDown: number
   /** 收货地址 */
-  addressInfo: AddressItem
+  addressInfo: Address
   /** 物流信息 */
   expressInfo: {
     /** 物流最新位置 */
@@ -693,10 +695,10 @@ onMounted(async () => {
     </div>
     <div class="order-detail">
       <van-cell-group>
-        <van-cell title="药品金额" value="￥50" />
-        <van-cell title="运费" value="￥4" />
-        <van-cell title="优惠券" value="-￥0" />
-        <van-cell title="实付款" value="￥54" class="price" />
+        <van-cell title="药品金额" value="￥50.00" />
+        <van-cell title="运费" value="￥4.00" />
+        <van-cell title="优惠券" value="-￥0.00" />
+        <van-cell title="实付款" value="￥54.00" class="price" />
         <van-cell title="订单编号" value="202201127465" />
         <van-cell title="创建时间" value="2022-01-23 09:23:46" />
         <van-cell title="支付时间" value="2022-01-23 09:23:46" />
@@ -778,12 +780,12 @@ onMounted(async () => {
 }
 :deep(.van-cell) {
   .van-cell__title {
-    font-size: 16px;
+    font-size: 14px;
     flex: none;
     width: 100px;
   }
   .van-cell__value {
-    font-size: 16px;
+    font-size: 14px;
   }
   &.price {
     .van-cell__value {
@@ -980,7 +982,7 @@ const { medicines = [] } = defineProps<{ medicines?: Medical[] }>()
 </style>
 ```
 
-3）获取订单详情数据hook封装 
+3）获取订单详情数据composable封装 
 ```ts
 import { getMedicalOrderDetail } from '@/services/order'
 import type { OrderDetail } from '@/types/order'
