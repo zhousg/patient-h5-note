@@ -203,7 +203,7 @@ interface Window {
 import { onMounted, ref } from 'vue'
 
 const openId = ref('')
-const isBind = ref(false)
+const isNeedBind = ref(false)
 onMounted(() => {
   if (window.QC.Login.check()) {
     window.QC.Login.getMe((id) => {
@@ -215,7 +215,7 @@ onMounted(() => {
         })
         .catch(() => {
           // 登录失败
-          isBind.value = true
+          isNeedBind.value = true
         })
     })
   }
@@ -229,47 +229,105 @@ onMounted(() => {
 <style lang="scss" scoped></style>
 ```
 
-小结：
-- `isBind` 是 `false` 需要显示绑定手机界面
-
-
-## 第三方登录-绑定手机
-
-步骤：
-- 准备基础页面
-- 表单校验
-- 发送验证码（拷贝）
-- 进行绑定
-- 绑定成功即是登录成功，根据是否有回跳地址进行跳转
-
-代码：
-
-1）准备基础页面
-
-```vue 
+```vue
 <template>
-  <div class="login-page" v-if="isBind">
+  <div class="login-page" v-if="isNeedBind">
     <cp-nav-bar></cp-nav-bar>
     <div class="login-head">
       <h3>手机绑定</h3>
     </div>
     <van-form autocomplete="off" ref="form">
-      <van-field name="mobile" placeholder="请输入手机号"
-      ></van-field>
+      <van-field name="mobile" placeholder="请输入手机号"></van-field>
       <van-field name="code" placeholder="请输入验证码">
         <template #button>
           <span class="btn-send">发送验证码</span>
         </template>
       </van-field>
       <div class="cp-cell">
-        <van-button block round type="primary" native-type="submit"> 立即绑定 </van-button>
+        <van-button
+          style="margin-top: 50px"
+          block
+          round
+          type="primary"
+          native-type="submit"
+        >
+          立即绑定
+        </van-button>
       </div>
     </van-form>
   </div>
 </template>
+
+<style lang="scss" scoped>
+@import '@/styles/login.scss';
+</style>
 ```
 
-2）表单校验
+小结：
+- `isNeedBind` 是 `true` 需要显示绑定手机界面
+
+## 第三方登录-发送验证码composable
+
+1）分析 composable 需要传入参数，返回哪些数据
+```
+参数：
+1. 手机号
+2. 发短信类型
+
+返回：
+1. form 表单实例
+2. time 倒计时数据
+3. send 发送函数
+```
+
+2）提取函数
+```ts
+import { Toast, type FormInstance } from 'vant'
+import { sendMobileCode } from '@/services/user'
+import type { CodeType } from '@/types/user'
+```
+```ts
+// 发送短信验证码吗逻辑
+export const useSendMobileCode = (mobile: Ref<string>, type: CodeType = 'login') => {
+  const form = ref<FormInstance>()
+  const time = ref(0)
+  let timeId: number
+  const send = async () => {
+    if (time.value > 0) return
+    await form.value?.validate('mobile')
+    await sendMobileCode(mobile.value, type)
+    Toast.success('发送成功')
+    time.value = 60
+    // 倒计时
+    clearInterval(timeId)
+    timeId = window.setInterval(() => {
+      time.value--
+      if (time.value <= 0) window.clearInterval(timeId)
+    }, 1000)
+  }
+  onUnmounted(() => {
+    window.clearInterval(timeId)
+  })
+  return { form, time, send }
+}
+```
+
+3）使用函数
+```ts
+const { form, time, send } = useSendMobileCode(mobile, 'login')
+```
+
+## 第三方登录-绑定手机
+
+步骤：
+- 表单校验
+- 发送验证码使用composable
+- 进行绑定
+- 绑定成功即是登录成功，根据是否有回跳地址进行跳转
+
+代码：
+
+1）表单校验
 ```ts 
 import { mobileRules, codeRules } from '@/utils/rules'
 
@@ -295,35 +353,14 @@ const bind = async () => {
     </template>
   </van-field>
   <div class="cp-cell">
-    <van-button block round type="primary" native-type="submit"> 立即绑定 </van-button>
+    <van-button style="margin-top: 50px" block round type="primary" native-type="submit"> 立即绑定 </van-button>
   </div>
 </van-form>
 ```
 
-3）发送验证码
+2）发送验证码
 ```ts
-import { Toast, type FormInstance } from 'vant'
-import { onUnmounted, ref } from 'vue'
-// ... 省略 ...
-const form = ref<FormInstance>()
-const time = ref(0)
-let timeId: number
-const send = async () => {
-  if (time.value > 0) return
-  await form.value?.validate('mobile')
-  await sendMobileCode(mobile.value, 'bindMobile')
-  Toast.success('发送成功')
-  time.value = 60
-  // 倒计时
-  clearInterval(timeId)
-  timeId = window.setInterval(() => {
-    time.value--
-    if (time.value <= 0) window.clearInterval(timeId)
-  }, 1000)
-}
-onUnmounted(() => {
-  window.clearInterval(timeId)
-})
+const { form, time, send } = useSendMobileCode(mobile, 'bindMobile')
 ```
 ```html 
   <template #button>
@@ -373,6 +410,7 @@ const bind = async () => {
 ```
 
 4) 绑定成功即是登录成功，根据是否有回跳地址进行跳转
+
 `stores/modules/user.ts`
 ```ts
    // 记录回跳地址
@@ -402,66 +440,8 @@ const loginSuccess = (res: { data: User }) => {
 ```
 
 
-## 第三方登录-验证码hook封装
 
-步骤：
-- 分析 hook 需要传入参数，返回哪些数据
-- 封装 hook 函数
-- 使用 hook 函数
-
-代码：
-
-1）分析 hook 需要传入参数，返回哪些数据
-```
-参数：
-1. 手机号
-2. 发短信类型
-
-返回：
-1. form 表单响应式数据
-2. time 倒计时数据
-3. send 发送函数
-```
-
-2）提取函数
-```ts
-import { Toast, type FormInstance } from 'vant'
-import { sendMobileCode } from '@/services/user'
-import type { CodeType } from '@/types/user'
-```
-```ts
-// 发送短信验证码吗逻辑
-export const useSendMobileCode = (mobile: Ref<string>, type: CodeType = 'login') => {
-  const form = ref<FormInstance>()
-  const time = ref(0)
-  let timeId: number
-  const send = async () => {
-    if (time.value > 0) return
-    await form.value?.validate('mobile')
-    await sendMobileCode(mobile.value, type)
-    Toast.success('发送成功')
-    time.value = 60
-    // 倒计时
-    clearInterval(timeId)
-    timeId = window.setInterval(() => {
-      time.value--
-      if (time.value <= 0) window.clearInterval(timeId)
-    }, 1000)
-  }
-  onUnmounted(() => {
-    window.clearInterval(timeId)
-  })
-  return { form, time, send }
-}
-```
-
-3）使用函数
-```ts
-const { form, time, send } = useSendMobileCode(mobile, 'bindMobile')
-```
-
-## 第三方登录-开发生产环境
-
+## 扩展-开发生产环境
 
 
 步骤：
