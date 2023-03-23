@@ -203,7 +203,7 @@ interface Window {
 import { onMounted, ref } from 'vue'
 
 const openId = ref('')
-const isBind = ref(true)
+const isBind = ref(false)
 onMounted(() => {
   if (window.QC.Login.check()) {
     window.QC.Login.getMe((id) => {
@@ -215,7 +215,7 @@ onMounted(() => {
         })
         .catch(() => {
           // 登录失败
-          isBind.value = false
+          isBind.value = true
         })
     })
   }

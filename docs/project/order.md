@@ -729,7 +729,7 @@ onMounted(async () => {
     <!-- 待支付 -->
     <!-- <van-action-bar>
       <p class="price">需要支付：<span>￥60</span></p>
-      <van-action-bar-button color="#bbb" text="取消问诊" />
+      <van-action-bar-button color="#bbb" text="取消订单" />
       <van-action-bar-button type="primary" text="继续支付" />
     </van-action-bar> -->
     <!-- 已完成 -->
@@ -1568,7 +1568,7 @@ onMounted(async () => {
       <p class="title">物流详情</p>
       <van-steps direction="vertical" :active="0">
         <van-step v-for="item in logistics?.list" :key="item.id">
-          <p class="status" v-if="item.statusValue">{{ item.statusValue }}</p>
+          <p class="status">{{ item.statusValue }}</p>
           <p class="content">{{ item.content }}</p>
           <p class="time">{{ item.createTime }}</p>
         </van-step>
@@ -1656,90 +1656,97 @@ const map = new AMap.Map('map', {
 代码：
 
 1）绘制路径  `map` 绘制到哪个地图上，`showTraffic` 是否先道路情况  [参考示例](https://lbs.amap.com/api/jsapi-v2/guide/services/navigation)
+2）关闭 `marker` 标记，自定义 `marker` 标记 [参考文档](https://lbs.amap.com/api/jsapi-v2/guide/map/map-layer)
+
 ```ts
 AMap.plugin('AMap.Driving', function () {
   const driving = new AMap.Driving({
     map: map,
     showTraffic: false,
+    hideMarkers: true
   })
 
-  // 起点
-  const start = res.data.logisticsInfo.shift()
-  // 终点
-  const end = res.data.logisticsInfo.pop()
-
-  driving.search(
-    [start?.longitude, start?.latitude],
-    [end?.longitude, end?.latitude],
-    { waypoints: res.data.logisticsInfo.map((item) => [item.longitude, item.latitude]) },
-    (status: string, result: object) => {
-      // 未出错时，result即是对应的路线规划方案
-      console.log(status, result)
-    }
-  )
+  if (
+    logistics.value?.logisticsInfo &&
+    logistics.value.logisticsInfo.length >= 2
+  ) {
+    const list = [...logistics.value.logisticsInfo]
+    // 起点
+    const start = list.shift()
+    // 终点
+    const end = list.pop()
+    driving.search(
+      [start?.longitude, start?.latitude],
+      [end?.longitude, end?.latitude],
+      { waypoints: list.map((item) => [item.longitude, item.latitude]) },
+      () => {
+        // 规划完毕
+      }
+    )
+  }
 })
 ```
 
-2）关闭 `marker` 标记，自定义 `marker` 标记 [参考文档](https://lbs.amap.com/api/jsapi-v2/guide/map/map-layer)
 
-```diff
-  const driving = new AMap.Driving({
-    map: map,
-    showTraffic: false,
-+    hideMarkers: true
-  })
-```
-```ts
-import endImg from '@/assets/end.png'
-import startImg from '@/assets/start.png'
-```
-```ts
-      // 终点
-      const end = res.data.logisticsInfo.pop()
-      const endMarker = new AMap.Marker({
-        position: [end?.longitude, end?.latitude],
-        icon: endImg
-      })
-      map.add(endMarker)
-      // 起点
-      const start = res.data.logisticsInfo.shift()
-      const startMarker = new AMap.Marker({
-        position: [start?.longitude, start?.latitude],
-        icon: startImg
-      })
-      map.add(startMarker)
-```
+## 药品订单-高德地图-绘制标记
 
-3）标记当前货运位置
+[使用标记](https://lbs.amap.com/api/jsapi-v2/guide/overlays/marker)
 
-```ts
-import carImg from '@/assets/car.png'
-```
-
-```diff
-driving.search(
-  [start?.longitude, start?.latitude],
-  [end?.longitude, end?.latitude],
-  { waypoints: res.data.logisticsInfo.map((item) => [item.longitude, item.latitude]) },
-  (status: string, result: object) => {
-    // 未出错时，result即是对应的路线规划方案
-    console.log(status, result)
-+    const marker = new AMap.Marker({
-+      icon: carImg,
-+      position: [
-+        res.data.currentLocationInfo.longitude,
-+        res.data.currentLocationInfo.latitude
-+      ],
-+      anchor: 'center'
-+    })
-+    map.add(marker)
-+    setTimeout(() => {
-+      map.setFitView([marker])
-+      map.setZoom(10)
-+    }, 3000)
-+  }
-)   
-```
 [自适应多个点位](https://lbs.amap.com/demo/jsapi-v2/example/marker/adaptive-show-multiple-markers/)
 
 [设置地图缩放级别](https://lbs.amap.com/api/jsapi-v2/documentation#mapsetzoom)
+
+```ts
+if (
+        logistics.value?.logisticsInfo &&
+        logistics.value.logisticsInfo.length >= 2
+      ) {
+        const list = [...logistics.value.logisticsInfo]
+        // 创建标记函数
+        const getMarker = (
+          point: Location,
+          image: string,
+          width = 25,
+          height = 30
+        ) => {
+          const icon = new AMap.Icon({
+            size: new AMap.Size(width, height),
+            image,
+            imageSize: new AMap.Size(width, height)
+          })
+          const marker = new AMap.Marker({
+            position: [point?.longitude, point?.latitude],
+            icon: icon,
+            offset: new AMap.Pixel(-width / 2, -height)
+          })
+          return marker
+        }
+        // 起点
+        const start = list.shift()
+        const startMarker = getMarker(start!, startImg)
+        map.add(startMarker)
+        // 终点
+        const end = list.pop()
+        const endMarker = getMarker(end!, endImg)
+        map.add(endMarker)
+
+        driving.search(
+          [start?.longitude, start?.latitude],
+          [end?.longitude, end?.latitude],
+          { waypoints: list.map((item) => [item.longitude, item.latitude]) },
+          () => {
+            // 规划完毕
+            // 运输位置
+            const curr = logistics.value?.currentLocationInfo
+            const currMarker = getMarker(curr!, carImg, 33, 20)
+            map.add(currMarker)
+            // 3s后定位当中间进行缩放
+            setTimeout(() => {
+              map.setFitView([currMarker])
+              map.setZoom(10)
+            }, 3000)
+          }
+        )
+      }
+```
+
