@@ -117,14 +117,14 @@ http://consult-patients.itheima.net/login/callback#access_token=B417C0C3EBF93A38
 5. 按下：esc
 6. 按下：shift + :
 7. 输入：wq 回车即可
+# 如果未生效，可执行 sudo killall mDNSResponder
 ```
 
 5） vite 配置
 ```ts
   server: {
     port: 80,
-    host: true,
-    open: true
+    host: true
   },
 ```
 
