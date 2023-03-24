@@ -137,13 +137,27 @@ router.beforeEach((to) => {
   if (!store.user?.token && !whiteList.includes(to.path)) return '/login'
 })
 ```
+```ts
+    {
+      path: '/login/callback',
+      component: () => import('@/views/Login/LoginCallback.vue'),
+      meta: { title: 'QQ登录-绑定手机' }
+    }
+```
+```vue
+<script setup lang="ts"></script>
 
+<template>
+  <div class="login-callback-page">login-callback</div>
+</template>
+
+<style lang="scss" scoped></style>
+```
 
 
 ## 第三方登录-进行登录
 
 步骤：
-- 路由规则，加入登录白名单，基础结构
 - 编写QQ登录API函数
 - 提供 `QC` 相关的类型，使用QQ的SDK提供 `QC` 相关API获取 `openId`
 - 提交三方登录亲请求
@@ -153,60 +167,37 @@ router.beforeEach((to) => {
 
 代码：
 
-1）路由规则，加入登录白名单，基础结构
-```ts
-    {
-      path: '/login/callback',
-      component: () => import('@/views/Login/LoginCallback.vue'),
-      meta: { title: 'QQ登录-绑定手机' }
-    }
-```
-```ts
-  // 不需要登录的页面，白名单
-  const wihteList = ['/login', '/login/callback']
-```
-```vue
-<script setup lang="ts"></script>
-
-<template>
-  <div class="login-page">login-callback</div>
-</template>
-
-<style lang="scss" scoped></style>
-```
-
-2）编写QQ登录API函数
+1）编写QQ登录API函数
 ```ts
 export const loginByQQ = (openId: string) =>
   request<User>('/login/thirdparty', 'POST', { openId, source: 'qq' })
 ```
 
-3）提供 `QC` 相关的类型，使用QQ的SDK提供 `QC` 相关API获取 `openId`
-`env.d.ts`
-```diff
-interface Window {
-  _AMapSecurityConfig: {
-    securityJsCode: string
+2）提供 `QC` 相关的类型，使用QQ的SDK提供 `QC` 相关API获取 `openId`
+`global.d.ts`
+```ts
+type QCType = {
+  Login: {
+    check(): boolean
+    getMe(cb: (openId: string) => void): void
   }
-+  QC: {
-+    Login: {
-+      check(): boolean
-+      getMe(cb: (openId: string) => void): void
-+    }
-+  }
 }
+
+declare const QC: QCType
 ```
 
+3）进行QQ登录
 `/Login/LoginCallback.vue`  记录 openId 和 isBind
 ```vue
 <script setup lang="ts">
+/*global QC*/
 import { onMounted, ref } from 'vue'
 
 const openId = ref('')
 const isNeedBind = ref(false)
 onMounted(() => {
-  if (window.QC.Login.check()) {
-    window.QC.Login.getMe((id) => {
+  if (QC.Login.check()) {
+    QC.Login.getMe((id) => {
       openId.value = id
       // QQ，登录
       loginByQQ(id)
@@ -223,7 +214,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="login-page">login-callback</div>
+  <div class="login-callback-page">login-callback</div>
 </template>
 
 <style lang="scss" scoped></style>
@@ -266,7 +257,7 @@ onMounted(() => {
 小结：
 - `isNeedBind` 是 `true` 需要显示绑定手机界面
 
-## 第三方登录-发送验证码composable
+## 第三方登录-验证码composable
 
 1）分析 composable 需要传入参数，返回哪些数据
 ```
@@ -282,7 +273,7 @@ onMounted(() => {
 
 2）提取函数
 ```ts
-import { Toast, type FormInstance } from 'vant'
+import { showToast, type FormInstance } from 'vant'
 import { sendMobileCode } from '@/services/user'
 import type { CodeType } from '@/types/user'
 ```
@@ -296,17 +287,17 @@ export const useSendMobileCode = (mobile: Ref<string>, type: CodeType = 'login')
     if (time.value > 0) return
     await form.value?.validate('mobile')
     await sendMobileCode(mobile.value, type)
-    Toast.success('发送成功')
+    showToast('发送成功')
     time.value = 60
     // 倒计时
     clearInterval(timeId)
-    timeId = window.setInterval(() => {
+    timeId = setInterval(() => {
       time.value--
-      if (time.value <= 0) window.clearInterval(timeId)
+      if (time.value <= 0) clearInterval(timeId)
     }, 1000)
   }
   onUnmounted(() => {
-    window.clearInterval(timeId)
+    clearInterval(timeId)
   })
   return { form, time, send }
 }
