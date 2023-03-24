@@ -283,7 +283,7 @@ export const useSendMobileCode = (mobile: Ref<string>, type: CodeType = 'login')
   const form = ref<FormInstance>()
   const time = ref(0)
   let timeId: number
-  const send = async () => {
+  const onSend = async () => {
     if (time.value > 0) return
     await form.value?.validate('mobile')
     await sendMobileCode(mobile.value, type)
@@ -299,13 +299,13 @@ export const useSendMobileCode = (mobile: Ref<string>, type: CodeType = 'login')
   onUnmounted(() => {
     clearInterval(timeId)
   })
-  return { form, time, send }
+  return { form, time, onSend }
 }
 ```
 
 3）使用函数
 ```ts
-const { form, time, send } = useSendMobileCode(mobile, 'login')
+const { form, time, onSend } = useSendMobileCode(mobile, 'login')
 ```
 
 ## 第三方登录-绑定手机
@@ -351,11 +351,11 @@ const bind = async () => {
 
 2）发送验证码
 ```ts
-const { form, time, send } = useSendMobileCode(mobile, 'bindMobile')
+const { form, time, onSend } = useSendMobileCode(mobile, 'bindMobile')
 ```
 ```html 
   <template #button>
-    <span class="btn-send" :class="{ active: time > 0 }" @click="send">
+    <span class="btn-send" :class="{ active: time > 0 }" @click="onSend">
       {{ time > 0 ? `${time}s后再次发送` : '发送验证码' }}
     </span>
   </template>
@@ -378,7 +378,7 @@ const router = useRouter()
 const loginSuccess = (res: { data: User }) => {
   store.setUser(res.data)
   router.replace('/user')
-  Toast.success('登录成功')
+  showSuccessToast('登录成功')
 }
 
 const bind = async () => {

@@ -540,7 +540,7 @@ const onDelete = (id: string) => {
 }
 ```
 
-## 问诊记录-查看处方Hook
+## 问诊记录-查看处方composable
 
 > 实现，查看处方逻辑复用，提取一个hook函数
 
@@ -550,7 +550,7 @@ const onDelete = (id: string) => {
 
 代码：
 
-1）提取hook函数  `composable/index.ts`
+1）提取hook函数  `composables/index.ts`
 ```ts
 import { getPrescriptionPic } from '@/services/consult'
 import { onShowPrescription } from 'vant'
@@ -1080,12 +1080,12 @@ const onSelect = (action: { text: string }, i: number) => {
     </div>
 ```
 
-## 问诊记录-取消订单Hook
+## 问诊记录-取消订单composable
 
 > 实现，取消订单逻辑复用，提取hook函数
 
 
-`composable/index.ts`
+`composables/index.ts`
 
 ```ts
 // 封装取消订单逻辑
@@ -1140,7 +1140,7 @@ const { loading, cancelConsultOrder } = useCancelOrder()
 ```
 
 
-## 问诊记录-删除订单Hook
+## 问诊记录-删除订单composable
 
 > 实现，取消删除逻辑复用，提取hook函数
 
