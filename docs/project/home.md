@@ -398,7 +398,7 @@ import KnowledgeCard from './KnowledgeCard.vue'
 import KnowledgeList from './components/KnowledgeList.vue'
 ```
 ```html
-    <van-tabs shrink sticky v-model:actie="active">
+    <van-tabs shrink sticky v-model:active="active">
       <van-tab title="关注"><knowledge-list /> </van-tab>
       <van-tab title="推荐"><knowledge-list /></van-tab>
       <van-tab title="减脂"><knowledge-list /></van-tab>
