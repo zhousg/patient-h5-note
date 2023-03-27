@@ -515,7 +515,7 @@ const qqUrl = `https://graph.qq.com/oauth2.0/authorize?client_id=102015968&respo
 
 安装 html 模板插件
 ```bash
-pnpm add vite-plugin-html
+pnpm add vite-plugin-html -D
 ```
 
 `vite.config.ts`
