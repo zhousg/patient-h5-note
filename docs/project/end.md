@@ -432,7 +432,7 @@ const loginSuccess = (res: { data: User }) => {
 
 
 
-## 扩展-开发生产环境
+## 部署-开发生产环境
 
 
 步骤：
@@ -546,7 +546,7 @@ plugins: [
 ```
 
 
-## 扩展-真机调试
+## 部署-真机调试
 
 - 在 Chrome 浏览器中使用什么进行调试？
   - 控制面板，开发者工具，F12
@@ -575,68 +575,7 @@ plugins: [
 
 
 
-## 扩展-mock接口数据
-
-https://www.npmjs.com/package/vite-plugin-mock
-
-1）安装 vite-plugin-mock mockjs
-```bash
-pnpm i vite-plugin-mock mockjs -D
-```
-
-2）使用插件扫描 `src/mock` 下文件
-```ts
-import { viteMockServe } from 'vite-plugin-mock'
-```
-```ts
-plugins: [
-    viteMockServe({
-      mockPath: './src/mock',
-      localEnabled: true
-    })
-]
-```
-
-3）mock文件 `src/mock/index.ts`
-```ts
-import type { MockMethod } from 'vite-plugin-mock'
-import Mock from 'mockjs'
-
-const rules: MockMethod[] = [
-  {
-    url: '/patient/message/list',
-    method: 'get',
-    timeout: 1000,
-    response: () => {
-      const data = []
-      for (let i = 0; i < 10; i++) {
-        data.push(
-          Mock.mock({
-            id: '@id',
-            avatar: '@image("100x100")',
-            title: '@ctitle(3,10)',
-            lastContent: '@ctitle(10,40)',
-            sendTime: '@datetime()'
-          })
-        )
-      }
-      return {
-        code: 10000,
-        message: '获取数据成功',
-        data
-      }
-    }
-  }
-]
-
-export default rules
-```
-
-
-使用注意：
-- 这些mock接口是  vite 本地服务器提供的，请求的时候不能带上其他服务器的域名。
-
-## 项目部署-pm2部署
+## 部署-pm2托管（手动）
 
 1）本地打包
 
@@ -698,7 +637,7 @@ pm2 delete my-cp-server
 
 
 
-## 自动部署-腾讯云部署
+## 部署-腾讯云部署
 
 
 
@@ -746,7 +685,7 @@ pm2 delete my-cp-server
 
 
 
-## 自动部署-gitlab部署(演示)
+## 部署-gitlab部署(演示)
 
 ![image-20220905124702905](./images/image-20220905124702905.png)
 
@@ -789,3 +728,74 @@ build-140:
     - patient-h5-preview
 ```
 
+
+## 扩展-mock接口数据
+
+https://www.npmjs.com/package/vite-plugin-mock
+
+1）安装 vite-plugin-mock mockjs
+```bash
+pnpm i vite-plugin-mock mockjs -D
+```
+
+2）使用插件扫描 `src/mock` 下文件
+```ts
+import { viteMockServe } from 'vite-plugin-mock'
+```
+```ts
+plugins: [
+    viteMockServe({
+      mockPath: './src/mock',
+      localEnabled: true
+    })
+]
+```
+
+3）mock文件 `src/mock/index.ts`
+```ts
+import Mock from 'mockjs'
+
+const rules = [
+  {
+    url: '/patient/message/list',
+    method: 'get',
+    timeout: 1000,
+    response: () => {
+      const data = []
+      for (let i = 0; i < 10; i++) {
+        data.push(
+          Mock.mock({
+            id: '@id',
+            avatar: '@image("100x100")',
+            title: '@ctitle(3,10)',
+            lastContent: '@ctitle(10,40)',
+            sendTime: '@datetime()'
+          })
+        )
+      }
+      return {
+        code: 10000,
+        message: '获取数据成功',
+        data
+      }
+    }
+  }
+]
+
+export default rules
+```
+测试 
+
+```ts
+request(import.meta.env.VITE_APP_CALLBACK + '/patient/message/list').then((res) => {
+  console.log(res)
+})
+```
+
+使用注意：
+- 这些mock接口是  vite 本地服务器提供的
+
+
+## 扩展-vitest单元测试
+
+## 扩展-vitest组件测试
