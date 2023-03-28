@@ -757,7 +757,7 @@ import Mock from 'mockjs'
 
 const rules = [
   {
-    url: '/patient/message/list',
+    url: '/patient/message/sys/list',
     method: 'get',
     timeout: 1000,
     response: () => {
@@ -768,14 +768,16 @@ const rules = [
             id: '@id',
             avatar: '@image("100x100")',
             title: '@ctitle(3,10)',
-            lastContent: '@ctitle(10,40)',
-            sendTime: '@datetime()'
+            content: '@ctitle(10,40)',
+            createTime: '@datetime()',
+            status: '@integer(0,1)',
+            type: '@integer(1,3)',
           })
         )
       }
       return {
         code: 10000,
-        message: '获取数据成功',
+        message: '模拟数据成功',
         data
       }
     }
