@@ -1524,41 +1524,6 @@ export const getPrescriptionPic = (id: string) =>
   }
 ```
 
-
-
-## 问诊室-购买药品
-
-
-步骤：
-- 处方状态不同此按钮操作不同：
-  - 如果处方失效：提示即可
-  - 如果没付款且有订单ID，代表已经生成订单没付款：去订单详情付款
-  - 如果没付款且没订单ID：去预支付页面
-
-代码：
-
-跳转逻辑处理
-```ts
-import { useRouter } from 'vue-router'
-import { PrescriptionStatus } from '@/enums'
-import { showToast } from 'vant'
-
-// 点击处方的跳转
-const router = useRouter()
-const buy = (pre?: Prescription) => {
-  if (pre) {
-    if (pre.status === PrescriptionStatus.Invalid) return showToast('处方已失效')
-    if (pre.status === PrescriptionStatus.NotPayment && !pre.orderId)
-      return router.push(`/order/pay?id=${pre.id}`)
-    router.push(`/order/${pre.orderId}`)
-  }
-}
-```
-按钮事件绑定
-```html
-<div class="foot"><span @click="buy(msg.prescription)">购买药品</span></div>
-```
-
 ## 问诊室-评价医生
 
 步骤：
