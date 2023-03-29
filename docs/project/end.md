@@ -800,4 +800,114 @@ request(import.meta.env.VITE_APP_CALLBACK + '/patient/message/list').then((res) 
 
 ## 扩展-vitest单元测试
 
+- 测试作用：自动化测试能够预防无意引入的 bug
+- 何时测试：越早越好，拖得越久，应用就会有越多的依赖和复杂性，想要开始添加测试也就越困难。
+- 测试类型：单元测试、组件测试、端对端测试
+
+> 单元测试：检查给定函数、类或组合式函数的输入是否产生预期的输出或副作用。
+
+- 安装 vitest 
+
+```bash
+pnpm i vitest -D
+```
+
+- 配置命令 `package.json`
+
+```ts
+"scripts": {
+    "test": "vitest"
+}
+```
+
+- 测试代码 `utils/test/filter.test.ts`
+
+```ts
+import { IllnessTime } from '@/enums'
+import { test, expect } from 'vitest'
+import { getConsultFlagText, getIllnessTimeText } from '../filter'
+
+// 测试 getIllnessTimeText 函数
+test('测试 getIllnessTimeText 函数', () => {
+  // 进行测试，函数：输入是否可以达到预期的输出
+  const text = getIllnessTimeText(IllnessTime.Month)
+  expect(text).toBe('一月内')
+  const text2 = getIllnessTimeText(IllnessTime.Week)
+  expect(text2).toBe('一周内')
+})
+
+// 测试 getConsultFlagText 函数
+test('测试 getConsultFlagText 函数', () => {
+  const text = getConsultFlagText(0)
+  expect(text).toBe('没就诊过')
+})
+```
+
+
 ## 扩展-vitest组件测试
+
+- 对于 视图 的测试：根据输入 prop 和插槽断言渲染输出是否正确。
+
+- 对于 交互 的测试：断言渲染的更新是否正确或触发的事件是否正确地响应了用户输入事件。
+
+- 组件测试通常涉及到单独挂载被测试的组件，触发模拟的用户输入事件，并对渲染的 DOM 输出进行断言。安装：happy-dom @testing-library/vue
+
+具体步骤：
+
+1）安装
+
+```bash
+pnpm i happy-dom @testing-library/vue -D
+```
+
+2）配置测试环境下的DOM生成器 `vite.config.ts`
+
+```ts{1,8,9,10}
+/// <reference types="vitest/config" />
+
+export default defineConfig({
+  server: {
+    port: 80,
+    host: true
+  },
+  test: {
+    environment: 'happy-dom'
+  },
+```
+
+3）测试代码 `components/test/components.test.ts`
+
+```ts
+import { test, expect } from 'vitest'
+import { render } from '@testing-library/vue'
+import CpRadioBtn from '../CpRadioBtn.vue'
+
+test('CpRadioBtn', async () => {
+  // 1.  单独挂着组件
+  const wrapper = render(CpRadioBtn, {
+    props: {
+      options: [
+        { label: '选项一', value: 1 },
+        { label: '选项二', value: 2 }
+      ],
+      modelValue: 1
+    }
+  })
+
+  // 2. 测试组件渲染
+  wrapper.getByText('选项一')
+  wrapper.getByText('选项二')
+
+  // 3. 测试props
+  expect(wrapper.queryByText('选项一')?.classList.contains('active')).toBe(true)
+
+  // 4. 自定义事件（update:modelValue）
+  wrapper.queryByText('选项二')?.click()
+  expect(wrapper.emitted()['update:modelValue'][0]).toEqual([2])
+  // 更新props
+  await wrapper.rerender({
+    modelValue: 2
+  })
+  expect(wrapper.queryByText('选项二')?.classList.contains('active')).toBe(true)
+})
+```

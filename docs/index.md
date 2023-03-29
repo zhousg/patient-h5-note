@@ -13,7 +13,7 @@ hero:
       link: /vue/
     - theme: alt
       text: 项目代码 🧑‍💻
-      link: https://gitee.com/zhoushugang/consult-patient-h5-149
+      link: http://git.itcast.cn/zhousg/consult-patient-h5-video
 
 features:
   - icon: 🪐
