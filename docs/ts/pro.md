@@ -73,7 +73,7 @@ export default defineConfig({
   ],
 });
 ```
-:::warn
+:::tip
 [响应式语法糖](https://cn.vuejs.org/guide/extras/reactivity-transform.html#reactive-props-destructure) 即将移除，建议使用 withDefaults 过度
 :::
 
