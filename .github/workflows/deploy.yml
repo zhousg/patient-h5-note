@@ -11,7 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-
+        with:
+          node-version: 'v16.13.0'
       - uses: actions/setup-node@v2
         with:
           node-version: 'v16.13.0'
@@ -29,6 +30,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
+          node-version: 'v16.13.0'
           path: ./docs/.vitepress/dist
       - uses: peaceiris/actions-gh-pages@v3
         with:
