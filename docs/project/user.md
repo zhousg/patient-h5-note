@@ -255,6 +255,11 @@ declare module 'vue-router' {
   }
 }
 ```
+:::tip 温馨提示
+建议修改标题放 [后置守卫](https://router.vuejs.org/zh/guide/advanced/navigation-guards.html#%E5%85%A8%E5%B1%80%E5%90%8E%E7%BD%AE%E9%92%A9%E5%AD%90) ，切换路由完成后修改标题
+:::
+
+
 
 ## 布局容器-加载进度{#layout-loading}
 
@@ -286,7 +291,7 @@ router.beforeEach((to) => {
 ```ts
 router.afterEach((to) => {
   // 修改标题
-  document.title = `149优医问诊-${to.meta.title || ''}`
+  document.title = `${to.meta.title || ''}-优医问诊`
   NProgress.done()
 })
 ```
@@ -304,12 +309,6 @@ NProgress.configure({
   background-color: var(--cp-primary) !important;
 }
 ```
-
-:::tip 温馨提示
-建议修改标题放 [后置守卫](https://router.vuejs.org/zh/guide/advanced/navigation-guards.html#%E5%85%A8%E5%B1%80%E5%90%8E%E7%BD%AE%E9%92%A9%E5%AD%90) ，切换路由完成后修改标题
-:::
-
-
 
 
 ## 🛖 个人中心 > {#user}
