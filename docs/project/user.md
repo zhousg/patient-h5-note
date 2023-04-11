@@ -237,13 +237,10 @@ const router = createRouter({
 - 切换路由设置标题
 
 `router/index.ts`
-```diff
-// 访问权限控制
-router.beforeEach((to) => {
-  // 处理标题
-+  document.title = `优医问诊-${to.meta.title || ''}`
-  // 用户仓库
-  const store = useUserStore()
+```ts
+router.afterEach((to) => {
+  document.title = `${to.meta.title || ''}-优医问诊`
+})
 ```
 
 - 扩展元信息类型 `types/vue-router.d.ts`
