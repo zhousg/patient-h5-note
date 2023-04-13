@@ -1345,7 +1345,7 @@ const agree = ref(false)
 </script>
 
 <template>
-  <div class="consult-pay-page" v-if="payInfo & patient">
+  <div class="consult-pay-page" v-if="payInfo && patient">
     <cp-nav-bar title="支付" />
     <div class="pay-info">
       <p class="tit">图文问诊 {{ payInfo.payment }} 元</p>
