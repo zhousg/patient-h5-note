@@ -37,6 +37,9 @@ img {
     max-width: 100%;
     padding: 25px;
   }
+  .VPHomeHero .text {
+    font-size: 30px;
+  }
 }
 
 
@@ -47,3 +50,32 @@ img {
 /* body {
   text-rendering: optimizeSpeed;
 } */
+
+.image-container .image-bg {
+  position: absolute;
+  top: 55%;
+  left: 50%;
+  border-radius: 50%;
+  width: 180px;
+  height: 180px;
+  background-image: linear-gradient( 180deg, #16C2A366 65%, #EAF8F6 30% );
+  filter: blur(40px);
+  transform: translate(-50%,-50%);
+}
+@media (min-width: 640px){
+  .image-container .image-bg {
+    width: 256px;
+    height: 256px;
+  }
+}
+
+@media (min-width: 960px){
+  .image-container .image-bg {
+    width: 320px;
+    height: 320px;
+  }
+  .image-container .image-src {
+    top: 63%;
+  }
+}
+
