@@ -37,7 +37,7 @@ export default defineConfig({
   themeConfig: {
     logo: "/logo2.png",
     editLink: {
-      pattern: 'https://github.com/zhousg/patient-h5-note/master/:path',
+      pattern: 'https://github.com/zhousg/patient-h5-note/master/docs:path',
       text: '帮我修正'
     },
     algolia: {
