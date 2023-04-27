@@ -1,37 +1,16 @@
 // 注释
 import { defineConfig } from "vitepress";
 
-const mdImageAttrPlugin = (md, attrs) => {
-  const defRenderer = md.renderer.rules["image"];
-  md.renderer.rules["image"] = (tokens, idx, options, env, self) => {
-    const token = tokens[idx];
-    if (attrs) {
-      for (let key in attrs) {
-        token.attrSet(key, attrs[key]);
-      }
-    }
-    return defRenderer(tokens, idx, options, env, self);
-  };
-};
-
 export default defineConfig({
   lang: "zh-CN",
   title: "优医问诊H5",
   description: "最新Vue3技术栈,Vue3,TS,Pinia,Vant,在线问诊项目,H5",
   markdown: {
     lineNumbers: true,
-    config(md) {
-      md.use(mdImageAttrPlugin, { "data-fancybox": "gallery" });
-    },
   },
   head: [
     ["link", { rel: "icon", type: "image/svg+xml", href: "./logo2.png" }],
   ],
-  vite: {
-    plugins: [
-      
-    ]
-  },
   base: "/patient-h5-note/",
   lastUpdated: true,
   themeConfig: {
