@@ -166,7 +166,9 @@ Done. Now run:
         ignores: ['index']
       }
     ],
-    'vue/no-setup-props-destructure': ['off']
+    'vue/no-setup-props-destructure': ['off'],
+    // 💡 添加未定义变量错误提示，create-vue@3.6.3 失效
+    'no-undef': 'error'
   }
 ```
 
