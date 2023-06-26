@@ -1401,6 +1401,15 @@ http://localhost:5173/room
 ```
 
 支付宝沙箱账号：
+
+```
+买家账号：scobys4865@sandbox.com
+登录密码：111111
+支付密码：111111
+```
+
+OR
+
 ```
 买家账号：askgxl8276@sandbox.com
 登录密码：111111
