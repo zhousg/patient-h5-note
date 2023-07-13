@@ -43,7 +43,7 @@
 
 代码：
 
-1） 引入QQ登录SDK
+1）引入QQ登录SDK
 
 `index.html`
 ```vue
@@ -54,7 +54,9 @@
 ></script>
 ```
 
-2）生成QQ登录跳转链接，改成直接跳转
+2）生成QQ登录跳转连接，跳转至QQ登录
+
+方式一：首先生成QQ登录按钮，再获取其跳转链接，然后配合 A 标签改成直接跳转
 
 ```ts
   onMounted(() => {
@@ -75,6 +77,25 @@
     <img src="@/assets/qq.svg" alt="" />
   </a>
 ```
+
+方式二：直接获取跳转链接，然后配合 `window.location.href` 改成直接跳转
+
+```ts
+const qqLogin = () => {
+  window.location.href = QC.Login.insertButton._getPopupUrl({
+    appId: '102015968',
+    redirectURI: 'http://consult-patients.itheima.net/login/callback'
+  })
+}
+```
+
+```html
+<div class="icon" @click="qqLogin">
+  <img src="@/assets/qq.svg" alt="" />
+</div>
+```
+
+> 补充说明：若使用方式二，那么在第一步 “**1）引入QQ登录SDK**” 时，则无需在 script 标签上绑定 `appid` 和 `redirecturi` 了。
 
 ![image-20220901163913209](./images/image-20220901163913209.png)
 
