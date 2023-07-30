@@ -698,8 +698,8 @@ const timeOptions = [
   { label: '大于半年', value: IllnessTime.More }
 ]
 const flagOptions = [
-  { label: '就诊过', value: 0 },
-  { label: '没就诊过', value: 1 }
+  { label: '就诊过', value: 1 },
+  { label: '没就诊过', value: 0 }
 ]
 const form = ref<ConsultIllness>({
   illnessDesc: '',
