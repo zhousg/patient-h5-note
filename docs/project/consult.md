@@ -1634,7 +1634,7 @@ const pay = async () => {
 }
 ```
 ```text
-买家账号：jfjbwb4477@sandbox.com
+测试账号：askgxl8276@sandbox.com 或者 scobys4865@sandbox.com
 登录密码：111111
 支付密码：111111
 ```
