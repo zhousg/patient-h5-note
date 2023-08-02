@@ -1538,7 +1538,7 @@ export const getPrescriptionPic = (id: string) =>
 
 代码：
 
-1）准备评价组件 `Room/components/evaluateCard.vue`
+1）准备评价组件 `Room/components/EvaluateCard.vue`
 
 ```vue
 <script setup lang="ts"></script>
