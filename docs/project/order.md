@@ -657,7 +657,7 @@ onMounted(async () => {
 <template>
   <div class="order-pay-result-page">
     <cp-nav-bar title="药品支付结果" />
-    <div class="result" v-if="order?.status === OrderType.ConsultPay">
+    <div class="result" v-if="order?.status === OrderType.MedicinePay">
       <van-icon name="clear" />
       <p class="price">￥ {{ order?.actualPayment }}</p>
       <p class="status">支付失败</p>
