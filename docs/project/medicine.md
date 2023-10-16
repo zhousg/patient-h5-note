@@ -1015,3 +1015,553 @@ import MedicineCard from './MedicineCard.vue'
 ```
 
 ## 选择药品-list组件渲染药品列表
+
+步骤：
+
+1. van-list初步使用
+2. 封装并调用请求
+3. 渲染药品卡片
+
+van-list初步使用`MedicineList.vue`
+
+```jsx
+
+<script setup lang="ts">
+import { ref } from 'vue'
+import MedicineCard from './MedicineCard.vue'
+const list = ref<number[]>([])
+const loading = ref(false)
+const finished = ref(false)
+
+const onLoad = () => {
+  // 异步更新数据
+  // setTimeout 仅做示例，真实场景中一般为 ajax 请求
+  setTimeout(() => {
+    for (let i = 0; i < 10; i++) {
+      list.value.push(list.value.length + 1)
+    }
+
+    // 加载状态结束
+    loading.value = false
+
+    // 数据全部加载完成
+    if (list.value.length >= 40) {
+      finished.value = true
+    }
+  }, 1000)
+}
+</script>
+
+<template>
+  <div class="medicine-list">
+    <van-list
+      v-model:loading="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onLoad"
+    >
+      <medicine-card v-for="i in list" :key="i"></medicine-card>
+    </van-list>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.medicine-list {
+  background-color: #fff;
+  padding: 0 15px 45px;
+}
+</style>
+
+```
+
+封装并调用请求
+
+`consult.d.ts`编写类型，提取`BasePage`泛型别名
+
+```ts
+import { Medical } from './room'
+
+// 药品列表查询参数
+export type MedicineParams = PageParams & {
+  keyword: string
+}
+
+
+export type BasePage<T = any> = {
+  pageTotal: number
+  total: number
+  rows: T
+}
+
+// 医生列表
+export type DoctorList = Doctor[]
+
+// 医生分页
+export type DoctorPage = BasePage<DoctorList>
+
+// 文章列表
+export type KnowledgeList = Knowledge[]
+
+// 文章列表带分页
+export type KnowledgePage = BasePage<KnowledgeList>
+
+// 药品列表
+export type MedicineList = Medical[]
+// 药品列表带分页
+export type MedicinePage = BasePage<MedicineList>
+
+```
+
+封装接口`service/consult.ts`
+
+```ts
+export const getMedicinePage = (params: MedicineParams) => {
+  return request<MedicinePage>('patient/medicine', 'GET', params)
+}
+```
+
+调用接口`MedicineList.vue`
+
+```jsx
+<script setup lang="ts">
+import { ref } from 'vue'
+import MedicineCard from './MedicineCard.vue'
+import type { MedicineList, MedicineParams } from '@/types/consult'
+import { getMedicinePage } from '@/services/consult'
+const list = ref<MedicineList>([])
+const loading = ref(false)
+const finished = ref(false)
+
+const params = ref<MedicineParams>({
+  keyword: '',
+  pageSize: 10,
+  current: 1
+})
+
+const onLoad = async () => {
+  const { data } = await getMedicinePage(params.value)
+  list.value.push(...data.rows)
+  loading.value = false
+  if (params.value.current >= data.pageTotal) {
+    finished.value = true
+  } else {
+    finished.value = false
+    params.value.current++
+  }
+}
+</script>
+
+<template>
+  <div class="medicine-list">
+    <van-list
+      v-model:loading="loading"
+      :finished="finished"
+      finished-text="没有更多了"
+      @load="onLoad"
+    >
+      <medicine-card v-for="item in list" :key="item.id"></medicine-card>
+    </van-list>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.medicine-list {
+  background-color: #fff;
+  padding: 0 15px 45px;
+}
+</style>
+
+```
+
+渲染药品卡片
+
+父传子`MedicineList.vue`
+
+```jsx
+<medicine-card
+        v-for="item in list"
+        :key="item.id"
+        :item="item"
+></medicine-card>
+```
+
+子组件接收数据并渲染`MedicineCard`
+
+```jsx
+<script setup lang="ts">
+import type { Medical } from '@/types/room'
+import { ref } from 'vue'
+
+defineProps<{
+  item: Medical
+}>()
+
+const step = ref(0)
+</script>
+
+<template>
+  <div class="item van-hairline--top">
+    <img class="img" :src="item.avatar" alt="" />
+    <div class="info">
+      <p class="name">
+        <span>{{ item.name }}</span>
+        <span>
+          <van-stepper v-model="step" min="0" :class="{ hide: step === 0 }" />
+        </span>
+      </p>
+      <p class="size">
+        <van-tag v-if="item.prescriptionFlag === 1">处方药</van-tag>
+        <span>{{ item.specs }}</span>
+      </p>
+      <p class="price">￥{{ item.amount }}</p>
+    </div>
+  </div>
+</template>
+
+```
+
+## 选择药品-搜索功能
+
+步骤：
+
+1. 搜索框双向数据绑定字段`searchValue`，`keyword`查询参数字段，回车后赋值该字段
+2. 父传子
+3. 监听字段，渲染页面
+
+`ConsultChoose`搜索框双向数据绑定字段`searchValue`,`keyword`查询参数字段，回车后赋值该字段
+
+```ts
+const searchValue = ref('')
+const keyword = ref('')
+const onSearch = () => {
+  keyword.value = searchValue.value
+}
+const onCancel = () => {
+  keyword.value = ''
+}
+```
+
+父传子`ConsultChoose`
+
+```jsx
+<!-- 药品列表 -->
+<medicine-list :keyword="keyword"></medicine-list>
+```
+
+监听字段，重新渲染页面`ConsultList`
+
+```jsx
+const props = defineProps<{
+  keyword: string
+}>()
+
+watch(
+  () => props.keyword,
+  (val) => {
+    list.value = []
+    params.value.keyword = val
+    params.value.current = 1
+    onLoad()
+  }
+)
+```
+
+## 选择药品-购物车底部操作栏
+
+步骤：
+
+1. `Consult`类型新增`medicines`字段
+2. `store`新增方法，存`medicines`字段
+3. 处理药品增加数量减少数量逻辑
+4. 计算属性处理数量和总金额
+
+`Consult`类型新增`medicines`字段
+
+`consult.d.ts`
+
+```ts
+export type Consult = {
+  ...
+  /** 药品 */
+  medicines: Medical[]
+}
+```
+
+`store`新增方法，存`medicines`字段
+
+```ts
+const setMedicines = (val: Medical[]) => (consult.value.medicines = val)
+return {
+    ...
+    setMedicines
+    ...
+}
+```
+
+处理药品增加数量减少数量逻辑
+`MedicineCard`
+
+```jsx
+<script setup lang="ts">
+import { useConsultStore } from '@/stores'
+import type { Medical } from '@/types/room'
+import { onMounted } from 'vue'
+import { ref } from 'vue'
+
+const props = defineProps<{
+  item: Medical
+}>()
+
+const step = ref(0)
+
+const consultStore = useConsultStore()
+const onChange = (value: string, detail: { name: string }) => {
+  // 不要忘记在组件上name属性绑定id值
+  const medicines = consultStore.consult.medicines || []
+  const medicine = medicines?.find((item) => item.id === detail.name)
+  if (medicine) {
+    medicine.quantity = value
+  } else {
+    medicines.push({
+      ...props.item,
+      quantity: value
+    })
+  }
+  consultStore.setMedicines(medicines.filter((item) => +item.quantity > 0))
+}
+
+watch(
+  () =>
+    consultStore.consult.medicines?.find((item) => item.id === props.item.id),
+  (val) => {
+    if (val) {
+      step.value = +val.quantity
+    } else {
+      step.value = 0
+    }
+  },
+  { deep: true, immediate: true }
+)
+</script>
+
+<template>
+  <div class="item van-hairline--top">
+    <img class="img" :src="item.avatar" alt="" />
+    <div class="info">
+      <p class="name">
+        <span>{{ item.name }}</span>
+        <span>
+          <van-stepper
+            :name="item.id"
+            v-model="step"
+            min="0"
+            :class="{ hide: step === 0 }"
+            @change="onChange"
+          />
+        </span>
+      </p>
+      <p class="size">
+        <van-tag v-if="item.prescriptionFlag === 1">处方药</van-tag>
+        <span>{{ item.specs }}</span>
+      </p>
+      <p class="price">￥{{ item.amount }}</p>
+    </div>
+  </div>
+</template>
+```
+
+计算属性处理数量和总金额
+`ConsultChoose`
+
+```jsx
+<script setup lang="ts">
+import { computed, ref } from 'vue'
+import MedicineList from './components/MedicineList.vue'
+import { useConsultStore } from '@/stores'
+
+const searchValue = ref('')
+const keyword = ref('')
+const onSearch = () => {
+  keyword.value = searchValue.value
+}
+const onCancel = () => {
+  keyword.value = ''
+}
+
+const consultStore = useConsultStore()
+const totalPrice = computed(() => {
+  return consultStore.consult.medicines
+    ?.reduce((sum, item) => {
+      return (sum += +item.amount * +item.quantity)
+    }, 0)
+    .toFixed(2)
+})
+const cartLength = computed(
+  () =>
+    consultStore.consult.medicines?.length || 0
+)
+</script>
+
+<template>
+  <div class="consult-choose-page">
+    <cp-nav-bar title="选择药品"></cp-nav-bar>
+    <van-search
+      v-model="searchValue"
+      show-action
+      placeholder="搜一搜: 药品名称"
+      @search="onSearch"
+      @cancel="onCancel"
+    />
+    <!-- 药品列表 -->
+    <medicine-list :keyword="keyword"></medicine-list>
+    <van-action-bar>
+      <van-action-bar-icon
+        icon="cart-o"
+        :color="cartLength > 0 ? '#323233' : '#eee'"
+        :badge="cartLength === 0 ? '' : cartLength"
+      />
+      <div class="total-price">￥ {{ totalPrice }}</div>
+      <van-action-bar-button type="primary" text="申请开方" />
+    </van-action-bar>
+  </div>
+</template>
+```
+
+## 选择药品-购物车抽屉
+
+步骤：
+
+1. 抽屉结构样式
+2. 打开抽屉，清空药品方法定义
+3. 药品列表渲染
+4. 实现增加减少清空药品功能
+
+抽屉结构样式`ConsultChoose.vue`
+
+```jsx
+<van-action-sheet v-model:show="show">
+  <div class="content">
+    <div class="content-header">
+      <div class="content-header-left">
+        <span>药品清单</span><span>共{{ cartLength }}件商品</span>
+      </div>
+      <div class="content-header-right" @click="clear">
+        <van-icon name="delete-o" />
+        <span>清空</span>
+      </div>
+    </div>
+  </div>
+  <van-action-bar>
+    <van-action-bar-icon
+      icon="cart-o"
+      :color="cartLength > 0 ? '#323233' : '#eee'"
+      :badge="cartLength === 0 ? '' : cartLength"
+    />
+    <div class="total-price">￥ {{ totalPrice }}</div>
+    <van-action-bar-button type="primary" text="申请开方" />
+  </van-action-bar>
+</van-action-sheet>
+```
+
+```scss
+  .content {
+  --content-height: 400px;
+  --content-header-height: 25px;
+  padding: 16px;
+  height: var(--content-height);
+  .content-header {
+    position: sticky;
+    top: 0px;
+    z-index: 10;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--content-header-height);
+    padding-bottom: 10px;
+    &-left {
+      span {
+        font-size: 16px;
+        color: #000000;
+        margin-right: 10px;
+      }
+      span + span {
+        font-size: 13px;
+        color: var(--cp-primary);
+      }
+    }
+    &-right {
+      span {
+        margin-left: 5px;
+      }
+    }
+  }
+  .medicine-list {
+    padding-bottom: 45px;
+  }
+}
+```
+
+打开抽屉，清空药品方法定义
+
+```ts
+const show = ref(false)
+const openCart = () => {
+  if (cartLength.value === 0) return showToast('请选择药品')
+  show.value = true
+}
+
+const clear = () => {
+  // console.log('clear')
+  show.value = false
+}
+```
+
+药品列表渲染
+
+```jsx
+<!-- 列表 -->
+<div class="medicine-list">
+  <medicine-card
+    v-for="item in consultStore.consult.medicines"
+    :key="item.id"
+    :item="item"
+  ></medicine-card>
+</div>
+```
+
+实现增加减少清空药品功能
+
+增加减少药品功能 `MedicineCard.vue`
+
+```jsx
+watch(
+  () => consultStore.consult.medicines?.find((item) => item.id === props.item.id),
+  (val) => {
+    if (val) {
+      step.value = +val.quantity
+    } else {
+      step.value = 0
+    }
+  },
+  { deep: true, immediate: true }
+)
+```
+
+清空购物车`ConsultChoose`
+
+```ts
+const clear = () => {
+  // console.log('clear')
+  consultStore.setMedicines([])
+  show.value = false
+}
+```
+
+## 药品详情-跳转详情页
+
+步骤：
+
+1. 基本结构，路由配置
+2. 跳转方法调用
+3. 静态结构
