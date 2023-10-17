@@ -79,21 +79,11 @@ export default defineConfig({
             { text: "8. 药品订单模块", link: "/project/order" },
             { text: "9. 其他扩展", link: "/project/end" },
             { text: "辅助-超级医生", link: "/project/super-doctor" },
+            { text: "3. 开药问诊", link: "/project/medicine" },
+            { text: "4. 问医生", link: "/project/medicine" },
           ],
         },
-      ],
-      "/dev/": [
-        {
-          text: "优医问诊H二次开发",
-          items: [
-            { text: "1. 项目起步", link: "/project/" },
-            { text: "2. 登录模块", link: "/project/login" },
-            { text: "4. 开药问诊", link: "/project/medicine" },
-            { text: "5. 问医生", link: "/project/medicine" },
-            { text: "辅助-超级医生", link: "/project/super-doctor" },
-          ],
-        },
-      ],
+      ]
     },
   },
 });
