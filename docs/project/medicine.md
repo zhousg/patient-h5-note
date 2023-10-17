@@ -54,7 +54,7 @@
 </router-link>
 ```
 
-cv静态结构`ConsultMedicine.vue`
+静态结构`ConsultMedicine.vue`
 
 ```jsx
 <script setup lang="ts"></script>
@@ -288,6 +288,7 @@ export type MedicineIllness = Pick<
   | 'allergicHistory'
   | 'fertilityStatus'
   | 'pictures'
+>    
 ```
 
 `src/stores/modules/consult.ts`
@@ -547,6 +548,7 @@ const onDeleteSuccess = (item: UploaderFileListItem) => {
 `ConsultMedicine.vue`使用上传组件
 
 ```ts
+const cpUploadRef = ref()
 const onUploadSuccess = (image: Image) => {
   form.value.pictures?.push(image)
 }
@@ -826,6 +828,14 @@ const step = ref(1)
 const step = ref(0)
 ```
 
+```jsx
+<van-stepper
+    v-model="step"
+    min="0"
+    :class="{ hide: step === 0 }"
+/>
+```
+
 ```scss
 .van-stepper {
     position: absolute;
@@ -1008,6 +1018,7 @@ import MedicineCard from './MedicineCard.vue'
 使用列表组件`ConsultChoose.vue`
 
 ```jsx
+import MedicineList from './components/MedicineList.vue'
 ...
 <!-- 药品列表 -->
 <medicine-list></medicine-list>
@@ -1079,7 +1090,7 @@ const onLoad = () => {
 `consult.d.ts`编写类型，提取`BasePage`泛型别名
 
 ```ts
-import { Medical } from './room'
+import type { Medical } from './room'
 
 // 药品列表查询参数
 export type MedicineParams = PageParams & {
@@ -1255,6 +1266,12 @@ const props = defineProps<{
   keyword: string
 }>()
 
+const params = ref<MedicineParams>({
+  keyword: props.keyword || '',
+  pageSize: 10,
+  current: 1
+})
+
 watch(
   () => props.keyword,
   (val) => {
@@ -1305,9 +1322,8 @@ return {
 <script setup lang="ts">
 import { useConsultStore } from '@/stores'
 import type { Medical } from '@/types/room'
-import { onMounted } from 'vue'
-import { ref } from 'vue'
-
+import { ref, watch } from 'vue'
+    
 const props = defineProps<{
   item: Medical
 }>()
@@ -1375,18 +1391,7 @@ watch(
 
 ```jsx
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import MedicineList from './components/MedicineList.vue'
-import { useConsultStore } from '@/stores'
-
-const searchValue = ref('')
-const keyword = ref('')
-const onSearch = () => {
-  keyword.value = searchValue.value
-}
-const onCancel = () => {
-  keyword.value = ''
-}
+....
 
 const consultStore = useConsultStore()
 const totalPrice = computed(() => {
@@ -1506,6 +1511,7 @@ const cartLength = computed(
 
 ```ts
 const show = ref(false)
+// 底部操作栏注册事件，注意不是抽屉内容的底部操作栏
 const openCart = () => {
   if (cartLength.value === 0) return showToast('请选择药品')
   show.value = true
@@ -1520,6 +1526,8 @@ const clear = () => {
 药品列表渲染
 
 ```jsx
+import MedicineCard from './components/MedicineCard.vue'
+
 <!-- 列表 -->
 <div class="medicine-list">
   <medicine-card
@@ -1826,7 +1834,6 @@ export const getMedicineDetail = (id: string) => {
 
 ```jsx
 <script setup lang="ts">
-import MedicineAction from './components/MedicineAction.vue'
 import { getMedicineDetail } from '@/services/consult'
 import type { MedicineDetail } from '@/types/consult'
 import { ref } from 'vue'
@@ -2074,8 +2081,6 @@ withDefaults(
     from: 'list'
   }
 )
-
-...
 
 const onAskDocotor = () => {
   console.log('申请开方')
