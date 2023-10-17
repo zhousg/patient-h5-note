@@ -2178,7 +2178,7 @@ export const fastKeys: Key[] = [
 ]
 
 // 问医生字段，比极速问诊多一个docId 医生Id
-export const doctorKeys: Key[] = [...fastKeys, 'docId']
+// export const doctorKeys: Key[] = [...fastKeys, 'docId']
 
 // 开药门诊字段
 export const medicineKeys: Key[] = [
@@ -2197,9 +2197,9 @@ export const getCreateOrderParams = (
   const params: Record<string, unknown> = {}
   switch (type) {
     case ConsultType.Doctor:
-      for (const key of doctorKeys) {
-        params[key] = consult[key]
-      }
+      //   for (const key of doctorKeys) {
+      //     params[key] = consult[key]
+      //   }
       break
     case ConsultType.Fast:
       for (const key of fastKeys) {
@@ -2214,6 +2214,7 @@ export const getCreateOrderParams = (
   }
   return params
 }
+
 ```
 
 此时再处理申请开单逻辑 `MedicineAction`
