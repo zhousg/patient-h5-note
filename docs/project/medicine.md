@@ -1565,3 +1565,759 @@ const clear = () => {
 1. 基本结构，路由配置
 2. 跳转方法调用
 3. 静态结构
+
+基本结构`ConsultMedicineDetail`
+
+```jsx
+<script setup lang="ts"></script>
+
+<template>
+  <div class="medicine-detail-page">
+    <h1>medicine-detail</h1>
+  </div>
+</template>
+
+<style scoped lang="scss"></style>
+
+```
+
+路由配置`router/index.ts`
+
+```ts
+{
+  path: '/medicineDetail/:id',
+  component: () => import('@/views/Consult/ConsultMedicineDetail.vue'),
+  meta: { title: '药品详情' }
+},
+```
+
+跳转方法调用`MedicineCard.vue`
+
+```jsx
+<div class="item van-hairline--top" @click="$router.push(`/medicineDetail/${item.id}`)">
+  <img class="img" :src="item.avatar" alt="" />
+  <div class="info">
+    <p class="name">
+      <span>{{ item.name }}</span>
+      <span>
+        <van-stepper
+          :name="item.id"
+          v-model="step"
+          min="0"
+          :class="{ hide: step === 0 }"
+          @change="onChange"
+          @click.stop
+        />
+      </span>
+    </p>
+    <p class="size">
+      <van-tag v-if="item.prescriptionFlag === 1">处方药</van-tag>
+      <span>{{ item.specs }}</span>
+    </p>
+    <p class="price">￥{{ item.amount }}</p>
+  </div>
+</div>
+```
+
+静态结构`ConsultMedicineDetail.vue`
+
+```jsx
+<script setup lang="ts"></script>
+
+<template>
+  <div class="medicine-detail-page">
+    <cp-nav-bar title="双蚁祛湿通络胶囊(双蚁)"></cp-nav-bar>
+    <!-- 主图片 -->
+    <van-swipe indicator-color="#fff">
+      <van-swipe-item>
+        <img src="http://img.39.net/yp/360/s/863578.jpg" alt="" />
+      </van-swipe-item>
+    </van-swipe>
+
+    <div class="detail-top">
+      <div class="info">
+        <p class="name">
+          <span>双蚁祛湿通络胶囊(双蚁)</span>
+        </p>
+        <p class="size">
+          <van-tag>处方药</van-tag>
+          <span>每粒装0.4克</span>
+        </p>
+        <p class="price">￥186.00</p>
+      </div>
+    </div>
+
+    <div class="pay-space"></div>
+
+    <div class="detail-bottom">
+      <div class="info-item">
+        <div class="info-title">药品名称</div>
+        <div class="info-desc">双蚁祛湿通络胶囊(双蚁)</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">品牌</div>
+        <div class="info-desc">无</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">功能主治</div>
+        <div class="info-desc">
+          补肝肾、益气血、活血通络、祛风除湿的功能，临床用于改善肝肾两亏、气血不足引起的腰膝冷痛、肢气肿胀、麻木不仁、酸软乏力、屈伸不利等痹证症状。
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">不良反应</div>
+        <div class="info-desc">尚不明确。</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">禁忌</div>
+        <div class="info-desc">尚不明确。</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">注意事项</div>
+        <div class="info-desc">1.忌与茶、牛奶同服。2.本品含有制川乌，应严格按照规定用量服用。</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">有效期</div>
+        <div class="info-desc">24 月</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">执行标准</div>
+        <div class="info-desc">国药准字J20030056</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">批准文号</div>
+        <div class="info-desc">国药准字B20021059</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">生产企业</div>
+        <div class="info-desc">企业名称：广西双蚁药业有限公司企业简称：双蚁药业</div>
+      </div>
+    </div>
+
+    <medicine-action></medicine-action>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.medicine-detail-page {
+  padding: 46px 0px 45px;
+
+  .van-swipe {
+    img {
+      width: 100%;
+    }
+  }
+
+  .detail-top {
+    padding: 15px;
+    .info {
+      padding-left: 15px;
+      width: 250px;
+      .name {
+        display: flex;
+        font-size: 15px;
+        margin-bottom: 5px;
+        > span:first-child {
+          width: auto;
+        }
+        > span:last-child {
+          text-align: right;
+        }
+      }
+      .size {
+        margin-bottom: 5px;
+        .van-tag {
+          background-color: var(--cp-primary);
+          vertical-align: middle;
+        }
+        span:not(.van-tag) {
+          margin-left: 10px;
+          color: var(--cp-tag);
+          vertical-align: middle;
+        }
+      }
+      .price {
+        font-size: 16px;
+        color: #eb5757;
+      }
+    }
+  }
+  .detail-bottom {
+    padding: 15px;
+    .info-item {
+      margin-bottom: 30px;
+      .info-title {
+        font-size: 18px;
+        font-family: PingFang SC, PingFang SC-Medium;
+        font-weight: 500;
+        color: #000000;
+      }
+      .info-desc {
+        margin-top: 10px;
+        font-size: 14px;
+        font-family: PingFang SC, PingFang SC-Regular;
+        font-weight: 400;
+        color: #3c3e42;
+      }
+    }
+  }
+  .pay-space {
+    height: 12px;
+    background-color: var(--cp-bg);
+  }
+}
+</style>
+
+```
+
+## 药品详情-渲染页面
+
+步骤：
+
+1. 定义类型
+2. 封装接口
+3. 调用请求渲染
+
+定义类型`consult.d.ts`
+
+```ts
+export type MedicineDetail = Medical & {
+  /** 品牌 */
+  brand: string
+  brandId?: any
+  /** 生产企业 */
+  manufacturer: string
+  /** 批准文号 */
+  approvalNo: string
+  /** 有效期 */
+  expiration: string
+  classify: string
+  classifyId: string
+  /** 功能主治 */
+  indicationsFunction: string
+  /** 禁忌 */
+  contraindication: string
+  /** 不良反应 */
+  untowardReaction: string
+  /** 注意事项 */
+  preparation: string
+  /** 执行标准 */
+  standard: string
+  /** 药品图片 */
+  mainPictures: string[]
+
+  creator: string
+  updator: string
+  createTime: string
+  updateTime: string
+  deleteState: number
+}
+```
+
+封装接口`services/consult.ts`
+
+```ts
+export const getMedicineDetail = (id: string) => {
+  return request<MedicineDetail>(`patient/medicine/${id}`)
+}
+```
+
+调用请求渲染`ConsultMedicineDetail.vue`
+
+```jsx
+<script setup lang="ts">
+import MedicineAction from './components/MedicineAction.vue'
+import { getMedicineDetail } from '@/services/consult'
+import type { MedicineDetail } from '@/types/consult'
+import { ref } from 'vue'
+import { onMounted } from 'vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const id = computed(() => route.params.id)
+const detail = ref<MedicineDetail>()
+onMounted(() => {
+  loadDetail()
+})
+const loadDetail = async () => {
+  const { data } = await getMedicineDetail(id.value as string)
+  detail.value = data
+}
+</script>
+
+<template>
+  <div class="medicine-detail-page" v-if="detail">
+    <cp-nav-bar :title="detail.name"></cp-nav-bar>
+    <!-- 主图片 -->
+    <van-swipe indicator-color="#fff">
+      <van-swipe-item v-for="(item, index) in detail.mainPictures" :key="index">
+        <img :src="item" alt="" />
+      </van-swipe-item>
+    </van-swipe>
+
+    <div class="detail-top">
+      <div class="info">
+        <p class="name">
+          <span>{{ detail.name }}</span>
+        </p>
+        <p class="size">
+          <van-tag v-if="detail.prescriptionFlag === 1">处方药</van-tag>
+          <span>{{ detail.specs }}</span>
+        </p>
+        <p class="price">￥{{ detail.amount }}</p>
+      </div>
+    </div>
+
+    <div class="pay-space"></div>
+
+    <div class="detail-bottom">
+      <div class="info-item">
+        <div class="info-title">药品名称</div>
+        <div class="info-desc">{{ detail.name }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">品牌</div>
+        <div class="info-desc">{{ detail.brand }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">功能主治</div>
+        <div class="info-desc">{{ detail.indicationsFunction }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">不良反应</div>
+        <div class="info-desc">{{ detail.untowardReaction }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">禁忌</div>
+        <div class="info-desc">{{ detail.contraindication }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">注意事项</div>
+        <div class="info-desc">{{ detail.preparation }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">有效期</div>
+        <div class="info-desc">{{ detail.expiration }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">执行标准</div>
+        <div class="info-desc">{{ detail.standard }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">批准文号</div>
+        <div class="info-desc">{{ detail.approvalNo }}</div>
+      </div>
+      <div class="info-item">
+        <div class="info-title">生产企业</div>
+        <div class="info-desc">{{ detail.manufacturer }}</div>
+      </div>
+    </div>
+  </div>
+</template>
+```
+
+## 药品详情-底部操作栏功能
+
+列表页和详情页都有底部操作栏，所以我们可以抽离组件
+
+步骤：
+
+1. 封装底部操作栏组件
+2. 区分加入药箱逻辑
+3. 加入药箱逻辑实现
+4. 申请开单跳转问诊室
+
+封装底部操作栏组件`MedicineAction.vue`
+
+```jsx
+<script setup lang="ts">
+import { useConsultStore } from '@/stores'
+import { computed, ref } from 'vue'
+import MedicineCard from './MedicineCard.vue'
+
+const consultStore = useConsultStore()
+const totalPrice = computed(() => {
+  return consultStore.consult.medicines
+    ?.reduce((sum, item) => {
+      return (sum += +item.amount * +item.quantity)
+    }, 0)
+    .toFixed(2)
+})
+const cartLength = computed(() => consultStore.consult.medicines?.length || 0)
+const show = ref(false)
+const openCart = () => {
+  if (cartLength.value === 0) return
+  show.value = true
+}
+
+const clear = () => {
+  // console.log('clear')
+  consultStore.setMedicines([])
+  show.value = false
+}
+</script>
+
+<template>
+  <van-action-bar>
+    <van-action-bar-icon
+      icon="cart-o"
+      :badge="cartLength === 0 ? '' : cartLength"
+      :color="cartLength > 0 ? '#323233' : '#eee'"
+      @click="openCart"
+    />
+    <div class="total-price">￥ {{ totalPrice }}</div>
+    <van-action-bar-button type="primary" text="申请开方" />
+  </van-action-bar>
+
+  <van-action-sheet v-model:show="show">
+    <div class="content">
+      <div class="content-header">
+        <div class="content-header-left">
+          <span>药品清单</span><span>共{{ cartLength }}件商品</span>
+        </div>
+        <div class="content-header-right" @click="clear">
+          <van-icon name="delete-o" />
+          <span>清空</span>
+        </div>
+      </div>
+      <!-- 列表 -->
+      <div class="medicine-list">
+        <medicine-card
+          v-for="item in consultStore.consult.medicines"
+          :key="item.id"
+          :item="item"
+        ></medicine-card>
+      </div>
+    </div>
+    <van-action-bar>
+      <van-action-bar-icon
+        icon="cart-o"
+        :color="cartLength > 0 ? '#323233' : '#eee'"
+        :badge="cartLength === 0 ? '' : cartLength"
+      />
+      <div class="total-price">￥ {{ totalPrice }}</div>
+      <van-action-bar-button type="primary" text="申请开方" />
+    </van-action-bar>
+  </van-action-sheet>
+</template>
+
+<style scoped lang="scss">
+.van-action-bar {
+  border-top: 1px solid rgba(237, 237, 237, 0.9);
+  .total-price {
+    width: 200px;
+    font-size: 24px;
+    line-height: 18px;
+    font-weight: 700;
+    color: #121826;
+  }
+}
+
+.content {
+  --content-height: 400px;
+  --content-header-height: 25px;
+  padding: 16px;
+  height: var(--content-height);
+  .content-header {
+    position: sticky;
+    top: 0px;
+    z-index: 10;
+    background-color: #fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: var(--content-header-height);
+    padding-bottom: 10px;
+    &-left {
+      span {
+        font-size: 16px;
+        color: #000000;
+        margin-right: 10px;
+      }
+      span + span {
+        font-size: 13px;
+        color: var(--cp-primary);
+      }
+    }
+    &-right {
+      span {
+        margin-left: 5px;
+      }
+    }
+  }
+  .medicine-list {
+    padding-bottom: 45px;
+  }
+}
+</style>
+
+```
+
+`ConsultMedicineDetail`使用底部操作栏
+
+```jsx
+<medicine-action></medicine-action>
+```
+
+区分加入药箱逻辑`MedicineAction`
+
+```ts
+<script setup lang="ts">
+...
+
+withDefaults(
+  defineProps<{
+    from?: 'list' | 'detail'
+  }>(),
+  {
+    from: 'list'
+  }
+)
+
+...
+
+const onAskDocotor = () => {
+  console.log('申请开方')
+}
+
+const onAddToCart = () => {
+  console.log('加入药箱')
+}
+</script>
+
+```
+
+底部操作栏按钮区分，注意抽屉内容都是申请开方
+
+```jsx
+<van-action-bar-button
+  v-if="from === 'list'"
+  type="primary"
+  text="申请开方"
+  @click="onAskDocotor"
+/>
+<van-action-bar-button
+  v-else
+  type="primary"
+  text="加入药箱"
+  @click="onAddToCart"
+></van-action-bar-button>
+```
+
+加入药箱逻辑实现，子传父通知父组件处理数据
+
+`MedicineAction`
+
+```ts
+const emits = defineEmits<{
+  (e: 'addToCart'): void
+}>()
+
+const onAddToCart = () => {
+  emits('addToCart')
+}
+```
+
+`ConsultMedicineDetail`
+
+```ts
+// ConsultMedicineDetail
+const consultStore = useConsultStore()
+const onAddToCart = () => {
+  const medicines = consultStore.consult.medicines || []
+  const medicine = medicines?.find((item) => item.id === detail.value?.id)
+  if (medicine) {
+    medicine.quantity += 1
+  } else {
+    medicines.push({
+      amount: detail.value?.amount!,
+      avatar: detail.value?.avatar!,
+      id: detail.value?.id!,
+      name: detail.value?.name!,
+      prescriptionFlag: detail.value?.prescriptionFlag!,
+      specs: detail.value?.specs!,
+      usageDosag: detail.value?.usageDosag!,
+      quantity: '1'
+    })
+  }
+  consultStore.setMedicines(medicines)
+}
+```
+
+申请开单跳转问诊室，需要先生成订单id，订单id的参数，我们都存在pinia中，由于不同主线需要的参数不同，所以，我们要区分下
+
+`utils/createOrderParams`
+
+```ts
+// utils/createOrderParams
+import { ConsultType } from '@/enums'
+import type { PartialConsult } from '@/types/consult'
+
+type Key = keyof PartialConsult
+
+// 三条线都有的字段
+export const commonKeys: Key[] = [
+  'type', // 问医生，极速问诊，开药门诊
+  'illnessDesc', // 病情描述
+  'patientId', // 患者Id
+  'pictures' // 图片
+]
+
+// 极速问诊字段
+export const fastKeys: Key[] = [
+  ...commonKeys,
+  'depId', // 科室
+  'illnessTime', // 患病时长
+  'consultFlag' // 是否就诊过
+]
+
+// 问医生字段，比极速问诊多一个docId 医生Id
+export const doctorKeys: Key[] = [...fastKeys, 'docId']
+
+// 开药门诊字段
+export const medicineKeys: Key[] = [
+  ...commonKeys,
+  'allergicHistory', // 过敏史
+  'fertilityStatus', // 生育状态及计划
+  'liverFunction', // 肝功能
+  'renalFunction', // 肾功能
+  'medicines' // 药品
+]
+
+export const getCreateOrderParams = (
+  consult: PartialConsult,
+  type: ConsultType = ConsultType.Fast
+) => {
+  const params: Record<string, unknown> = {}
+  switch (type) {
+    case ConsultType.Doctor:
+      for (const key of doctorKeys) {
+        params[key] = consult[key]
+      }
+      break
+    case ConsultType.Fast:
+      for (const key of fastKeys) {
+        params[key] = consult[key]
+      }
+      break
+    case ConsultType.Medication:
+      for (const key of medicineKeys) {
+        params[key] = consult[key]
+      }
+      break
+  }
+  return params
+}
+```
+
+此时再处理申请开单逻辑 `MedicineAction`
+
+```ts
+// MedicineAction
+const onAskDocotor = async () => {
+  const medicines = consultStore.consult.medicines || []
+  if (medicines?.length === 0) return showToast('请先选药')
+  const params = getCreateOrderParams(
+    consultStore.consult,
+    ConsultType.Medication
+  )
+  // console.log(params)
+  try {
+    const { data } = await createConsultOrder(params)
+    router.push(`/room?orderId=${data.id}&from=medicine`)
+  } catch (e) {
+    return showDialog({
+      title: '温馨提示',
+      message: '问诊信息不完整请重新填写',
+      closeOnPopstate: false
+    }).then(() => {
+      router.push('/')
+    })
+  } finally {
+    consultStore.clear()
+  }
+}
+```
+
+## 问诊室-开药门诊信息渲染
+
+步骤：
+
+1. 渲染开药门诊信息
+2. 数据转中文
+
+渲染开药门诊信息 `RoomMessage`
+
+```ts
+// RoomMessage
+const route = useRoute()
+const fromPage = computed(() => route.query.from)
+```
+
+```jsx
+<span v-if="fromPage === 'medicine'">
+  肝功能 {{ item.msg.consultRecord.liverFunction }} | 肾功能
+  {{ item.msg.consultRecord.renalFunction }} | 过敏史
+  {{ item.msg.consultRecord.allergicHistory }} | 生育状态
+  {{ item.msg.consultRecord.fertilityStatus }}
+</span>
+<span v-else>
+  {{ getIllnessTimeText(item.msg.consultRecord?.illnessTime) }} |
+  {{ getConsultFlagText(item.msg.consultRecord?.consultFlag) }}
+</span>
+```
+
+```jsx
+<van-col span="6" v-if="fromPage === 'medicine'">用药需求</van-col>
+<van-col span="18" v-if="fromPage === 'medicine'">
+  {{
+    item.msg.consultRecord?.medicines
+      .map(
+        (item) => `${item.name}
+  ${item.specs} X${item.quantity}`
+      )
+      .join(',')
+  }}
+</van-col>
+```
+
+数据转中文
+
+`filter.ts`
+
+```ts
+// filter.ts
+
+...
+
+export const getLiverFunctionText = (val: LiverFunction) => {
+  return liverFunctionOptions.find((item) => item.value === val)?.label
+}
+
+export const getAllergicHistoryText = (val: AllergicHistory) => {
+  return allergicHistoryOptions.find((item) => item.value === val)?.label
+}
+
+export const getFertilityStatusText = (val: FertilityStatus) => {
+  return fertilityStatusOptions.find((item) => item.value === val)?.label
+}
+
+export const getRenalFunctionText = (val: RenalFunction) => {
+  return renalFunctionOptions.find((item) => item.value === val)?.label
+}
+
+```
+
+```jsx
+<span v-if="fromPage === 'medicine'">
+  肝功能
+  {{ getLiverFunctionText(item.msg.consultRecord.liverFunction) }} |
+  肾功能
+  {{ getRenalFunctionText(item.msg.consultRecord.renalFunction) }} |
+  过敏史
+  {{ getAllergicHistoryText(item.msg.consultRecord.allergicHistory) }} |
+  生育状态
+  {{ getFertilityStatusText(item.msg.consultRecord.fertilityStatus) }}
+</span>
+```
