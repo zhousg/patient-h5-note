@@ -82,6 +82,18 @@ export default defineConfig({
           ],
         },
       ],
+      "/dev/": [
+        {
+          text: "优医问诊H二次开发",
+          items: [
+            { text: "1. 项目起步", link: "/project/" },
+            { text: "2. 登录模块", link: "/project/login" },
+            { text: "4. 开药问诊", link: "/project/medicine" },
+            { text: "5. 问医生", link: "/project/medicine" },
+            { text: "辅助-超级医生", link: "/project/super-doctor" },
+          ],
+        },
+      ],
     },
   },
 });
