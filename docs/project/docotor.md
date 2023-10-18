@@ -345,6 +345,8 @@ onMounted(() => {
 const allDepts = computed(() =>
   depts.value.map((item) => item?.child || []).flat()
 )
+    
+const consultStore = useConsultStore()
 </script>
 
 
@@ -360,6 +362,8 @@ const allDepts = computed(() =>
 
 渲染数据，跳转医生列表页
 
+`DepartmentContent.vue`
+
 ```jsx
 <script setup lang="ts">
 import type { TopDep } from '@/types/consult'
@@ -374,16 +378,18 @@ const showDepts = computed(() => props.depts[0]?.child || [])
 const consultStore = useConsultStore()
 const router = useRouter()
 const goFindDoctorByDepId = (item: SubDep) => {
-  consultStore.setDepId(item.id)
+  consultStore.setDep(item.id)
   router.push(`/doctorList/${item?.id}?department=${item?.name}`)
 }
+    
+const show = ref(false)
 </script>
 
 <template>
   <div class="department-content">
     <div class="department-header">
       <p class="title-text">按科室找医生</p>
-      <p class="all-link">
+      <p class="all-link" @click="show = true">
         全部科室
         <van-icon name="arrow" />
       </p>
@@ -549,7 +555,7 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const department = route.query.department as string
-// const depId = route.params.depId
+// const depId = route.params.depId as string
 
 const menuRef = ref(null)
 const itemRef = ref()
@@ -1417,6 +1423,13 @@ const form = ref<FindDoctorForm>({ ...initForm })
 表单双向数据绑定
 
 ```jsx
+import {
+  gradeOptions,
+  positionalTitlesOptions,
+  priceRangeOptions
+} from '@/services/constants'
+
+
 <div class="find-doctor-form">
     <div class="item">
     <p>医院等级</p>
@@ -1494,11 +1507,11 @@ export type DoctorParams = PageParams & {
   /** 排序 */
   order: DoctorOrderType
   /** 医院等级 */
-  grade?: string
+  grade?: string //+
   /** 职称 */
-  positionalTitles?: PositionalTitles
+  positionalTitles?: PositionalTitles //+
   /** 价格范围 */
-  priceRange?: PriceRange
+  priceRange?: PriceRange //+
 }
 ```
 
@@ -1536,6 +1549,8 @@ const onConfirm = () => {
 `DoctorList.vue`
 
 ```jsx
+import type { PositionalTitles, PriceRange } from '@/enums'
+
 const props = defineProps<{
   depId: string
   order?: DoctorOrderType
@@ -1709,7 +1724,7 @@ const submit = async () => {
 }
 ```
 
-支付抽屉组件回调地址处理
+支付抽屉组件回调地址处理`CpPaySheet.vue`
 
 ```ts
 // payCallback: 'http://localhost' + props.payCallback
