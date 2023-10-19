@@ -14,7 +14,7 @@
 
 页面结构`ConsultDoctor.vue`
 
-```jsx
+```vue
 <script setup lang="ts"></script>
 
 <template>
@@ -207,7 +207,7 @@
 
 首页跳转`home/index.vue`
 
-```jsx
+```vue
 <router-link
     to="/consult/doctor"
     class="nav"
@@ -235,7 +235,7 @@
 中间区域选择科室，抽离组件
 `DepartmentContent.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 
 </script>
@@ -324,7 +324,7 @@ type SubDep = {
 
 发送请求，状态提升在父组件申明数据（`DepartmentContent`与`Tabs`都会用到科室数据）
 
-```jsx
+```vue
 // ConsultDoctor 发请求，状态提升
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
@@ -363,7 +363,7 @@ const consultStore = useConsultStore()
 
 `DepartmentContent.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 import type { TopDep } from '@/types/consult'
 import { computed } from 'vue'
@@ -456,7 +456,7 @@ const show = ref(false)
 
 抽屉内容结构
 
-```jsx
+```vue
 <van-action-sheet v-model:show="show" title="全部科室">
     <div class="content">
       <div>
@@ -514,7 +514,7 @@ const show = ref(false)
 
 渲染抽屉内容
 
-```jsx
+```vue
 <van-action-sheet v-model:show="show" title="全部科室">
     <div class="content">
       <div v-for="item in depts" :key="item.id">
@@ -547,7 +547,7 @@ const show = ref(false)
 搭建页面结构
 `ConsultDoctorList`
 
-```jsx
+```vue
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -779,7 +779,7 @@ const onConfirm = () => {
 
 医生卡片组件`DoctorCard.vue`
 
-```jsx
+```vue
 <script setup lang="ts"></script>
 
 <template>
@@ -917,7 +917,7 @@ const onConfirm = () => {
 
 医生列表组件`DoctorList`
 
-```jsx
+```vue
 <script setup lang="ts">
 import DoctorCard from './DoctorCard.vue'
 defineProps<{
@@ -982,7 +982,7 @@ export const getFindDoctorPage = (params: DoctorParams) => {
 
 发送请求`DoctorList.vue`
 
-```jsx
+```vue
 // DoctorList.vue
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -1040,7 +1040,7 @@ const onLoad = async () => {
 
 渲染数据`DoctorCard.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 import type { Doctor } from '@/types/consult'
 
@@ -1100,20 +1100,20 @@ const options = [
 ]
 ```
 
-```jsx
+```vue
 <van-dropdown-item v-model="order" :options="options" />
 ```
 
 父传子排序字段
 
-```jsx
+```vue
 <doctor-list :dep-id="depId" :order="order"></doctor-list>
 ```
 
 监听排序字段，发送请求
 `DoctorList.vue`
 
-```jsx
+```vue
 const props = defineProps<{
   depId: string
   order?: DoctorOrderType
@@ -1153,7 +1153,7 @@ watch(
 下拉菜单区域结构布局
 `ConsultDoctorList.vue`
 
-```jsx
+```vue
 const active = ref(0)
 
 
@@ -1232,7 +1232,7 @@ const selectCity = (id: string) => {
 
 渲染区域数据
 
-```jsx
+```vue
 <div class="wrapper">
     <van-sidebar v-model="active">
     <van-sidebar-item
@@ -1305,7 +1305,7 @@ const selectCity = (id: string) => {
 
 `DoctorList.vue`
 
-```jsx
+```vue
 // DoctorList
 const props = defineProps<{
   depId: string
@@ -1421,7 +1421,7 @@ const form = ref<FindDoctorForm>({ ...initForm })
 
 表单双向数据绑定
 
-```jsx
+```vue
 import {
   gradeOptions,
   positionalTitlesOptions,
@@ -1534,7 +1534,7 @@ const onConfirm = () => {
 
 父传子
 
-```jsx
+```vue
 <doctor-list
   :dep-id="depId"
   :order="order"
@@ -1547,7 +1547,7 @@ const onConfirm = () => {
 
 `DoctorList.vue`
 
-```jsx
+```vue
 import type { PositionalTitles, PriceRange } from '@/enums'
 
 const props = defineProps<{
@@ -1740,7 +1740,7 @@ const submit = async () => {
 页面结构处理
 `ConsultDoctorDetail.vue`
 
-```jsx
+```vue
 <script setup lang="ts"></script>
 
 <template>
@@ -2056,7 +2056,7 @@ const submit = async () => {
 跳转页面
 `DoctorCard.vue`
 
-```jsx
+```vue
 const goDoctorDetail = () => {
   if (props.grade === '9') {
     consultStore.setIllnessType(1)
@@ -2091,7 +2091,7 @@ export const getDoctorDetail = (id: string) => {
 
 页面渲染
 
-```jsx
+```vue
 <script setup lang="ts">
 import { getDoctorDetail } from '@/services/consult'
 import type { Doctor } from '@/types/consult'
@@ -2196,7 +2196,7 @@ onMounted(() => {
 const { loading, follow } = useFollow('doc')
 ```
 
-```jsx
+```vue
 <van-button
     class="follow-btn"
     round
