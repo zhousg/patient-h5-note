@@ -327,12 +327,11 @@ type SubDep = {
 ```jsx
 // ConsultDoctor 发请求，状态提升
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import DepartmentContent from './components/DepartmentContent.vue'
 import type { TopDep } from '@/types/consult'
-import { onMounted } from 'vue'
+
 import { getAllDep } from '@/services/consult'
-import { computed } from 'vue'
 
 const depts = ref<TopDep[]>([])
 const loadDepts = async () => {
@@ -1258,7 +1257,7 @@ const selectCity = (id: string) => {
 
 `ConsultDoctorList.vue`
 
-```jsx
+```diff
 <script setup lang="ts">
 const provinceId = ref('100000')
 const selectCity = (id: string) => {
@@ -1284,7 +1283,7 @@ const selectCity = (id: string) => {
 <style scoped lang="scss">
 ...
 .wrapper {  
-  height: 400px; //+
++  height: 400px; 
   overflow: hidden;
   display: flex;
   .sub {
@@ -1292,8 +1291,8 @@ const selectCity = (id: string) => {
     height: 100%;
     overflow-y: auto;
     > span {
-      display: flex; //+
-      justify-content: space-between; //+
++      display: flex;
++      justify-content: space-between;
       padding: 14px 30px;
       color: var(--cp-dark);
     }
@@ -1498,7 +1497,7 @@ const onReset = () => {
 
 接口类型定义`consult.d.ts`
 
-```ts
+```diff
 export type DoctorParams = PageParams & {
   /** 省份id */
   provinceId: string
@@ -1506,12 +1505,12 @@ export type DoctorParams = PageParams & {
   depId: string
   /** 排序 */
   order: DoctorOrderType
-  /** 医院等级 */
-  grade?: string //+
-  /** 职称 */
-  positionalTitles?: PositionalTitles //+
-  /** 价格范围 */
-  priceRange?: PriceRange //+
++  /** 医院等级 */
++  grade?: string 
++  /** 职称 */
++  positionalTitles?: PositionalTitles 
++  /** 价格范围 */
++  priceRange?: PriceRange
 }
 ```
 
@@ -1724,7 +1723,7 @@ const submit = async () => {
 }
 ```
 
-支付抽屉组件回调地址处理`CpPaySheet.vue`
+支付抽屉组件回调地址处理`CpPaySheet.vue`，需要配置host，如果没有配置可以先用localhost处理
 
 ```ts
 // payCallback: 'http://localhost' + props.payCallback
