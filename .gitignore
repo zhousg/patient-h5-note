@@ -1,3 +1,5 @@
 node_modules
 docs/.vitepress/dist
+docs/.DS_Store
 ppt
+.DS_Store
