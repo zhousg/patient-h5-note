@@ -79,8 +79,8 @@ export default defineConfig({
             { text: "8. 药品订单模块", link: "/project/order" },
             { text: "9. 其他扩展", link: "/project/end" },
             { text: "辅助-超级医生", link: "/project/super-doctor" },
-            { text: "3. 开药问诊", link: "/project/medicine" },
-            { text: "4. 问医生", link: "/project/medicine" },
+            { text: "二次开发-开药问诊", link: "/project/medicine" },
+            { text: "二次开发-问医生", link: "/project/doctor" },
           ],
         },
       ]
