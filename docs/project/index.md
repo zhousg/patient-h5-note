@@ -22,7 +22,7 @@
 5. 基于 pinia 的状态管理解决方案
 6. 基于 pinia-plugin-persistedstate 状态持久化解决方案
 7. 基于 @vuecore/use 的组合式API工具库解决方案
-7. 基于 id-validator 的身份证信息校验解决方案
+7. 身份证信息校验解决方案
 8. 基于 postcss-px-to-viewport 移动端适配解决方案
 9.  基于 vite-plugin-svg-icons 的svg图标组件解决方案
 10. 基于 vite-plugin-html 自定义html模板解决方案

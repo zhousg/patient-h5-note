@@ -201,7 +201,7 @@ const say = () => {
 
 - 在 `JS` 中如果没有返回值，默认返回的是 `undefined`
 - 但是 `void` 和 `undefined` 在 `TypeScript` 中并不是一回事
-- 如果指定返回值类型是 `undefined` 那返回值必须是 `undefined`
+- 如果指定返回值类型是 `undefined` 那返回值必须是 `undefined`(在[TS5.1](https://www.typescriptlang.org/docs/handbook/release-notes/typescript-5-1.html)版本可以不返回undefined)
 
 ```typescript
 const add = (): undefined => {

@@ -6,18 +6,18 @@
 
 ![开药门诊流程](./images/image-20231010175804736.png)
 
-## 开药门诊-路由搭建
+## 开药门诊-表单页面路由搭建
 
 步骤
 
-1. 基础结构代码
+1. 准备基础结构代码
 2. 路由配置
 3. 首页跳转
 4. cv静态结构
 
 基础结构代码`views/Consult/ConsultMedicine.vue`
 
-```jsx
+```vue
 <script setup lang="ts"></script>
 
 <template>
@@ -42,7 +42,7 @@
 
 首页跳转`Home/index.vue`
 
-```jsx
+```vue
 <router-link
     to="/consult/medicine"
     class="nav"
@@ -56,7 +56,7 @@
 
 静态结构`ConsultMedicine.vue`
 
-```jsx
+```vue
 <script setup lang="ts"></script>
 
 <template>
@@ -138,6 +138,10 @@
 ```
 
 ## 开药门诊-表单单选框处理
+
+需求：
+
+完成表单双向数据绑定
 
 步骤：
 
@@ -232,7 +236,7 @@ import {
 } from '@/services/constants'
 ```
 
-```jsx
+```vue
       <div class="item">
         <p>肝功能</p>
         <cp-radio-btn :options="liverFunctionOptions"></cp-radio-btn>
@@ -328,7 +332,7 @@ const form = ref<MedicineIllness>({
 })
 ```
 
-```jsx
+```vue
 <div class="illness-form">
       <div class="adm-list-header">症状描述</div>
       <van-field
@@ -387,7 +391,7 @@ const form = ref<MedicineIllness>({
 
 封装组件`components/CpUpload.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 import { uploadImage } from '@/services/consult'
 import type { UploaderFileListItem } from 'vant'
@@ -537,7 +541,7 @@ const onDeleteSuccess = (item: UploaderFileListItem) => {
 
 ```
 
-```jsx
+```vue
 <cp-upload
   ref="cpUploadRef"
   @upload-success="onUploadSuccess"
@@ -559,7 +563,7 @@ const onDeleteSuccess = (item: UploaderFileListItem) => {
 }
 ```
 
-```jsx
+```vue
 <cp-upload
   ref="cpUploadRef"
   @upload-success="onUploadSuccess"
@@ -567,7 +571,7 @@ const onDeleteSuccess = (item: UploaderFileListItem) => {
 ></cp-upload>
 ```
 
-## 开药门诊-下一步功能
+## 开药门诊-表单页面下一步功能
 
 `ConsultMedicine`
 
@@ -590,7 +594,7 @@ const disabled = computed(
 )
 ```
 
-```jsx
+```vue
 <van-button
   :class="{ disabled }"
   type="primary"
@@ -633,7 +637,7 @@ const next = () => {
 }
 ```
 
-## 开药门诊-选择患者下一步功能
+## 开药门诊-选择患者页面下一步功能
 
 步骤：
 
@@ -660,7 +664,7 @@ const next = () => {
 
 新建页面结构`ConsultChoose.vue`
 
-```jsx
+```vue
 <script setup lang="ts"></script>
 
 <template>
@@ -692,7 +696,7 @@ const next = () => {
 
 静态结构`ConsultChoose.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 import { showToast } from 'vant'
 import { ref } from 'vue'
@@ -828,7 +832,7 @@ const step = ref(1)
 const step = ref(0)
 ```
 
-```jsx
+```vue
 <van-stepper
     v-model="step"
     min="0"
@@ -879,7 +883,7 @@ const step = ref(0)
 
 抽离卡片组件`views/Consult/components/MedicineCard.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 import { ref } from 'vue'
 
@@ -995,7 +999,7 @@ const step = ref(0)
 
 抽离列表组件`src/views/Consult/components/MedicineList.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 import MedicineCard from './MedicineCard.vue'
 </script>
@@ -1017,7 +1021,7 @@ import MedicineCard from './MedicineCard.vue'
 
 使用列表组件`ConsultChoose.vue`
 
-```jsx
+```vue
 import MedicineList from './components/MedicineList.vue'
 ...
 <!-- 药品列表 -->
@@ -1035,7 +1039,7 @@ import MedicineList from './components/MedicineList.vue'
 
 van-list初步使用`MedicineList.vue`
 
-```jsx
+```vue
 
 <script setup lang="ts">
 import { ref } from 'vue'
@@ -1133,7 +1137,7 @@ export const getMedicinePage = (params: MedicineParams) => {
 
 调用接口`MedicineList.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 import { ref } from 'vue'
 import MedicineCard from './MedicineCard.vue'
@@ -1188,7 +1192,7 @@ const onLoad = async () => {
 
 父传子`MedicineList.vue`
 
-```jsx
+```vue
 <medicine-card
         v-for="item in list"
         :key="item.id"
@@ -1198,7 +1202,7 @@ const onLoad = async () => {
 
 子组件接收数据并渲染`MedicineCard`
 
-```jsx
+```vue
 <script setup lang="ts">
 import type { Medical } from '@/types/room'
 import { ref } from 'vue'
@@ -1254,14 +1258,14 @@ const onCancel = () => {
 
 父传子`ConsultChoose`
 
-```jsx
+```vue
 <!-- 药品列表 -->
 <medicine-list :keyword="keyword"></medicine-list>
 ```
 
 监听字段，重新渲染页面`ConsultList`
 
-```jsx
+```vue
 const props = defineProps<{
   keyword: string
 }>()
@@ -1318,7 +1322,7 @@ return {
 处理药品增加数量减少数量逻辑
 `MedicineCard`
 
-```jsx
+```vue
 <script setup lang="ts">
 import { useConsultStore } from '@/stores'
 import type { Medical } from '@/types/room'
@@ -1389,7 +1393,7 @@ watch(
 计算属性处理数量和总金额
 `ConsultChoose`
 
-```jsx
+```vue
 <script setup lang="ts">
 ....
 
@@ -1443,7 +1447,7 @@ const cartLength = computed(
 
 抽屉结构样式`ConsultChoose.vue`
 
-```jsx
+```vue
 <van-action-sheet v-model:show="show">
   <div class="content">
     <div class="content-header">
@@ -1525,7 +1529,7 @@ const clear = () => {
 
 药品列表渲染
 
-```jsx
+```vue
 import MedicineCard from './components/MedicineCard.vue'
 
 <!-- 列表 -->
@@ -1542,7 +1546,7 @@ import MedicineCard from './components/MedicineCard.vue'
 
 增加减少药品功能 `MedicineCard.vue`
 
-```jsx
+```vue
 watch(
   () => consultStore.consult.medicines?.find((item) => item.id === props.item.id),
   (val) => {
@@ -1576,7 +1580,7 @@ const clear = () => {
 
 基本结构`ConsultMedicineDetail`
 
-```jsx
+```vue
 <script setup lang="ts"></script>
 
 <template>
@@ -1601,7 +1605,7 @@ const clear = () => {
 
 跳转方法调用`MedicineCard.vue`
 
-```jsx
+```vue
 <div class="item van-hairline--top" @click="$router.push(`/medicineDetail/${item.id}`)">
   <img class="img" :src="item.avatar" alt="" />
   <div class="info">
@@ -1629,7 +1633,7 @@ const clear = () => {
 
 静态结构`ConsultMedicineDetail.vue`
 
-```jsx
+```vue
 <script setup lang="ts"></script>
 
 <template>
@@ -1832,7 +1836,7 @@ export const getMedicineDetail = (id: string) => {
 
 调用请求渲染`ConsultMedicineDetail.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 import { getMedicineDetail } from '@/services/consult'
 import type { MedicineDetail } from '@/types/consult'
@@ -1937,7 +1941,7 @@ const loadDetail = async () => {
 
 封装底部操作栏组件`MedicineAction.vue`
 
-```jsx
+```vue
 <script setup lang="ts">
 import { useConsultStore } from '@/stores'
 import { computed, ref } from 'vue'
@@ -2063,7 +2067,7 @@ const clear = () => {
 
 `ConsultMedicineDetail`使用底部操作栏
 
-```jsx
+```vue
 <medicine-action></medicine-action>
 ```
 
@@ -2095,7 +2099,7 @@ const onAddToCart = () => {
 
 底部操作栏按钮区分，注意抽屉内容都是申请开方
 
-```jsx
+```vue
 <van-action-bar-button
   v-if="from === 'list'"
   type="primary"
@@ -2261,7 +2265,7 @@ const route = useRoute()
 const fromPage = computed(() => route.query.from)
 ```
 
-```jsx
+```vue
 <span v-if="fromPage === 'medicine'">
   肝功能 {{ item.msg.consultRecord.liverFunction }} | 肾功能
   {{ item.msg.consultRecord.renalFunction }} | 过敏史
@@ -2274,7 +2278,7 @@ const fromPage = computed(() => route.query.from)
 </span>
 ```
 
-```jsx
+```vue
 <van-col span="6" v-if="fromPage === 'medicine'">用药需求</van-col>
 <van-col span="18" v-if="fromPage === 'medicine'">
   {{
@@ -2315,7 +2319,7 @@ export const getRenalFunctionText = (val: RenalFunction) => {
 
 ```
 
-```jsx
+```vue
 <span v-if="fromPage === 'medicine'">
   肝功能
   {{ getLiverFunctionText(item.msg.consultRecord.liverFunction) }} |

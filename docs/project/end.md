@@ -932,3 +932,298 @@ test('CpRadioBtn', async () => {
   expect(wrapper.queryByText('选项二')?.classList.contains('active')).toBe(true)
 })
 ```
+
+## 工程化-plop
+
+思考：
+1. 每次在`modules`中新建个`store`模块，`defineStore`组合式语法代码又是固定的写法，之后还要在`index`中统一导出，这是重复的工作
+2. 每次在`views`中新建页面组件，写最基本结构，之后在配置路由规则，这又是重复的工作
+3. 每次在`components`中新写组件，实现后最后都不能忘记在`components.d.ts`中写类型声明，这不又重复工作了吗
+
+
+
+**有什么办法吗！可以使用[plop](https://plopjs.com/)**
+
+
+
+### 演示效果
+
+
+
+#### store
+
+![生成store](./images/generate-store.gif)
+
+#### view
+
+![生成view](./images/generate-view.gif)
+
+#### component
+
+![生成component](./images/generate-component.gif)
+
+### 代码实现
+
+1. 安装依赖
+```bash
+npm install --save-dev plop
+```
+2. 在根目录下创建`plopfile.js`
+```js
+// eslint-disable-next-line
+module.exports = function (plop) {
+  // plop generator code
+  plop.setGenerator('store', {
+    // 描述
+    description: 'generate store',
+    prompts: [
+      {
+        type: 'input', // 用户输入
+        name: 'name', // 接收的变量名
+        message: 'store name please' // 提示用户输入信息
+      }
+    ],
+    actions: [
+      {
+        type: 'add', // 新建文件
+        path: 'src/stores/modules/{{ name }}.ts', // 新建文件的路径
+        templateFile: 'plop-templates/store/module.ts.hbs' // 模板路径
+      },
+      {
+        type: 'modify', // 修改文件
+        path: 'src/stores/index.ts', // 修改文件路径
+        pattern: /(\/\/ -- append store here --)/gi, // 正则找到标识位置(在文件哪里修改)
+        templateFile: 'plop-templates/store/index.ts.hbs' // 模板路径
+      }
+    ]
+  })
+
+  plop.setGenerator('view', {
+    description: 'generate view',
+    prompts: [
+      {
+        type: 'input',
+        name: 'name',
+        message: 'view name please'
+      }
+    ],
+    actions: [
+      {
+        type: 'add',
+        path: 'src/views/{{ properCase name }}/index.vue', // properCase大驼峰，详细请看文档
+        templateFile: 'plop-templates/view/index.vue.hbs'
+      },
+      {
+        type: 'modify',
+        path: 'src/router/index.ts',
+        pattern: /(\/\/ -- append route here --)/gi,
+        templateFile: 'plop-templates/view/route.ts.hbs'
+      }
+    ]
+  })
+  plop.setGenerator('component', {
+    description: 'generate component',
+    prompts: [
+      {
+        type: 'input',
+        name: 'name',
+        message: 'component name please'
+      }
+    ],
+    actions: [
+      {
+        type: 'add',
+        path: 'src/components/Cp{{ name }}.vue',
+        templateFile: 'plop-templates/component/index.vue.hbs'
+      },
+      {
+        type: 'modify',
+        path: 'src/types/components.d.ts',
+        pattern: /(\/\/ -- append import here --)/gi,
+        templateFile: 'plop-templates/component/import.ts.hbs'
+      },
+      {
+        type: 'modify',
+        path: 'src/types/components.d.ts',
+        pattern: /(\/\/ -- append type here --)/gi,
+        templateFile: 'plop-templates/component/type.ts.hbs'
+      }
+    ]
+  })
+}
+```
+3. 配置模板
+
+- store
+```ts
+// index.ts.hbs
+// -- append store here --
+export * from './modules/{{ name }}'
+```
+
+```ts
+// module.ts.hbs
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
+
+export const use{{ properCase name }}Store = defineStore(
+  'cp-{{ name }}',
+  () => {
+    
+    return {
+      
+    }
+  },
+  {
+    persist: true
+  }
+)
+
+```
+- view
+```vue
+// index.vue.hbs
+<script setup lang="ts"></script>
+
+<template>
+  <div class="{{ name }}-page">
+    <h1>{{ name }}</h1>
+  </div>
+</template>
+
+<style scoped lang="scss">
+.{{ name }}-page {
+
+}
+</style>
+
+```
+
+```ts
+// route.ts.hbs
+// -- append route here --
+{
+    path: '/{{ name }}',
+    component: () => import('@/views/{{ properCase name }}/index.vue'),
+    meta: { title: '{{ name }}' }
+},
+```
+- component
+
+```ts
+// import.ts.hbs
+// -- append import here --
+import Cp{{ properCase name }} from '@/components/Cp{{ properCase name }}.vue'
+```
+
+```vue
+// index.vue.hbs
+<script setup lang="ts"></script>
+
+<template>
+  <div class="cp-{{ dashCase name }}"></div>
+</template>
+
+<style scoped lang="scss">
+.cp-{{ dashCase name }} {
+
+}
+</style>
+
+```
+
+```ts
+// type.ts.hbs
+// -- append type here --
+Cp{{ properCase name }}: typeof Cp{{ properCase name }}
+```
+
+4. 修改文件在对应文件中加上标识
+
+`store/index.ts`
+
+```diff
+// 1. 创建pinia实例
+// 2. 使用pinia插件
+
+import { createPinia } from 'pinia'
+import presist from 'pinia-plugin-persistedstate'
+
+const pinia = createPinia()
+pinia.use(presist)
+
+export default pinia
+
+// import { useUserStore } from './modules/user'
+// export { useUserStore }
+export * from './modules/user'
+export * from './modules/consult'
+
++// -- append store here --
+
+```
+
+`router/index.ts`
+
+```diff
+  routes: [
+    ...
+    {
+      path: '/login/callback',
+      component: () => import('@/views/Login/LoginCallback.vue'),
+      meta: { title: '三方登录' }
+    },
++    // -- append route here --
+    {
+      path: '/',
+      redirect: '/home',
+      component: () => import('@/views/Layout/index.vue'),
+      children: [
+        {
+          path: '/home',
+          component: () => import('@/views/Home/index.vue'),
+          meta: { title: '首页' }
+        },
+        {
+          path: '/article',
+          component: () => import('@/views/Article/index.vue'),
+          meta: { title: '健康百科' }
+        },
+        {
+          path: '/notify',
+          component: () => import('@/views/Notify/index.vue'),
+          meta: { title: '消息通知' }
+        },
+        {
+          path: '/user',
+          component: () => import('@/views/User/index.vue'),
+          meta: { title: '个人中心' }
+        }
+      ]
+    }
+  ]
+```
+`components.d.ts`
+
+```diff
+import CpNavBar from '@/components/CpNavBar.vue'
+import CpIcon from '@/components/CpIcon.vue'
+import CpRadioBtn from '@/components/CpRadioBtn.vue'
+import CpPaySheet from '@/components/CpPaySheet.vue'
+
++// -- append import here --
+
+declare module 'vue' {
+  interface GlobalComponents {
+    // 添加组件类型
+    CpNavBar: typeof CpNavBar
+    CpIcon: typeof CpIcon
+    CpRadioBtn: typeof CpRadioBtn
+    CpPaySheet: typeof CpPaySheet
+
++    // -- append type here --
+  }
+}
+
+```
+

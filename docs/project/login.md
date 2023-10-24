@@ -170,7 +170,7 @@ export default defineConfig({
 
 组件使用：了解 van-nav-bar 组件的基本功能属性[文档](https://vant-contrib.gitee.io/vant/#/zh-CN/nav-bar#api)
 
-抽离组件：`components/cp-nav-bar.vue`
+抽离组件：`components/CpNavBar.vue`
 
 ```vue
 <script setup lang="ts">
@@ -216,7 +216,8 @@ const onClickRight = () => {
 
 > 实现：组件的返回功能，支持 title rightText 属性，支持 click-right 事件
 
-`components/cp-nav-bar.vue`
+`components/CpNavBar.vue`
+
 ```vue
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
@@ -949,5 +950,11 @@ const show = ref(false)
   </template>
 </van-field>
 ```
+补充:
+
+- 为什么可以在`cp-icon`上可以使用`@click`呢，以前vue2中，组件要么实现子传父，要么使用`.native`修饰符
+- 因为vue3废弃了native修饰符，它将把它们作为原生事件监听器添加到子组件的根元素中，详细请看[迁移文档](https://v3-migration.vuejs.org/zh/breaking-changes/v-on-native-modifier-removed.html)
+
 小结：
+
 - 表单绑定数据后，通过 show 切换 text 和 password，对应切换图标组件的 name 即可。
