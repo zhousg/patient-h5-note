@@ -5,7 +5,7 @@
 
 - [产品原型](https://app.mockplus.cn/s/dtKxarcngm8)
 - [产品设计](https://app.mockplus.cn/s/klLPNrzsU)
-- [接口文档](https://www.apifox.cn/apidoc/shared-16a58bff-e4db-465c-9c8b-859c839318ac)
+- [接口文档](https://apifox.com/apidoc/shared-aeb0d03e-c713-4f55-afaf-21cddf542751)
 - [演示项目](https://cp.itheima.net/)
 
 手机端演示：
